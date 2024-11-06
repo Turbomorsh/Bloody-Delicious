@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Hello shell"
+for file in `git diff --staged --name-only`; do
+	echo ${file}
+done
