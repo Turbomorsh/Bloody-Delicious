@@ -1,5 +1,8 @@
-# Visual Studio 2015 user specific files
+# Visual Studio 2020 user specific files
 .vs/
+.vsconfig
+
+# Rider user specific files
 .idea
 
 # Compiled Object files
@@ -73,3 +76,6 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Logs
+*.htm
