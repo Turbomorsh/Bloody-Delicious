@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDCharacter, All, All);
 
@@ -30,11 +31,18 @@ void ABDPlayerCharacter::BeginPlay()
 
     if (auto* PC = Cast<APlayerController>(GetController()))
     {
+        // set Enhanced Input
         if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
         {
             Subsystem->ClearAllMappings();
             Subsystem->AddMappingContext(CharacterMappingContext, 0);
         }
+
+        // camera settings
+        PC->PlayerCameraManager->ViewPitchMax = PitchMax;
+        PC->PlayerCameraManager->ViewPitchMin = PitchMin;
+        UE_LOG(LogBDCharacter, Display, TEXT("ViewPitchMax: %f | ViewPitchMin: %f"),  //
+            PC->PlayerCameraManager->ViewPitchMax, PC->PlayerCameraManager->ViewPitchMin);
     }
 }
 
