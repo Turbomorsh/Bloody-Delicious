@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDCharacter, All, All);
 
@@ -44,6 +45,9 @@ void ABDPlayerCharacter::BeginPlay()
         UE_LOG(LogBDCharacter, Display, TEXT("ViewPitchMax: %f | ViewPitchMin: %f"),  //
             PC->PlayerCameraManager->ViewPitchMax, PC->PlayerCameraManager->ViewPitchMin);
     }
+
+    // set speed
+    GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 }
 
 void ABDPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -43,11 +43,14 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Input")
     TObjectPtr<UInputAction> InteractAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "BDPlayer Camera settings", meta = (ClampMin = "0", ClampMax = "90"))
+    UPROPERTY(EditDefaultsOnly, Category = "BDPlayer | Camera settings", meta = (ClampMin = "0", ClampMax = "90"))
     float PitchMax = 70.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "BDPlayer Camera settings", meta = (ClampMin = "-90", ClampMax = "0"))
+    UPROPERTY(EditDefaultsOnly, Category = "BDPlayer | Camera settings", meta = (ClampMin = "-90", ClampMax = "0"))
     float PitchMin = -70.0f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "BDPlayer | Walk speed", meta = (ClampMin = "0", ClampMax = "600"))
+    float MaxSpeed = 212.0f;
 
     UFUNCTION()
     void Move(const FInputActionValue& InputActionValue);
