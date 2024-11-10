@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "BDPlayerCharacter.generated.h"
 
+class ABDPickable;
+class UBDInteractionHintWidget;
+struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
 class UCameraComponent;
@@ -43,11 +46,23 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Input")
     TObjectPtr<UInputAction> InteractAction;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Input")
+    TObjectPtr<UInputAction> DropAction;
+
     UPROPERTY(EditDefaultsOnly, Category = "BDPlayer Camera settings", meta = (ClampMin = "0", ClampMax = "90"))
     float PitchMax = 70.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "BDPlayer Camera settings", meta = (ClampMin = "-90", ClampMax = "0"))
     float PitchMin = -70.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    TObjectPtr<USceneComponent> ItemSocket;
+
+    UPROPERTY()
+    TObjectPtr<AActor> InteractibleObj;
+
+    UPROPERTY()
+    TObjectPtr<ABDPickable> HandledObj;
 
     UFUNCTION()
     void Move(const FInputActionValue& InputActionValue);
@@ -58,5 +73,15 @@ protected:
     UFUNCTION()
     void PlayerInteract();
 
+    void GrabItem();
+
+    UFUNCTION()
+    void DropItem(const FInputActionValue& InputActionValue);
+
+    void InteractionRaycast();
+
     virtual void BeginPlay() override;
+
+public:
+    virtual void Tick(float DeltaSeconds) override;
 };
