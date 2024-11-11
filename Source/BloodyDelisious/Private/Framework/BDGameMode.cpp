@@ -4,12 +4,18 @@
 #include "Player/BDPlayerCharacter.h"
 #include "Player/BDPlayerController.h"
 #include "UI/BDGameHUD.h"
+// for test visibility manager
+#include "Framework/BDVisibilityManager.h"
+#include "Kismet/GameplayStatics.h"
 
 ABDGameMode::ABDGameMode()
 {
     DefaultPawnClass = ABDPlayerCharacter::StaticClass();
     PlayerControllerClass = ABDPlayerController::StaticClass();
     HUDClass = ABDGameHUD::StaticClass();
+
+    // for test visibility manager
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 void ABDGameMode::StartPlay()
@@ -17,6 +23,10 @@ void ABDGameMode::StartPlay()
     Super::StartPlay();
 
     SetGameState(EBDGameState::GameInProgress);
+
+    // for test visibility manager
+    VisibilityManager = NewObject<UBDVisibilityManager>(this);
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), ScarryTag, TargetActors);
 }
 
 bool ABDGameMode::SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate)
@@ -57,4 +67,20 @@ void ABDGameMode::GameOver()
 void ABDGameMode::GameComplete()
 {
     SetGameState(EBDGameState::GameCompleted);
+}
+
+// for test visibility manager
+void ABDGameMode::VisibilitiManagerLog()
+{
+    VisibilityManager->CameraLog();
+}
+
+void ABDGameMode::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    for (auto TargetActor : TargetActors)
+    {
+        VisibilityManager->IsActorVisible(TargetActor);
+    }
 }

@@ -24,6 +24,8 @@ ABDPlayerCharacter::ABDPlayerCharacter()
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraCompontent");
     CameraComponent->SetupAttachment(SpringArmComponent);
     CameraComponent->bUsePawnControlRotation = true;
+
+    GetMesh()->bOwnerNoSee = true;
 }
 
 void ABDPlayerCharacter::BeginPlay()
