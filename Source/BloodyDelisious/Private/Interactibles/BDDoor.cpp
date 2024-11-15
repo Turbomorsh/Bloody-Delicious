@@ -23,7 +23,7 @@ ABDDoor::ABDDoor()
 
     BIndTimeline();
 }
-void ABDDoor::Interact()
+void ABDDoor::Interact(TObjectPtr<UObject> Object)
 {
     if (DoorState != EDoorStates::Locked && !Timeline.IsPlaying())
     {

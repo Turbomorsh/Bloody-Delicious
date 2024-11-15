@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "BDInteract.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "BDPickable.generated.h"
 
+class ABDPlayerCharacter;
 class UBDInteractionHintWidget;
 UCLASS()
 class BLOODYDELISIOUS_API ABDPickable : public AActor, public IBDInteract
@@ -17,27 +19,51 @@ public:
     // Sets default values for this actor's properties
     ABDPickable();
 
-    void Interact() override;
+    void Interact(TObjectPtr<UObject> Object) override;
 
     void Show() override;
 
     void Hide() override;
 
+    void ClearOwner();
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
-    TObjectPtr<UStaticMeshComponent> Mesh;
+public:
+    virtual void Destroyed() override;
+
+protected:
+    void BindTimeLine();
+
+    UFUNCTION()
+    void TimelineProgress(float Alpha);
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)
+    TObjectPtr<UStaticMeshComponent> MeshComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
-    TSubclassOf<UBDInteractionHintWidget> HintWidgetClass;
+    TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
+
+    TObjectPtr<ABDPlayerCharacter> PlayerOwner;
 
     UPROPERTY()
     TObjectPtr<UBDInteractionHintWidget> Hint;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Note)
     FText HintText = FText::FromString("pick cube");
+
+    UPROPERTY()
+    FTimeline Timeline;
+
+    UPROPERTY()
+    TObjectPtr<UCurveFloat> Curve;
+
+    UPROPERTY()
+    TObjectPtr<USceneComponent> GrabLocationSocket;
+
+    FVector InitGrabLocation;
 
 public:
     // Called every frame

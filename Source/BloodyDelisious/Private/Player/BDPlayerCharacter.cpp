@@ -16,7 +16,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogBDCharacter, All, All);
 ABDPlayerCharacter::ABDPlayerCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
-    PrimaryActorTick.TickInterval = 0.5;
+    PrimaryActorTick.TickInterval = 0.3;
 
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponetn");
     SpringArmComponent->SetupAttachment(GetMesh());
@@ -30,8 +30,7 @@ ABDPlayerCharacter::ABDPlayerCharacter()
     CameraComponent->bUsePawnControlRotation = true;
 
     ItemSocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
-    ItemSocket->SetupAttachment(GetMesh());
-    ItemSocket->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("Weapon_R"));
+    ItemSocket->SetupAttachment(CameraComponent);
 }
 
 void ABDPlayerCharacter::BeginPlay()
@@ -121,25 +120,44 @@ void ABDPlayerCharacter::PlayerInteract()
 {
     if (InteractibleObj)
     {
-        Cast<IBDInteract>(InteractibleObj)->Interact();
-
-        if (InteractibleObj->GetClass()->IsChildOf(ABDPickable::StaticClass()))
+        if (!HandledObj)
         {
-            HandledObj = Cast<ABDPickable>(InteractibleObj);
-            GrabItem();
+            Cast<IBDInteract>(InteractibleObj)->Interact(ItemSocket);
+
+            if (InteractibleObj->GetClass()->IsChildOf(ABDPickable::StaticClass()) && !HandledObj)
+                HandledObj = Cast<ABDPickable>(InteractibleObj);
+        }
+        else
+            Cast<IBDInteract>(InteractibleObj)->Interact(HandledObj);
+    }
+}
+
+void ABDPlayerCharacter::GrabItem(TObjectPtr<ABDPickable> Item)
+{
+    if (!HandledObj)
+    {
+        Item->Grab(ItemSocket);
+        HandledObj = Item;
+    }
+}
+
+void ABDPlayerCharacter::ClearItemRef(TObjectPtr<ABDPickable> InItem)
+{
+    if (HandledObj)
+    {
+        if (InItem == HandledObj)
+        {
+            HandledObj = nullptr;
         }
     }
 }
 
-void ABDPlayerCharacter::GrabItem()
-{
-    if (HandledObj) HandledObj->Grab(ItemSocket);
-}
 void ABDPlayerCharacter::DropItem(const FInputActionValue& InputActionValue)
 {
     if (HandledObj)
     {
         HandledObj->Drop(CameraComponent->GetComponentRotation(), CameraComponent->GetComponentLocation());
+        HandledObj->ClearOwner();
         HandledObj = nullptr;
     }
 }
@@ -153,10 +171,13 @@ void ABDPlayerCharacter::InteractionRaycast()
 
     GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility, TraceParams);
 
-    if (InteractibleObj && InteractibleObj != OutHit.GetActor()) Cast<IBDInteract>(InteractibleObj)->Hide();
+    if (InteractibleObj && InteractibleObj != OutHit.GetActor())
+    {
+        Cast<IBDInteract>(InteractibleObj)->Hide();
+        InteractibleObj = nullptr;
+    }
 
-    if (!OutHit.GetActor()) InteractibleObj = nullptr;
-    else if (UKismetSystemLibrary::DoesImplementInterface(OutHit.GetActor(), UBDInteract::StaticClass()))
+    if (UKismetSystemLibrary::DoesImplementInterface(OutHit.GetActor(), UBDInteract::StaticClass()))
     {
         InteractibleObj = OutHit.GetActor();
         Cast<IBDInteract>(InteractibleObj)->Show();

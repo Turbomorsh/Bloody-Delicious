@@ -21,7 +21,7 @@ class BLOODYDELISIOUS_API IBDInteract
     GENERATED_BODY()
 
 public:
-    virtual void Interact() = 0;
+    virtual void Interact(TObjectPtr<UObject> Object = nullptr) = 0;
 
     virtual void Show() = 0;
 

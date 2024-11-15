@@ -4,6 +4,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/BDPlayerCharacter.h"
 #include "UI/BDInteractionHintWidget.h"
 
 // Sets default values
@@ -12,14 +13,48 @@ ABDPickable::ABDPickable()
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
-    Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-    SetRootComponent(Mesh);
+    MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+    SetRootComponent(MeshComponent);
+
+    Curve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
+
+    BindTimeLine();
 }
 
-void ABDPickable::Interact() {}
+// Called when the game starts or when spawned
+void ABDPickable::BeginPlay()
+{
+    Super::BeginPlay();
+}
+void ABDPickable::Destroyed()
+{
+    Super::Destroyed();
+
+    if (PlayerOwner)
+    {
+        ClearOwner();
+    }
+}
+
+// Called every frame
+void ABDPickable::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (Timeline.IsPlaying()) Timeline.TickTimeline(DeltaTime);
+}
+
+void ABDPickable::Interact(TObjectPtr<UObject> Object)
+{
+    if (TObjectPtr<USceneComponent> CastedScene = Cast<USceneComponent>(Object))
+    {
+        Grab(CastedScene);
+    }
+}
+
 void ABDPickable::Show()
 {
-    if (!Hint)
+    if (HintWidgetClass && !Hint)
     {
         Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
         Hint->AddToViewport();
@@ -28,40 +63,68 @@ void ABDPickable::Show()
 }
 void ABDPickable::Hide()
 {
-    if (Hint)
+    if (HintWidgetClass && Hint)
     {
         Hint->RemoveFromParent();
         Hint = nullptr;
     }
 }
-
-// Called when the game starts or when spawned
-void ABDPickable::BeginPlay()
+void ABDPickable::ClearOwner()
 {
-    Super::BeginPlay();
+    if (PlayerOwner)
+    {
+        PlayerOwner->ClearItemRef(this);
+        PlayerOwner = nullptr;
+    }
 }
 
-// Called every frame
-void ABDPickable::Tick(float DeltaTime)
+void ABDPickable::BindTimeLine()
 {
-    Super::Tick(DeltaTime);
+    if (Curve)
+    {
+        Curve->FloatCurve.AddKey(0, 0);
+        Curve->FloatCurve.AddKey(0.1, 1);
+        Timeline.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+        Timeline = FTimeline{};
+        FOnTimelineFloat ProgressFunction{};
+        ProgressFunction.BindUFunction(this, "TimelineProgress");
+        Timeline.AddInterpFloat(Curve, ProgressFunction, "Float1", "FloatTrack");
+    }
 }
+
+void ABDPickable::TimelineProgress(float Alpha)
+{
+    SetActorLocation(FVector(UKismetMathLibrary::VLerp(InitGrabLocation, GrabLocationSocket->GetComponentLocation(), Alpha)));
+}
+
 void ABDPickable::Drop(FRotator CameraRotation, FVector CameraLocation)
 {
     const FDetachmentTransformRules DetachmentRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, false);
     DetachFromActor(DetachmentRules);
 
     SetActorEnableCollision(true);
-    Mesh->SetSimulatePhysics(true);
+    MeshComponent->SetSimulatePhysics(true);
     SetActorLocation(CameraLocation + UKismetMathLibrary::GetForwardVector(CameraRotation) * 100);
-    Mesh->AddImpulse(UKismetMathLibrary::GetForwardVector(CameraRotation) * 200);
+    MeshComponent->AddImpulse(UKismetMathLibrary::GetForwardVector(CameraRotation) * 200);
 }
+
 void ABDPickable::Grab(USceneComponent* Socket)
 {
-    Mesh->SetSimulatePhysics(false);
-    SetActorLocation(Socket->GetComponentLocation());
+    MeshComponent->SetSimulatePhysics(false);
+    SetActorRotation(Socket->GetComponentRotation());
 
     const FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
     AttachToComponent(Socket, AttachmentRules);
     SetActorEnableCollision(false);
+
+    GrabLocationSocket = Socket;
+    InitGrabLocation = GetActorLocation();
+
+    Timeline.PlayFromStart();
+
+    if (TObjectPtr<ABDPlayerCharacter> CastedPlayer = Cast<ABDPlayerCharacter>(Socket->GetOwner()))
+    {
+        PlayerOwner = CastedPlayer;
+    }
 }

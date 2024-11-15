@@ -29,7 +29,7 @@ public:
     // Sets default values for this actor's properties
     ABDDoor();
 
-    virtual void Interact() override;
+    virtual void Interact(TObjectPtr<UObject> Object) override;
     virtual void Show() override;
     virtual void Hide() override;
 

@@ -24,6 +24,10 @@ public:
 
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    void ClearItemRef(TObjectPtr<ABDPickable> InItem);
+
+    void GrabItem(TObjectPtr<ABDPickable> Item);
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UCameraComponent* CameraComponent;
@@ -72,8 +76,6 @@ protected:
 
     UFUNCTION()
     void PlayerInteract();
-
-    void GrabItem();
 
     UFUNCTION()
     void DropItem(const FInputActionValue& InputActionValue);
