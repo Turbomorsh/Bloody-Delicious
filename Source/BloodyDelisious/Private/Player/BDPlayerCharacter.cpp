@@ -147,6 +147,7 @@ void ABDPlayerCharacter::GrabItem(TObjectPtr<ABDPickable> Item)
     {
         Item->Grab(ItemSocket);
         HandledObj = Item;
+        HandledObj->OnGrabbed.AddDynamic(this, &ABDPlayerCharacter::ClearItemRef);
     }
 }
 
