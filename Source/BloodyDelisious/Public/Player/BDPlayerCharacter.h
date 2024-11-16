@@ -24,7 +24,8 @@ public:
 
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    void ClearItemRef(TObjectPtr<ABDPickable> InItem);
+    UFUNCTION()
+    void ClearItemRef();
 
     void GrabItem(TObjectPtr<ABDPickable> Item);
 

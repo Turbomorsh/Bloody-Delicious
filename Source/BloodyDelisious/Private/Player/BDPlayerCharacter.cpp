@@ -125,7 +125,10 @@ void ABDPlayerCharacter::PlayerInteract()
             Cast<IBDInteract>(InteractibleObj)->Interact(ItemSocket);
 
             if (InteractibleObj->GetClass()->IsChildOf(ABDPickable::StaticClass()) && !HandledObj)
+            {
                 HandledObj = Cast<ABDPickable>(InteractibleObj);
+                HandledObj->OnGrabbed.AddDynamic(this, &ABDPlayerCharacter::ClearItemRef);
+            }
         }
         else
             Cast<IBDInteract>(InteractibleObj)->Interact(HandledObj);
@@ -141,14 +144,12 @@ void ABDPlayerCharacter::GrabItem(TObjectPtr<ABDPickable> Item)
     }
 }
 
-void ABDPlayerCharacter::ClearItemRef(TObjectPtr<ABDPickable> InItem)
+void ABDPlayerCharacter::ClearItemRef()
 {
     if (HandledObj)
     {
-        if (InItem == HandledObj)
-        {
-            HandledObj = nullptr;
-        }
+        HandledObj->OnGrabbed.RemoveDynamic(this, &ABDPlayerCharacter::ClearItemRef);
+        HandledObj = nullptr;
     }
 }
 
@@ -157,8 +158,7 @@ void ABDPlayerCharacter::DropItem(const FInputActionValue& InputActionValue)
     if (HandledObj)
     {
         HandledObj->Drop(CameraComponent->GetComponentRotation(), CameraComponent->GetComponentLocation());
-        HandledObj->ClearOwner();
-        HandledObj = nullptr;
+        ClearItemRef();
     }
 }
 

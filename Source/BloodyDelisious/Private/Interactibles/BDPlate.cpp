@@ -44,6 +44,5 @@ void ABDPlate::PlaceItem(TObjectPtr<ABDBurgerPart> BurgerPart)
         TypesArray.Add(BurgerPart->PartType);
         BurgerPart->SetActorEnableCollision(false);
         LastPart = BurgerPart;
-        LastPart->ClearOwner();
     }
 }

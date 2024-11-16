@@ -8,6 +8,8 @@
 #include "GameFramework/Actor.h"
 #include "BDPickable.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabbed);
+
 class ABDPlayerCharacter;
 class UBDInteractionHintWidget;
 UCLASS()
@@ -25,16 +27,12 @@ public:
 
     void Hide() override;
 
-    void ClearOwner();
+    FGrabbed OnGrabbed;
 
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-public:
-    virtual void Destroyed() override;
-
-protected:
     void BindTimeLine();
 
     UFUNCTION()
@@ -45,8 +43,6 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
-
-    TObjectPtr<ABDPlayerCharacter> PlayerOwner;
 
     UPROPERTY()
     TObjectPtr<UBDInteractionHintWidget> Hint;

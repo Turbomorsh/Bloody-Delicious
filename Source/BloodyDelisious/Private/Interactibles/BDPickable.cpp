@@ -26,15 +26,6 @@ void ABDPickable::BeginPlay()
 {
     Super::BeginPlay();
 }
-void ABDPickable::Destroyed()
-{
-    Super::Destroyed();
-
-    if (PlayerOwner)
-    {
-        ClearOwner();
-    }
-}
 
 // Called every frame
 void ABDPickable::Tick(float DeltaTime)
@@ -69,14 +60,6 @@ void ABDPickable::Hide()
         Hint = nullptr;
     }
 }
-void ABDPickable::ClearOwner()
-{
-    if (PlayerOwner)
-    {
-        PlayerOwner->ClearItemRef(this);
-        PlayerOwner = nullptr;
-    }
-}
 
 void ABDPickable::BindTimeLine()
 {
@@ -105,8 +88,23 @@ void ABDPickable::Drop(FRotator CameraRotation, FVector CameraLocation)
 
     SetActorEnableCollision(true);
     MeshComponent->SetSimulatePhysics(true);
-    SetActorLocation(CameraLocation + UKismetMathLibrary::GetForwardVector(CameraRotation) * 100);
-    MeshComponent->AddImpulse(UKismetMathLibrary::GetForwardVector(CameraRotation) * 200);
+
+    FVector End = CameraLocation + UKismetMathLibrary::GetForwardVector(CameraRotation) * 100.f;
+    FHitResult OutHit;
+    FCollisionQueryParams TraceParams;
+
+    GetWorld()->LineTraceSingleByChannel(OutHit, CameraLocation, End, ECollisionChannel::ECC_Visibility, TraceParams);
+
+    if (OutHit.bBlockingHit)
+    {
+        SetActorRotation(FRotator(0));
+        SetActorLocation(FVector(OutHit.Location.X, OutHit.Location.Y, OutHit.Location.Z + 15));
+    }
+    else
+    {
+        SetActorLocation(CameraLocation + UKismetMathLibrary::GetForwardVector(CameraRotation) * 100);
+        MeshComponent->AddImpulse(UKismetMathLibrary::GetForwardVector(CameraRotation) * 200);
+    }
 }
 
 void ABDPickable::Grab(USceneComponent* Socket)
@@ -121,10 +119,7 @@ void ABDPickable::Grab(USceneComponent* Socket)
     GrabLocationSocket = Socket;
     InitGrabLocation = GetActorLocation();
 
-    Timeline.PlayFromStart();
+    OnGrabbed.Broadcast();
 
-    if (TObjectPtr<ABDPlayerCharacter> CastedPlayer = Cast<ABDPlayerCharacter>(Socket->GetOwner()))
-    {
-        PlayerOwner = CastedPlayer;
-    }
+    Timeline.PlayFromStart();
 }
