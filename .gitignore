@@ -79,3 +79,6 @@ DerivedDataCache/*
 
 # Logs
 *.htm
+
+# SourceContent
+SourceContent/*

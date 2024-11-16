@@ -10,6 +10,7 @@
 #include "Interactibles/BDInteract.h"
 #include "Interactibles/BDPickable.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDCharacter, All, All);
 
@@ -31,6 +32,8 @@ ABDPlayerCharacter::ABDPlayerCharacter()
 
     ItemSocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
     ItemSocket->SetupAttachment(CameraComponent);
+
+    GetMesh()->bOwnerNoSee = true;
 }
 
 void ABDPlayerCharacter::BeginPlay()
@@ -52,6 +55,9 @@ void ABDPlayerCharacter::BeginPlay()
         UE_LOG(LogBDCharacter, Display, TEXT("ViewPitchMax: %f | ViewPitchMin: %f"),  //
             PC->PlayerCameraManager->ViewPitchMax, PC->PlayerCameraManager->ViewPitchMin);
     }
+
+    // set speed
+    GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 }
 
 void ABDPlayerCharacter::Tick(float DeltaSeconds)
