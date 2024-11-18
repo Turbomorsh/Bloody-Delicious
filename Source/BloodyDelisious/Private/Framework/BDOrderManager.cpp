@@ -52,8 +52,8 @@ void ABDOrderManager::BeginPlay()
 
 void ABDOrderManager::MakeOrder()
 {
-    CurrentCustomer->SetOrderManagerPtr(this);
-    CurrentCustomer->SetCustomerState(EBDCustomerStates::Ordering);
+    // CurrentCustomer->SetOrderManagerPtr(this);
+    // CurrentCustomer->SetCustomerState(EBDCustomerStates::Ordering);
     OrderState = EBDOrderStates::Pending;
 
     GetWorldTimerManager().SetTimer(PendingTimerHandle, this, &ThisClass::PendingTimeOut, TimeToPendingOrder, false);
@@ -62,7 +62,7 @@ void ABDOrderManager::MakeOrder()
 
 void ABDOrderManager::ReceiveOrder()
 {
-    CurrentCustomer->SetCustomerState(EBDCustomerStates::OrderAccepted);
+    // CurrentCustomer->SetCustomerState(EBDCustomerStates::OrderAccepted);
     OrderState = EBDOrderStates::Cooking;
 
     GetWorldTimerManager().ClearTimer(PendingTimerHandle);
@@ -79,7 +79,7 @@ void ABDOrderManager::DeliverOrder()
     GetWorldTimerManager().ClearTimer(CookingTimerHandle);
     OrderState = EBDOrderStates::NextInLine;
 
-    CurrentCustomer->SetCustomerState(EBDCustomerStates::OrderReady);
+    // CurrentCustomer->SetCustomerState(EBDCustomerStates::OrderReady);
 
     // if (IsOrderCorrect())
     //{
@@ -93,7 +93,7 @@ void ABDOrderManager::DeliverOrder()
 
 void ABDOrderManager::PendingTimeOut()
 {
-    CurrentCustomer->SetCustomerState(EBDCustomerStates::Leaving);
+    // CurrentCustomer->SetCustomerState(EBDCustomerStates::Leaving);
     OrderState = EBDOrderStates::NextInLine;
 
     UE_LOG(LogBDOrderManager, Display, TEXT("PendingTimeOut"));
@@ -101,7 +101,7 @@ void ABDOrderManager::PendingTimeOut()
 
 void ABDOrderManager::CookingTimeOut()
 {
-    CurrentCustomer->SetCustomerState(EBDCustomerStates::Leaving);
+    // CurrentCustomer->SetCustomerState(EBDCustomerStates::Leaving);
     OrderState = EBDOrderStates::NextInLine;
 
     UE_LOG(LogBDOrderManager, Display, TEXT("CookingTimeOut"));
@@ -137,19 +137,19 @@ void ABDOrderManager::OrderingAriaBeginOverlap(UPrimitiveComponent* OverlappedCo
     const auto BDAICharacter = Cast<ABDAICharacter>(OtherActor);
     if (!BDAICharacter) return;
 
-    CurrentCustomer = BDAICharacter;
+    // CurrentCustomer = BDAICharacter;
 
-    switch (CurrentCustomer->GetCustomerState())
-    {
-        case EBDCustomerStates::Hungry:
-            MakeOrder();
-            break;
-        case EBDCustomerStates::OrderReady:
-            DeliverOrder();
-            break;
-        default:
-            break;
-    }
+    /* switch (CurrentCustomer->GetCustomerState())
+     {
+         case EBDCustomerStates::Hungry:
+             MakeOrder();
+             break;
+         case EBDCustomerStates::OrderReady:
+             DeliverOrder();
+             break;
+         default:
+             break;
+     }*/
 }
 
 void ABDOrderManager::AcceptanceAriaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

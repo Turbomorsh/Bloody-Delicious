@@ -16,6 +16,9 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EBDGameState);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameDataChangedSignature, int32);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCookTimerChangedSignature, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPendingTimerChangedSignature, int32);
+
 UENUM(BlueprintType)
 enum class EBDCustomerStates : uint8
 {

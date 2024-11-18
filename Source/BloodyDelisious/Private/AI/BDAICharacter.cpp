@@ -29,16 +29,52 @@ ABDAICharacter::ABDAICharacter()
     TraySocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
     if (GetMesh()) TraySocket->SetupAttachment(GetMesh(), "Wirst_L");
 }
+
+void ABDAICharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // set speed
+    GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
+
+    TArray<EFoodType> Food;
+    Food.Add(EFoodType::Meet);
+    Order.Burger = Food;
+}
+
+void ABDAICharacter::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+}
+
 void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
 {
-    if (Cast<USceneComponent>(Object))
+    UE_LOG(LogTemp, Display, TEXT("Interact!"));
+    const auto TestObject = Cast<USceneComponent>(Object);
+    if (TestObject)
     {
-        PlayDialogue(Dialogue, DialoguePage);
-        DialoguePage++;
+        if (CustomerState == EBDCustomerStates::Ordering)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Interact Ordering"));
+            PlayDialogue(Dialogue, DialoguePage);
+            DialoguePage++;
+
+            // stop PendingTimer
+            if (PendingTimerHandle.IsValid() && GetWorldTimerManager().IsTimerActive(PendingTimerHandle))
+            {
+                GetWorldTimerManager().ClearTimer(PendingTimerHandle);
+                UE_LOG(LogTemp, Warning, TEXT("PendingTimer OFF!"));
+            }
+        }
     }
-    if (TObjectPtr<ABDFoodTray> CastedTray = Cast<ABDFoodTray>(Object))
+
+    if (CurrentFood = Cast<ABDFoodTray>(Object))
     {
-        if (Talked) TryGetOrder(CastedTray);
+        if (CustomerState == EBDCustomerStates::OrderAccepted)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Interact OrderAccepted"));
+            TryGetOrder(CurrentFood);
+        }
     }
 }
 
@@ -65,98 +101,137 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int Page)
 {
     if (Page <= InDialogue.Num() && InDialogue.Num() != 0)
     {
-        if (DialogueWidgetClass && !DialogueWidget)
+        UE_LOG(LogTemp, Warning, TEXT("PlayDialogue!"));
+        if (DialogueWidgetClass)
         {
-            DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
-            DialogueWidget->AddToViewport();
-            SetCustomerState(EBDCustomerStates::OrderAccepted);
+            // show DialogueWidget
+            // @TODO: fix visible
+            if (!DialogueWidget)
+            {
+                DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
+                DialogueWidget->AddToViewport();
+                DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+            }
+            else if (DialogueWidget->GetVisibility() != ESlateVisibility::Visible)
+            {
+                DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+            }
         }
 
-        if (DialogueWidget && Page < InDialogue.Num()) DialogueWidget->SetText(InDialogue[Page]);
+        if (DialogueWidget && Page < InDialogue.Num())
+        {
+            DialogueWidget->SetText(InDialogue[Page]);
+        }
 
         if (Page == InDialogue.Num() && DialogueWidget)
         {
-            DialogueWidget->RemoveFromParent();
-            Talked = true;
-            OrderAccepted();
+            // hide DialogueWidget
+            DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
+            DialoguePage = 0;
+            // DialogueWidget->RemoveFromParent();
+            //  Talked = true;
+
+            SetCustomerState(EBDCustomerStates::OrderAccepted);
         }
     }
 }
+
 void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
 {
     if (Order == InOrder->GetTray())
     {
+        UE_LOG(LogTemp, Warning, TEXT("GetTray"));
         InOrder->Grab(TraySocket);
         SetCustomerState(EBDCustomerStates::OrderReady);
     }
 }
 
-void ABDAICharacter::BeginPlay()
-{
-    Super::BeginPlay();
-
-    // set speed
-    GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
-
-    TArray<EFoodType> Food;
-    Food.Add(EFoodType::Meet);
-    Order.Burger = Food;
-}
-
-void ABDAICharacter::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-}
-
 void ABDAICharacter::Hungry()
 {
-    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
-
     UE_LOG(LogBDAICharacter, Display, TEXT("I'm so hungry!!!"));
 }
 
 void ABDAICharacter::Ordering()
 {
+    GetWorldTimerManager().SetTimer(PendingTimerHandle, this, &ThisClass::PendingTimeOut, TimeToPendingOrder, false);
     UE_LOG(LogBDAICharacter, Display, TEXT("I would like a burger!"));
+    UE_LOG(LogTemp, Warning, TEXT("PendingTimer %f ON!"), TimeToPendingOrder);
 }
 
 void ABDAICharacter::OrderAccepted()
 {
-    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
-
+    GetWorldTimerManager().SetTimer(CookingTimerHandle, this, &ThisClass::CookingTimeOut, TimeToCooking, false);
     UE_LOG(LogBDAICharacter, Display, TEXT("Ok! I'll wait!"));
+    UE_LOG(LogTemp, Warning, TEXT("CookingTimer %f ON!"), TimeToCooking);
 }
 
 void ABDAICharacter::OrderReady()
 {
-    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
+    /// stop CookingTimer
+    GetWorldTimerManager().ClearTimer(CookingTimerHandle);
+    UE_LOG(LogTemp, Warning, TEXT("CookingTimer OFF!"));
 
-    if (!OrderManager)
+    UE_LOG(LogBDAICharacter, Display, TEXT("O-o-oh!!! My burger!!!"));
+    // check order
+    if (IsOrderCorrect())
     {
-        UE_LOG(LogBDAICharacter, Warning, TEXT("OrderManager faild"));
-        return;
+        SetCustomerState(EBDCustomerStates::Eating);
     }
+    else
+    {
+        UE_LOG(LogBDAICharacter, Display, TEXT("This is the wrong burger! I'm upset!"));
+        SetCustomerState(EBDCustomerStates::Leaving);
+    }
+}
 
-    OrderManager->SetOrderState(EBDOrderStates::NextInLine);
-
-    // for test all orders correct
-    UE_LOG(LogBDAICharacter, Display, TEXT("Is it my order? All correct! Good! Bye!"));
-    SetCustomerState(EBDCustomerStates::Eating);
+bool ABDAICharacter::IsOrderCorrect()
+{
+    return true;
 }
 
 void ABDAICharacter::Eating()
 {
-    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
+    UE_LOG(LogBDAICharacter, Display, TEXT("All correct! Good! Bye!"));
 
-    GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
+    GetWorldTimerManager().SetTimer(EatTimerHandle, this, &ThisClass::EatingTimeOut, TimeToEat, false);
 }
 
 void ABDAICharacter::Leaving()
 {
-    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
 
     GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
 }
+
+void ABDAICharacter::MakeOrder()
+{
+    SetCustomerState(EBDCustomerStates::Ordering);
+}
+
+void ABDAICharacter::PendingTimeOut()
+{
+    SetCustomerState(EBDCustomerStates::Leaving);
+}
+
+void ABDAICharacter::CookingTimeOut()
+{
+    SetCustomerState(EBDCustomerStates::Leaving);
+}
+
+void ABDAICharacter::EatingTimeOut()
+{
+    // @TODO: fix Drop
+    CurrentFood->Drop(GetActorRotation(), GetActorLocation());
+    CurrentFood = nullptr;
+
+    SetCustomerState(EBDCustomerStates::Leaving);
+}
+
+void ABDAICharacter::HungryAgain()
+{
+    SetCustomerState(EBDCustomerStates::Hungry);
+}
+
+void ABDAICharacter::TimerUpdate() {}
 
 void ABDAICharacter::SetBlackboardEnumData(FName KeyName, EBDCustomerStates& NewState)
 {
@@ -184,16 +259,12 @@ void ABDAICharacter::SetBlackboardEnumData(FName KeyName, EBDCustomerStates& New
     BDController->GetBlackboardComponent()->SetValueAsEnum(CustomerStatusKeyName, static_cast<uint8>(NewState));
 }
 
-void ABDAICharacter::HungryAgain()
-{
-    SetCustomerState(EBDCustomerStates::Hungry);
-}
-
 void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
 {
     CustomerState = NewState;
+    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
 
-    UE_LOG(LogTemp, Display, TEXT("%s"), *UEnum::GetValueAsString(CustomerState));
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *UEnum::GetValueAsString(CustomerState));
 
     switch (CustomerState)
     {

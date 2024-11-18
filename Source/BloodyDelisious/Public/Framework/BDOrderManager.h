@@ -57,7 +57,7 @@ protected:
 private:
     EBDOrderStates OrderState = EBDOrderStates::NextInLine;
 
-    TObjectPtr<ABDAICharacter> CurrentCustomer;
+    // TObjectPtr<ABDAICharacter> CurrentCustomer;
 
     FTimerHandle PendingTimerHandle;
     FTimerHandle CookingTimerHandle;

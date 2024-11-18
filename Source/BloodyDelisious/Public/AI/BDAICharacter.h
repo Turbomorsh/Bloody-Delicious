@@ -25,17 +25,20 @@ public:
     virtual void Show() override;
     virtual void Hide() override;
 
+    void MakeOrder();
     void SetCustomerState(EBDCustomerStates NewState);
 
     UFUNCTION(BlueprintCallable)
     EBDCustomerStates GetCustomerState() const { return CustomerState; };
 
-    void SetOrderManagerPtr(TObjectPtr<ABDOrderManager> InOrderManager) { OrderManager = InOrderManager; };
+    // void SetOrderManagerPtr(TObjectPtr<ABDOrderManager> InOrderManager) { OrderManager = InOrderManager; };
+    FOnCookTimerChangedSignature OnCookTimerChanged;
+    FOnPendingTimerChangedSignature OnPendingTimerChanged;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
     TObjectPtr<UBehaviorTree> BehsaviorTreeAsset;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue", meta = (ExposeOnSpawn))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Dialogue", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
 protected:
@@ -45,8 +48,20 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI")
     FName CustomerStatusKeyName = "CustomerStatus";
 
-    UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (ClampMin = "0", ClampMax = "600"))
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
     float TimeHungryAgain = 10.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
+    float TimeToEat = 10.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "120"))
+    float TimeToPendingOrder = 5.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "120"))
+    float TimeToCooking = 15.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "1"))
+    float TimeUpdateInterval = 0.1f;
 
     void PlayDialogue(TArray<FText> Dialogue, int Page);
 
@@ -57,7 +72,7 @@ protected:
 
     FOrderStruct Order;
 
-    bool Talked = false;
+    // bool Talked = false;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
@@ -85,13 +100,27 @@ public:
 private:
     EBDCustomerStates CustomerState = EBDCustomerStates::Hungry;
 
-    TObjectPtr<ABDOrderManager> OrderManager;
+    TObjectPtr<ABDFoodTray> CurrentFood;
 
+    // TObjectPtr<ABDOrderManager> OrderManager;
+    FTimerHandle TimerHandle;
+    float TimeRemaining = 0.0f;
+
+    FTimerHandle PendingTimerHandle;
+    FTimerHandle CookingTimerHandle;
     FTimerHandle HungryAgainTimerHandle;
+    FTimerHandle EatTimerHandle;
+
+    void TimerUpdate();
 
     void SetBlackboardEnumData(FName KeyName, EBDCustomerStates& NewState);
 
+    void PendingTimeOut();
+    void CookingTimeOut();
+    void EatingTimeOut();
     void HungryAgain();
+
+    bool IsOrderCorrect();
 
     void Hungry();
     void Ordering();
