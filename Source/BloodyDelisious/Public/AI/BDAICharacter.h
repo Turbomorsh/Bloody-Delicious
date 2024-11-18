@@ -57,6 +57,8 @@ protected:
 
     FOrderStruct Order;
 
+    bool Talked = false;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
 

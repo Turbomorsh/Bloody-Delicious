@@ -38,7 +38,7 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
     }
     if (TObjectPtr<ABDFoodTray> CastedTray = Cast<ABDFoodTray>(Object))
     {
-        TryGetOrder(CastedTray);
+        if (Talked) TryGetOrder(CastedTray);
     }
 }
 
@@ -69,6 +69,7 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int Page)
         {
             DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
             DialogueWidget->AddToViewport();
+            SetCustomerState(EBDCustomerStates::OrderAccepted);
         }
 
         if (DialogueWidget && Page < InDialogue.Num()) DialogueWidget->SetText(InDialogue[Page]);
@@ -76,6 +77,7 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int Page)
         if (Page == InDialogue.Num() && DialogueWidget)
         {
             DialogueWidget->RemoveFromParent();
+            Talked = true;
             OrderAccepted();
         }
     }
@@ -85,7 +87,7 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
     if (Order == InOrder->GetTray())
     {
         InOrder->Grab(TraySocket);
-        OrderReady();
+        SetCustomerState(EBDCustomerStates::OrderReady);
     }
 }
 
@@ -120,11 +122,15 @@ void ABDAICharacter::Ordering()
 
 void ABDAICharacter::OrderAccepted()
 {
+    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
+
     UE_LOG(LogBDAICharacter, Display, TEXT("Ok! I'll wait!"));
 }
 
 void ABDAICharacter::OrderReady()
 {
+    SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
+
     if (!OrderManager)
     {
         UE_LOG(LogBDAICharacter, Warning, TEXT("OrderManager faild"));

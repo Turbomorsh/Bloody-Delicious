@@ -76,7 +76,8 @@ void ABDDoor::BIndTimeline()
 
 void ABDDoor::TimelineProgress(float Alpha)
 {
-    DoorSocket->SetRelativeRotation(FRotator(0, UKismetMathLibrary::Lerp(0, 90, Alpha), 0));
+    DoorSocket->SetRelativeRotation(
+        FRotator(DoorSocket->GetRelativeRotation().Pitch, UKismetMathLibrary::Lerp(0, 90, Alpha), DoorSocket->GetRelativeRotation().Roll));
 }
 
 // Called every frame
