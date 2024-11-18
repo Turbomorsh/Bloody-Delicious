@@ -40,7 +40,7 @@ void ABDTray::BeginPlay()
 }
 void ABDTray::TakeItem(TObjectPtr<ABDPlayerCharacter> Player)
 {
-    if (FoodClass)
+    if (FoodClass && FoodDataAsset)
     {
         const FTransform SpawnTransform = FTransform(FRotator(0), GetActorLocation());
         FActorSpawnParameters SpawnParams;

@@ -19,4 +19,5 @@ void ABDBurgerPart::ChangeType(TObjectPtr<UBDFoodPartDataAsset> Data)
 {
     PartType = Data->Type;
     MeshComponent->SetStaticMesh(Data->Mesh);
+    MeshComponent->SetMaterial(0, Data->Material);
 }

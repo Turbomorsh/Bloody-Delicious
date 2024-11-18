@@ -23,5 +23,5 @@ public:
     TObjectPtr<UStaticMesh> Mesh;
 
     UPROPERTY(EditDefaultsOnly)
-    TObjectPtr<UTexture> Texture;
+    TObjectPtr<UMaterial> Material;
 };

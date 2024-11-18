@@ -5,6 +5,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Framework/BDOrderManager.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Interactibles/BDFoodTray.h"
+#include "Rendering/RenderCommandPipes.h"
+#include "UI/BDDialogueWidget.h"
+#include "UI/BDInteractionHintWidget.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDAICharacter, All, All);
 
@@ -21,6 +25,68 @@ ABDAICharacter::ABDAICharacter()
         GetCharacterMovement()->bUseControllerDesiredRotation = true;
         GetCharacterMovement()->RotationRate = FRotator(0.0f, 200.0f, 0.0f);
     }
+
+    TraySocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
+    if (GetMesh()) TraySocket->SetupAttachment(GetMesh(), "Wirst_L");
+}
+void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
+{
+    if (Cast<USceneComponent>(Object))
+    {
+        PlayDialogue(Dialogue, DialoguePage);
+        DialoguePage++;
+    }
+    if (TObjectPtr<ABDFoodTray> CastedTray = Cast<ABDFoodTray>(Object))
+    {
+        TryGetOrder(CastedTray);
+    }
+}
+
+void ABDAICharacter::Show()
+{
+    if (HintWidgetClass && !Hint)
+    {
+        Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
+        Hint->AddToViewport();
+        Hint->SetText(HintText);
+    }
+}
+
+void ABDAICharacter::Hide()
+{
+    if (HintWidgetClass && Hint)
+    {
+        Hint->RemoveFromParent();
+        Hint = nullptr;
+    }
+}
+
+void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int Page)
+{
+    if (Page <= InDialogue.Num() && InDialogue.Num() != 0)
+    {
+        if (DialogueWidgetClass && !DialogueWidget)
+        {
+            DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
+            DialogueWidget->AddToViewport();
+        }
+
+        if (DialogueWidget && Page < InDialogue.Num()) DialogueWidget->SetText(InDialogue[Page]);
+
+        if (Page == InDialogue.Num() && DialogueWidget)
+        {
+            DialogueWidget->RemoveFromParent();
+            OrderAccepted();
+        }
+    }
+}
+void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
+{
+    if (Order == InOrder->GetTray())
+    {
+        InOrder->Grab(TraySocket);
+        OrderReady();
+    }
 }
 
 void ABDAICharacter::BeginPlay()
@@ -29,6 +95,10 @@ void ABDAICharacter::BeginPlay()
 
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
+
+    TArray<EFoodType> Food;
+    Food.Add(EFoodType::Meet);
+    Order.Burger = Food;
 }
 
 void ABDAICharacter::Tick(float DeltaTime)
