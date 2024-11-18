@@ -82,3 +82,6 @@ DerivedDataCache/*
 
 # SourceContent
 SourceContent/*
+
+# ExternalContent
+Content/ExternalContent/*/**

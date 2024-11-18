@@ -19,6 +19,11 @@ public:
     ABDGameMode();
 
     FOnGameStateChangedSignature OnGameStateChanged;
+    FOnGameDataChangedSignature OnGameDataChanged;
+
+    FGameData GetGameData() const { return GameData; }
+    int32 GetCurrentRoundNum() const { return CurrentRound; }
+    int32 GetRuondSecondsRemaning() const { return RoundCountDown; }
 
     UPROPERTY()
     UBDVisibilityManager* VisibilityManager;  // for test visibility manager
@@ -36,25 +41,29 @@ public:
     virtual void Tick(float DeltaTime) override;
 
 protected:
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, Category = "Test")
     FName ScaryTag = "Scary";  // for test visibility manager
 
-    UPROPERTY(EditDefaultsOnly, Category = "Game | AI")
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<AAIController> AIControllerClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Game | AI")
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<APawn> AICustomerPawnClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Game | AI", meta = (ClampMin = "1", ClampMax = "50"))
-    uint32 CustomerCount = 1;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Game | AI")
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName ToNPCStartTag{"NPC"};
-    UPROPERTY(EditDefaultsOnly, Category = "Game | AI")
+
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName ToPlayerStartTag{"Player"};
+
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
+    FGameData GameData;
 
 private:
     EBDGameState GameState = EBDGameState::Waiting;
+    int32 CurrentRound = 1;
+    int32 RoundCountDown = 0;
+    FTimerHandle GameRoundTimerHandle;
 
     TArray<AActor*> TargetActors;  // for test visibility manager
 
@@ -63,4 +72,9 @@ private:
     void GameComplete();
 
     void SpawnCustomers();
+    void StartRound();
+    void GameTimerUpdate();
+
+    void ResetPlayers();
+    void ResetOnePlayer(AController* Controller);
 };

@@ -33,8 +33,15 @@ void UBDTargetActorEnvQueryContext::ProvideContext(FEnvQueryInstance& QueryInsta
         default:
             break;
     }
-
-    UEnvQueryItemType_Actor::SetContextHelper(ContextData, Cast<AActor>(FoundActor));
+    if (FoundActor == nullptr)
+    {
+        UE_LOG(LogBDTargetActorEnvQueryContext, Display, TEXT("Actor is nullptr!"));
+    }
+    else
+    {
+        UE_LOG(LogBDTargetActorEnvQueryContext, Display, TEXT("Actor %s tag found!"), *FoundActor->GetName());
+        UEnvQueryItemType_Actor::SetContextHelper(ContextData, Cast<AActor>(FoundActor));
+    }
 }
 
 AActor* UBDTargetActorEnvQueryContext::GetActorWithTag(FName Tag) const
