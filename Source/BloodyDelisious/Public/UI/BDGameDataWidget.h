@@ -31,6 +31,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     UTextBlock* RoundInfo_TextBlock;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString Day = "Day ";
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString Between = " / ";
+
 private:
     ABDGameMode* GetBGGameMode() const;
 };

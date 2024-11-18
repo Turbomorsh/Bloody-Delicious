@@ -37,9 +37,9 @@ void UBDGameDataWidget::UpdateWidgetData(int32 Time)
 {
     TotalTime_TextBlock->SetText(FText::FromString(UKismetStringLibrary::TimeSecondsToString(Time).Mid(0, 5)));
 
-    FString RoundInfo = "Day ";
+    FString RoundInfo = Day;
     RoundInfo.Append(FString::FromInt(GetCurrentRoundNum()));
-    RoundInfo.Append(" / ");
+    RoundInfo.Append(Between);
     RoundInfo.Append(FString::FromInt(GetTotalRoundNum()));
 
     RoundInfo_TextBlock->SetText(FText::FromString(RoundInfo));
