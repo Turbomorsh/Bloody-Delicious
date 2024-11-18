@@ -14,6 +14,8 @@ enum class EBDGameState : uint8
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EBDGameState);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameDataChangedSignature, int32);
+
 UENUM(BlueprintType)
 enum class EBDCustomerStates : uint8
 {
@@ -34,4 +36,22 @@ enum class EBDOrderStates : uint8
     Cooking,
     Ready,
     NextInLine
+};
+
+USTRUCT(BlueprintType)
+struct FGameData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
+        meta = (ClampMin = "1", ClampMax = "20", ToolTip = "Costomers count"))
+    int32 CustomersNum = 2;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
+        meta = (ClampMin = "1", ClampMax = "10", ToolTip = "Days count"))
+    int32 RoundsNum = 4;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
+        meta = (ClampMin = "3", ClampMax = "300", ToolTip = "Day time in sec"))
+    int32 RoundTime = 10;  // in seconds;
 };

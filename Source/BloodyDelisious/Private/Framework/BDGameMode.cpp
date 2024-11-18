@@ -27,13 +27,60 @@ void ABDGameMode::StartPlay()
 {
     Super::StartPlay();
 
+    CurrentRound = 1;
+    StartRound();
+    SpawnCustomers();
     SetGameState(EBDGameState::GameInProgress);
+    OnGameDataChanged.Broadcast(RoundCountDown);
 
     // for test visibility manager
     VisibilityManager = NewObject<UBDVisibilityManager>(this);
     UGameplayStatics::GetAllActorsWithTag(GetWorld(), ScaryTag, TargetActors);
+}
 
-    SpawnCustomers();
+void ABDGameMode::StartRound()
+{
+    RoundCountDown = GameData.RoundTime;
+    GetWorldTimerManager().SetTimer(GameRoundTimerHandle, this, &ThisClass::GameTimerUpdate, 1.0f, true);
+}
+
+void ABDGameMode::GameTimerUpdate()
+{
+    if (--RoundCountDown == 0)
+    {
+        GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
+
+        if (CurrentRound + 1 <= GameData.RoundsNum)
+        {
+            ++CurrentRound;
+            ResetPlayers();
+            StartRound();
+        }
+        else
+        {
+            GameOver();
+        }
+    }
+    OnGameDataChanged.Broadcast(GetRuondSecondsRemaning());
+}
+
+void ABDGameMode::ResetPlayers()
+{
+    if (!GetWorld()) return;
+
+    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+    {
+        ResetOnePlayer(It->Get());
+    }
+}
+
+void ABDGameMode::ResetOnePlayer(AController* Controller)
+{
+    if (Controller && Controller->GetPawn())
+    {
+        Controller->GetPawn()->Reset();
+    }
+    RestartPlayer(Controller);
 }
 
 bool ABDGameMode::SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate)
@@ -68,6 +115,16 @@ void ABDGameMode::SetGameState(EBDGameState State)
 
 void ABDGameMode::GameOver()
 {
+    UE_LOG(LogBDGameMode, Display, TEXT("==== GAME OVER ===="));
+    for (auto Pawn : TActorRange<APawn>(GetWorld()))
+    {
+        if (Pawn)
+        {
+            Pawn->TurnOff();
+            Pawn->DisableInput(nullptr);
+        }
+    }
+
     SetGameState(EBDGameState::GameOver);
 }
 
@@ -107,7 +164,7 @@ void ABDGameMode::SpawnCustomers()
 {
     if (!GetWorld()) return;
 
-    for (uint32 i = 0; i < CustomerCount; ++i)
+    for (int32 i = 0; i < GameData.CustomersNum; ++i)
     {
         FActorSpawnParameters SpawnInfo;
         SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
