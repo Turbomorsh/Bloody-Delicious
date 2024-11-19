@@ -11,8 +11,8 @@
 
 class UBDDialogueWidget;
 class UBDInteractionHintWidget;
+class UBDGameplayWidget;
 class UBehaviorTree;
-class ABDOrderManager;
 
 UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract
 {
@@ -31,9 +31,8 @@ public:
     UFUNCTION(BlueprintCallable)
     EBDCustomerStates GetCustomerState() const { return CustomerState; };
 
-    // void SetOrderManagerPtr(TObjectPtr<ABDOrderManager> InOrderManager) { OrderManager = InOrderManager; };
-    FOnCookTimerChangedSignature OnCookTimerChanged;
-    FOnPendingTimerChangedSignature OnPendingTimerChanged;
+    FOnCustomerTimerChangedSignature OnCustomerTimerChanged;
+    FOnCustomerTextSaySignature OnCustomerPhraseSay;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
     TObjectPtr<UBehaviorTree> BehsaviorTreeAsset;
@@ -61,9 +60,9 @@ protected:
     float TimeToCooking = 15.0f;  // in sec
 
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "1"))
-    float TimeUpdateInterval = 0.1f;
+    float TimerUpdateInterval = 0.1f;
 
-    void PlayDialogue(TArray<FText> Dialogue, int Page);
+    void PlayDialogue(TArray<FText> Dialogue, int32 Page);
 
     void TryGetOrder(TObjectPtr<ABDFoodTray> InOrder);
 
@@ -71,8 +70,6 @@ protected:
     TObjectPtr<USceneComponent> TraySocket;
 
     FOrderStruct Order;
-
-    // bool Talked = false;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
@@ -89,7 +86,7 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hint)
     FText HintText = FText::FromString("pick cube");
 
-    int DialoguePage = 0;
+    int32 DialoguePage = 0;
 
     virtual void BeginPlay() override;
 
@@ -102,16 +99,16 @@ private:
 
     TObjectPtr<ABDFoodTray> CurrentFood;
 
-    // TObjectPtr<ABDOrderManager> OrderManager;
-    FTimerHandle TimerHandle;
-    float TimeRemaining = 0.0f;
-
-    FTimerHandle PendingTimerHandle;
-    FTimerHandle CookingTimerHandle;
+    TMap<EBDCustomerTimers, FCustomerTimerData> CustomerTimersMap;
     FTimerHandle HungryAgainTimerHandle;
     FTimerHandle EatTimerHandle;
 
-    void TimerUpdate();
+    UBDGameplayWidget* GetGameplayWidget() const;
+
+    void InitializeTimers();
+    void StartCustomerTimer(EBDCustomerTimers InETimer);
+    void UpdateProgressBar(EBDCustomerTimers InETimer, float TotalTime);
+    void CustomerTimerEnd(EBDCustomerTimers InETimer);
 
     void SetBlackboardEnumData(FName KeyName, EBDCustomerStates& NewState);
 

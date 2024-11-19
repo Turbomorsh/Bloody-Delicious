@@ -3,12 +3,13 @@
 #include "AI/BDAICharacter.h"
 #include "AI/BDAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Framework/BDOrderManager.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Interactibles/BDFoodTray.h"
 #include "Rendering/RenderCommandPipes.h"
 #include "UI/BDDialogueWidget.h"
 #include "UI/BDInteractionHintWidget.h"
+#include "UI/BDGameplayWidget.h"
+#include "UI/BDGameHUD.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDAICharacter, All, All);
 
@@ -34,12 +35,22 @@ void ABDAICharacter::BeginPlay()
 {
     Super::BeginPlay();
 
+    // create dialogue widget
+    if (DialogueWidgetClass)
+    {
+        DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
+        DialogueWidget->AddToViewport();
+        DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
+    }
+
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
     TArray<EFoodType> Food;
     Food.Add(EFoodType::Meet);
     Order.Burger = Food;
+
+    InitializeTimers();
 }
 
 void ABDAICharacter::Tick(float DeltaTime)
@@ -50,29 +61,26 @@ void ABDAICharacter::Tick(float DeltaTime)
 void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
 {
     UE_LOG(LogTemp, Display, TEXT("Interact!"));
-    const auto TestObject = Cast<USceneComponent>(Object);
-    if (TestObject)
-    {
-        if (CustomerState == EBDCustomerStates::Ordering)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Interact Ordering"));
-            PlayDialogue(Dialogue, DialoguePage);
-            DialoguePage++;
 
-            // stop PendingTimer
-            if (PendingTimerHandle.IsValid() && GetWorldTimerManager().IsTimerActive(PendingTimerHandle))
-            {
-                GetWorldTimerManager().ClearTimer(PendingTimerHandle);
-                UE_LOG(LogTemp, Warning, TEXT("PendingTimer OFF!"));
-            }
-        }
+    if (Cast<USceneComponent>(Object) && CustomerState == EBDCustomerStates::Ordering)
+    {
+        // stop PendingTimer
+        CustomerTimerEnd(EBDCustomerTimers::Pending);
+
+        UE_LOG(LogTemp, Display, TEXT("Interact Ordering"));
+        // @TODO: fix play logic
+        // PlayDialogue(Dialogue, DialoguePage);
+        // DialoguePage++;
+
+        // AcceptOrder
+        SetCustomerState(EBDCustomerStates::OrderAccepted);
     }
 
     if (CurrentFood = Cast<ABDFoodTray>(Object))
     {
         if (CustomerState == EBDCustomerStates::OrderAccepted)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Interact OrderAccepted"));
+            UE_LOG(LogTemp, Display, TEXT("Interact OrderAccepted"));
             TryGetOrder(CurrentFood);
         }
     }
@@ -97,42 +105,33 @@ void ABDAICharacter::Hide()
     }
 }
 
-void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int Page)
+void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 {
-    if (Page <= InDialogue.Num() && InDialogue.Num() != 0)
+    if (Page >= InDialogue.Num() && InDialogue.IsEmpty()) return;
+
+    UE_LOG(LogTemp, Display, TEXT("PlayDialogue!"));
+
+    // show DialogueWidget
+    // @TODO: fix Play logic
+    if (DialogueWidget && Page == 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("PlayDialogue!"));
-        if (DialogueWidgetClass)
-        {
-            // show DialogueWidget
-            // @TODO: fix visible
-            if (!DialogueWidget)
-            {
-                DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
-                DialogueWidget->AddToViewport();
-                DialogueWidget->SetVisibility(ESlateVisibility::Visible);
-            }
-            else if (DialogueWidget->GetVisibility() != ESlateVisibility::Visible)
-            {
-                DialogueWidget->SetVisibility(ESlateVisibility::Visible);
-            }
-        }
+        UE_LOG(LogTemp, Display, TEXT("Page == 0"));
+        DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+    }
 
-        if (DialogueWidget && Page < InDialogue.Num())
-        {
-            DialogueWidget->SetText(InDialogue[Page]);
-        }
+    if (DialogueWidget && Page < InDialogue.Num())
+    {
+        DialogueWidget->SetText(InDialogue[Page]);
+        UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
+    }
 
-        if (Page == InDialogue.Num() && DialogueWidget)
-        {
-            // hide DialogueWidget
-            DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
-            DialoguePage = 0;
-            // DialogueWidget->RemoveFromParent();
-            //  Talked = true;
-
-            SetCustomerState(EBDCustomerStates::OrderAccepted);
-        }
+    if (Page == InDialogue.Num() && DialogueWidget)
+    {
+        // hide DialogueWidget
+        UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
+        DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
+        DialoguePage = 0;
+        UE_LOG(LogTemp, Display, TEXT("Page %i "), DialoguePage);
     }
 }
 
@@ -140,7 +139,8 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
 {
     if (Order == InOrder->GetTray())
     {
-        UE_LOG(LogTemp, Warning, TEXT("GetTray"));
+        // if order correct
+        UE_LOG(LogTemp, Display, TEXT("GetTray"));
         InOrder->Grab(TraySocket);
         SetCustomerState(EBDCustomerStates::OrderReady);
     }
@@ -153,25 +153,24 @@ void ABDAICharacter::Hungry()
 
 void ABDAICharacter::Ordering()
 {
-    GetWorldTimerManager().SetTimer(PendingTimerHandle, this, &ThisClass::PendingTimeOut, TimeToPendingOrder, false);
-    UE_LOG(LogBDAICharacter, Display, TEXT("I would like a burger!"));
-    UE_LOG(LogTemp, Warning, TEXT("PendingTimer %f ON!"), TimeToPendingOrder);
+    StartCustomerTimer(EBDCustomerTimers::Pending);
+
+    GetGameplayWidget()->SubscribeToNPCPhrases(this);
+    OnCustomerPhraseSay.Broadcast(FText::FromString("I would like a burger!"), true);
 }
 
 void ABDAICharacter::OrderAccepted()
 {
-    GetWorldTimerManager().SetTimer(CookingTimerHandle, this, &ThisClass::CookingTimeOut, TimeToCooking, false);
-    UE_LOG(LogBDAICharacter, Display, TEXT("Ok! I'll wait!"));
-    UE_LOG(LogTemp, Warning, TEXT("CookingTimer %f ON!"), TimeToCooking);
+    StartCustomerTimer(EBDCustomerTimers::Cooking);
+    OnCustomerPhraseSay.Broadcast(FText::FromString("Ok! I'll wait!"), true);
 }
 
 void ABDAICharacter::OrderReady()
 {
     /// stop CookingTimer
-    GetWorldTimerManager().ClearTimer(CookingTimerHandle);
-    UE_LOG(LogTemp, Warning, TEXT("CookingTimer OFF!"));
+    CustomerTimerEnd(EBDCustomerTimers::Cooking);
+    OnCustomerPhraseSay.Broadcast(FText::FromString("O-o-oh!!! My burger!!!"), true);
 
-    UE_LOG(LogBDAICharacter, Display, TEXT("O-o-oh!!! My burger!!!"));
     // check order
     if (IsOrderCorrect())
     {
@@ -186,19 +185,20 @@ void ABDAICharacter::OrderReady()
 
 bool ABDAICharacter::IsOrderCorrect()
 {
+
     return true;
 }
 
 void ABDAICharacter::Eating()
 {
-    UE_LOG(LogBDAICharacter, Display, TEXT("All correct! Good! Bye!"));
-
+    OnCustomerPhraseSay.Broadcast(FText::FromString("All correct! Good! Bye!"), true);
     GetWorldTimerManager().SetTimer(EatTimerHandle, this, &ThisClass::EatingTimeOut, TimeToEat, false);
 }
 
 void ABDAICharacter::Leaving()
 {
-
+    OnCustomerPhraseSay.Broadcast(FText::FromString("Bye!"), true);
+    GetGameplayWidget()->UnSubscribeToNPCPhrases(this);
     GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
 }
 
@@ -220,7 +220,8 @@ void ABDAICharacter::CookingTimeOut()
 void ABDAICharacter::EatingTimeOut()
 {
     // @TODO: fix Drop
-    CurrentFood->Drop(GetActorRotation(), GetActorLocation());
+    // CurrentFood->Drop(GetActorRotation(), GetActorLocation());
+    CurrentFood->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
     CurrentFood = nullptr;
 
     SetCustomerState(EBDCustomerStates::Leaving);
@@ -231,7 +232,106 @@ void ABDAICharacter::HungryAgain()
     SetCustomerState(EBDCustomerStates::Hungry);
 }
 
-void ABDAICharacter::TimerUpdate() {}
+UBDGameplayWidget* ABDAICharacter::GetGameplayWidget() const
+{
+    if (!GetWorld()) return nullptr;
+
+    const auto PlayerController = GetWorld()->GetFirstPlayerController();
+    if (!IsValid(PlayerController)) return nullptr;
+
+    const auto HUD = Cast<ABDGameHUD>(PlayerController->GetHUD());
+    if (!IsValid(HUD)) return nullptr;
+
+    return Cast<UBDGameplayWidget>(HUD->GetGameplayWidget());
+}
+
+void ABDAICharacter::InitializeTimers()
+{
+    FCustomerTimerData PendingTimerData;
+    PendingTimerData.Type = EBDCustomerTimers::Pending;
+    PendingTimerData.Duration = TimeToPendingOrder;
+    PendingTimerData.TimerDelegate.BindUObject(this, &ThisClass::PendingTimeOut);
+    FTimerHandle InPendingTimerHandle;
+    PendingTimerData.TimerHandle = InPendingTimerHandle;
+    PendingTimerData.ProgressBarUpdateInterval = TimerUpdateInterval;
+
+    FCustomerTimerData CookingTimerData;
+    CookingTimerData.Type = EBDCustomerTimers::Cooking;
+    CookingTimerData.Duration = TimeToCooking;
+    CookingTimerData.TimerDelegate.BindUObject(this, &ThisClass::CookingTimeOut);
+    FTimerHandle InCookingTimerHandle;
+    CookingTimerData.TimerHandle = InCookingTimerHandle;
+    CookingTimerData.ProgressBarUpdateInterval = TimerUpdateInterval;
+
+    CustomerTimersMap.Add(EBDCustomerTimers::Pending, PendingTimerData);
+    CustomerTimersMap.Add(EBDCustomerTimers::Cooking, CookingTimerData);
+}
+
+void ABDAICharacter::StartCustomerTimer(EBDCustomerTimers InETimer)
+{
+    if (CustomerTimersMap.Contains(InETimer))
+    {
+        GetGameplayWidget()->SubscribeToNPCTimers(this);
+        FCustomerTimerData& ETimerData = CustomerTimersMap[InETimer];
+
+        GetWorldTimerManager().SetTimer(  //
+            ETimerData.TimerHandle,       //
+            ETimerData.TimerDelegate,     //
+            ETimerData.Duration,          //
+            false);
+
+        ETimerData.ProgressBarTimerDelegate.BindUObject(  //
+            this,                                         //
+            &ThisClass::UpdateProgressBar,                //
+            ETimerData.Type,                              //
+            ETimerData.Duration);
+
+        GetWorldTimerManager().SetTimer(           //
+            ETimerData.ProgressBarTimerHandle,     //
+            ETimerData.ProgressBarTimerDelegate,   //
+            ETimerData.ProgressBarUpdateInterval,  //
+            true);
+
+        ETimerData.OnMainTimerClearDelegate.BindUObject(this, &ThisClass::CustomerTimerEnd, InETimer);
+
+        UE_LOG(LogBDAICharacter, Display, TEXT("%s timer STARTED"), *UEnum::GetValueAsString(InETimer));
+    }
+}
+
+void ABDAICharacter::UpdateProgressBar(EBDCustomerTimers InETimer, float TotalTime)
+{
+    if (!GetWorld()) return;
+
+    if (CustomerTimersMap.Contains(InETimer))
+    {
+        FCustomerTimerData& ETimerData = CustomerTimersMap[InETimer];
+
+        float InTimeRemaining = GetWorldTimerManager().GetTimerRemaining(ETimerData.TimerHandle);
+
+        OnCustomerTimerChanged.Broadcast(InTimeRemaining / TotalTime, ETimerData.Type);
+
+        if (InTimeRemaining <= 0.0f)
+        {
+            GetWorldTimerManager().ClearTimer(ETimerData.ProgressBarTimerHandle);
+            UE_LOG(LogBDAICharacter, Display, TEXT("ProgressBar %s stoped"), *UEnum::GetValueAsString(InETimer));
+        }
+    }
+}
+
+void ABDAICharacter::CustomerTimerEnd(EBDCustomerTimers InETimer)
+{
+    if (!CustomerTimersMap.Contains(InETimer)) return;
+
+    GetGameplayWidget()->UnSubscribeFromNPCTimers(this);
+
+    FCustomerTimerData& ETimerData = CustomerTimersMap[InETimer];
+
+    GetWorldTimerManager().ClearTimer(ETimerData.TimerHandle);
+
+    GetWorldTimerManager().ClearTimer(ETimerData.ProgressBarTimerHandle);
+
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s timer stoped"), *UEnum::GetValueAsString(InETimer));
+};
 
 void ABDAICharacter::SetBlackboardEnumData(FName KeyName, EBDCustomerStates& NewState)
 {
