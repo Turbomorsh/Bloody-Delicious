@@ -9,6 +9,7 @@
 #include "Interactibles/BDInteract.h"
 #include "BDAICharacter.generated.h"
 
+class UBDBurgerTypeDataAsset;
 class UBDDialogueWidget;
 class UBDInteractionHintWidget;
 class UBDGameplayWidget;
@@ -27,6 +28,8 @@ public:
 
     void MakeOrder();
     void SetCustomerState(EBDCustomerStates NewState);
+
+    void SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder);
 
     UFUNCTION(BlueprintCallable)
     EBDCustomerStates GetCustomerState() const { return CustomerState; };
@@ -70,6 +73,9 @@ protected:
     TObjectPtr<USceneComponent> TraySocket;
 
     FOrderStruct Order;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Order")
+    TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;

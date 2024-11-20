@@ -12,14 +12,16 @@
  *
  */
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FOrderStruct
 {
     GENERATED_BODY()
 
-    EDrinkType Drink;
+    UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
+    TEnumAsByte<EDrinkType> Drink;
 
-    TArray<EFoodType> Burger;
+    UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
+    TArray<TEnumAsByte<EFoodType>> Burger;
 
     friend bool operator==(const FOrderStruct a, const FOrderStruct b);
 };

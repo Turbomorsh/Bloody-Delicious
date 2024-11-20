@@ -16,7 +16,7 @@ void ABDPlate::Interact(TObjectPtr<UObject> Object)
     else if (TObjectPtr<ABDBurgerPart> CastedPart = Cast<ABDBurgerPart>(Object))
         PlaceItem(CastedPart);
 }
-TArray<EFoodType> ABDPlate::GetBurger()
+TArray<TEnumAsByte<EFoodType>> ABDPlate::GetBurger()
 {
     return TypesArray;
 }

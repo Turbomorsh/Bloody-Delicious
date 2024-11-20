@@ -4,6 +4,7 @@
 #include "AI/BDAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Interactibles/BDBurgerTypeDataAsset.h"
 #include "Interactibles/BDFoodTray.h"
 #include "Rendering/RenderCommandPipes.h"
 #include "UI/BDDialogueWidget.h"
@@ -46,9 +47,7 @@ void ABDAICharacter::BeginPlay()
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
-    TArray<EFoodType> Food;
-    Food.Add(EFoodType::Meet);
-    Order.Burger = Food;
+    if (OrderType) Order = OrderType->Order;
 
     InitializeTimers();
 }
@@ -122,8 +121,20 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 
     if (DialogueWidget && Page < InDialogue.Num())
     {
-        DialogueWidget->SetText(InDialogue[Page]);
-        UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
+        if (InDialogue[Page].ToString().GetCharArray().Num() == 0)
+        {
+            FFormatOrderedArguments FormatArguments;
+            FormatArguments.Add(FText::FromString(TEXT("")));
+            FormatArguments.Add(OrderType->OrderName);
+
+            // Leave one Dialogue Array field empty to NPC says his order name
+            DialogueWidget->SetText(FText::Join(FText::FromString(TEXT("I want ")), FormatArguments));
+        }
+        else
+        {
+            DialogueWidget->SetText(InDialogue[Page]);
+            UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
+        }
     }
 
     if (Page == InDialogue.Num() && DialogueWidget)
@@ -393,4 +404,8 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
         default:
             break;
     }
+}
+void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
+{
+    if (InOrder) OrderType = InOrder;
 }

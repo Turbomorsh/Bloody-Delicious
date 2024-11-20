@@ -21,7 +21,7 @@ public:
 
     void Interact(TObjectPtr<UObject> Object) override;
 
-    TArray<EFoodType> GetBurger();
+    TArray<TEnumAsByte<EFoodType>> GetBurger();
 
 protected:
     virtual void BeginPlay() override;
@@ -31,7 +31,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sockets)
     TObjectPtr<USceneComponent> FoodSocket;
 
-    TArray<EFoodType> TypesArray;
+    TArray<TEnumAsByte<EFoodType>> TypesArray;
 
     TObjectPtr<ABDBurgerPart> LastPart;
 };
