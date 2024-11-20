@@ -17,6 +17,9 @@ class BLOODYDELISIOUS_API ABDGameHUD : public AHUD
 {
     GENERATED_BODY()
 
+public:
+    UUserWidget* GetGameplayWidget() const { return GameWidgets[EBDGameState::GameInProgress]; };
+
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "UI")
     TSubclassOf<UBDGameplayWidget> GameplayWidgetClass;

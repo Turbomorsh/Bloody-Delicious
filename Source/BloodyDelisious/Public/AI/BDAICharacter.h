@@ -11,8 +11,8 @@
 
 class UBDDialogueWidget;
 class UBDInteractionHintWidget;
+class UBDGameplayWidget;
 class UBehaviorTree;
-class ABDOrderManager;
 
 UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract
 {
@@ -25,17 +25,19 @@ public:
     virtual void Show() override;
     virtual void Hide() override;
 
+    void MakeOrder();
     void SetCustomerState(EBDCustomerStates NewState);
 
     UFUNCTION(BlueprintCallable)
     EBDCustomerStates GetCustomerState() const { return CustomerState; };
 
-    void SetOrderManagerPtr(TObjectPtr<ABDOrderManager> InOrderManager) { OrderManager = InOrderManager; };
+    FOnCustomerTimerChangedSignature OnCustomerTimerChanged;
+    FOnCustomerTextSaySignature OnCustomerPhraseSay;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
     TObjectPtr<UBehaviorTree> BehsaviorTreeAsset;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue", meta = (ExposeOnSpawn))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Dialogue", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
 protected:
@@ -45,10 +47,22 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI")
     FName CustomerStatusKeyName = "CustomerStatus";
 
-    UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (ClampMin = "0", ClampMax = "600"))
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
     float TimeHungryAgain = 10.0f;  // in sec
 
-    void PlayDialogue(TArray<FText> Dialogue, int Page);
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
+    float TimeToEat = 10.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "120"))
+    float TimeToPendingOrder = 5.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "120"))
+    float TimeToCooking = 15.0f;  // in sec
+
+    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "1"))
+    float TimerUpdateInterval = 0.1f;
+
+    void PlayDialogue(TArray<FText> Dialogue, int32 Page);
 
     void TryGetOrder(TObjectPtr<ABDFoodTray> InOrder);
 
@@ -56,8 +70,6 @@ protected:
     TObjectPtr<USceneComponent> TraySocket;
 
     FOrderStruct Order;
-
-    bool Talked = false;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
@@ -74,7 +86,7 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hint)
     FText HintText = FText::FromString("pick cube");
 
-    int DialoguePage = 0;
+    int32 DialoguePage = 0;
 
     virtual void BeginPlay() override;
 
@@ -85,13 +97,27 @@ public:
 private:
     EBDCustomerStates CustomerState = EBDCustomerStates::Hungry;
 
-    TObjectPtr<ABDOrderManager> OrderManager;
+    TObjectPtr<ABDFoodTray> CurrentFood;
 
+    TMap<EBDCustomerTimers, FCustomerTimerData> CustomerTimersMap;
     FTimerHandle HungryAgainTimerHandle;
+    FTimerHandle EatTimerHandle;
+
+    UBDGameplayWidget* GetGameplayWidget() const;
+
+    void InitializeTimers();
+    void StartCustomerTimer(EBDCustomerTimers InETimer);
+    void UpdateProgressBar(EBDCustomerTimers InETimer, float TotalTime);
+    void CustomerTimerEnd(EBDCustomerTimers InETimer);
 
     void SetBlackboardEnumData(FName KeyName, EBDCustomerStates& NewState);
 
+    void PendingTimeOut();
+    void CookingTimeOut();
+    void EatingTimeOut();
     void HungryAgain();
+
+    bool IsOrderCorrect();
 
     void Hungry();
     void Ordering();

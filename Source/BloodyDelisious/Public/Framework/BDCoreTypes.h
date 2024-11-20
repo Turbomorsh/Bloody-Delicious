@@ -13,8 +13,42 @@ enum class EBDGameState : uint8
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EBDGameState);
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameDataChangedSignature, int32);
+
+// Timers
+UENUM()
+enum class EBDCustomerTimers : uint8
+{
+    Pending = 0,
+    Cooking,
+    None
+};
+
+USTRUCT(BlueprintType)
+struct FCustomerTimerData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
+    EBDCustomerTimers Type;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
+    float Duration;
+
+    FTimerHandle TimerHandle;
+    FTimerDelegate TimerDelegate;
+    FTimerDelegate OnMainTimerClearDelegate;
+
+    FTimerHandle ProgressBarTimerHandle;
+    FTimerDelegate ProgressBarTimerDelegate;
+
+    float ProgressBarUpdateInterval;
+
+    FCustomerTimerData() : Type(EBDCustomerTimers::None), Duration(0.0f), ProgressBarUpdateInterval(0.1f) {}
+};
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCustomerTimerChangedSignature, float, EBDCustomerTimers);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCustomerTextSaySignature, FText, bool);
 
 UENUM(BlueprintType)
 enum class EBDCustomerStates : uint8
