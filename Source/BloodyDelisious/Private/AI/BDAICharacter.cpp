@@ -6,7 +6,6 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Interactibles/BDBurgerTypeDataAsset.h"
 #include "Interactibles/BDFoodTray.h"
-#include "Rendering/RenderCommandPipes.h"
 #include "UI/BDDialogueWidget.h"
 #include "UI/BDInteractionHintWidget.h"
 #include "UI/BDGameplayWidget.h"
@@ -69,7 +68,6 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
         UE_LOG(LogTemp, Display, TEXT("Interact Ordering"));
         // @TODO: fix play logic
         PlayDialogue(Dialogue, DialoguePage);
-        DialoguePage++;
 
         // AcceptOrder
         // SetCustomerState(EBDCustomerStates::OrderAccepted);
@@ -129,10 +127,12 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 
             // Leave one Dialogue Array field empty to NPC says his order name
             DialogueWidget->SetText(FText::Join(FText::FromString(TEXT("I want ")), FormatArguments));
+            DialoguePage++;
         }
         else
         {
             DialogueWidget->SetText(InDialogue[Page]);
+            DialoguePage++;
             UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
         }
     }
