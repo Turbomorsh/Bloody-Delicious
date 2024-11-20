@@ -61,6 +61,8 @@ void ABDDoor::Hide()
 void ABDDoor::BeginPlay()
 {
     Super::BeginPlay();
+
+    InitRotator = DoorSocket->GetRelativeRotation();
 }
 
 void ABDDoor::BIndTimeline()
@@ -76,8 +78,12 @@ void ABDDoor::BIndTimeline()
 
 void ABDDoor::TimelineProgress(float Alpha)
 {
-    DoorSocket->SetRelativeRotation(
-        FRotator(DoorSocket->GetRelativeRotation().Pitch, UKismetMathLibrary::Lerp(0, 90, Alpha), DoorSocket->GetRelativeRotation().Roll));
+    int StartRot = InitRotator.Yaw;
+
+    int EndRot = InitRotator.Yaw + 90;
+
+    DoorSocket->SetRelativeRotation(FRotator(DoorSocket->GetRelativeRotation().Pitch, UKismetMathLibrary::Lerp(StartRot, EndRot, Alpha),
+        DoorSocket->GetRelativeRotation().Roll));
 }
 
 // Called every frame

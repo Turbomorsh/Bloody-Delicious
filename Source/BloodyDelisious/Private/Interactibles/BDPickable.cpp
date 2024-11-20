@@ -17,14 +17,14 @@ ABDPickable::ABDPickable()
     SetRootComponent(MeshComponent);
 
     Curve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
-
-    BindTimeLine();
 }
 
 // Called when the game starts or when spawned
 void ABDPickable::BeginPlay()
 {
     Super::BeginPlay();
+
+    BindTimeLine();
 }
 
 // Called every frame

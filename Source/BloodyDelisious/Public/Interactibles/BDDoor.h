@@ -57,6 +57,8 @@ protected:
 
     EDoorStates DoorState = EDoorStates::Closed;
 
+    FRotator InitRotator;
+
     void BIndTimeline();
 
     UFUNCTION()
