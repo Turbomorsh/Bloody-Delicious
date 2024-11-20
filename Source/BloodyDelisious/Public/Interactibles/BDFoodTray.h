@@ -18,7 +18,7 @@ struct FOrderStruct
     GENERATED_BODY()
 
     UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
-    TEnumAsByte<EDrinkType> Drink;
+    TEnumAsByte<EDrinkType> Drink = EDrinkType::Empty;
 
     UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
     TArray<TEnumAsByte<EFoodType>> Burger;
