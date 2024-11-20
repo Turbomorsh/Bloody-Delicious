@@ -23,6 +23,15 @@ struct FOrderStruct
     UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
     TArray<TEnumAsByte<EFoodType>> Burger;
 
+    FOrderStruct();
+
+    FOrderStruct(TEnumAsByte<EDrinkType> InDrink, TArray<TEnumAsByte<EFoodType>> InBurger)
+    {
+        Drink = InDrink;
+
+        Burger = InBurger;
+    }
+
     friend bool operator==(const FOrderStruct a, const FOrderStruct b);
 };
 
