@@ -34,6 +34,8 @@ void ABDFoodTray::PlaceItem(TObjectPtr<UObject> Object)
         {
             CastedPlate->Grab(PlateSocket);
             TrayFood.Burger = CastedPlate->GetBurger();
+
+            CastedPlate->SetActorEnableCollision(false);
         }
 
     if (TObjectPtr<ABDCup> CastedCup = Cast<ABDCup>(Object))
@@ -41,5 +43,7 @@ void ABDFoodTray::PlaceItem(TObjectPtr<UObject> Object)
         {
             CastedCup->Grab(DrinkSocket);
             TrayFood.Drink = CastedCup->Type;
+
+            CastedCup->SetActorEnableCollision(false);
         }
 }

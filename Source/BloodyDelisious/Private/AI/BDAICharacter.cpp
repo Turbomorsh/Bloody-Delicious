@@ -69,15 +69,16 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
 
         UE_LOG(LogTemp, Display, TEXT("Interact Ordering"));
         // @TODO: fix play logic
-        // PlayDialogue(Dialogue, DialoguePage);
-        // DialoguePage++;
+        PlayDialogue(Dialogue, DialoguePage);
+        DialoguePage++;
 
         // AcceptOrder
-        SetCustomerState(EBDCustomerStates::OrderAccepted);
+        // SetCustomerState(EBDCustomerStates::OrderAccepted);
     }
 
-    if (CurrentFood = Cast<ABDFoodTray>(Object))
+    if (TObjectPtr<ABDFoodTray> CastedFood = Cast<ABDFoodTray>(Object))
     {
+        CurrentFood = CastedFood;
         if (CustomerState == EBDCustomerStates::OrderAccepted)
         {
             UE_LOG(LogTemp, Display, TEXT("Interact OrderAccepted"));
@@ -131,6 +132,7 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
         UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
         DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
         DialoguePage = 0;
+        SetCustomerState(EBDCustomerStates::OrderAccepted);
         UE_LOG(LogTemp, Display, TEXT("Page %i "), DialoguePage);
     }
 }
@@ -142,6 +144,8 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
         // if order correct
         UE_LOG(LogTemp, Display, TEXT("GetTray"));
         InOrder->Grab(TraySocket);
+        CurrentFood = InOrder;
+
         SetCustomerState(EBDCustomerStates::OrderReady);
     }
 }

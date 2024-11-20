@@ -97,6 +97,7 @@ public:
 private:
     EBDCustomerStates CustomerState = EBDCustomerStates::Hungry;
 
+    UPROPERTY()
     TObjectPtr<ABDFoodTray> CurrentFood;
 
     TMap<EBDCustomerTimers, FCustomerTimerData> CustomerTimersMap;
