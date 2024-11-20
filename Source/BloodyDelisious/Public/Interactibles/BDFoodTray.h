@@ -23,9 +23,15 @@ struct FOrderStruct
     UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
     TArray<TEnumAsByte<EFoodType>> Burger;
 
-    FOrderStruct();
+    FOrderStruct()
+    {
+        Drink = EDrinkType::Empty;
 
-    FOrderStruct(TEnumAsByte<EDrinkType> InDrink, TArray<TEnumAsByte<EFoodType>> InBurger)
+        const TArray<TEnumAsByte<EFoodType>> NewBurger;
+        Burger = NewBurger;
+    }
+
+    FOrderStruct(const TEnumAsByte<EDrinkType> InDrink, const TArray<TEnumAsByte<EFoodType>> InBurger)
     {
         Drink = InDrink;
 
