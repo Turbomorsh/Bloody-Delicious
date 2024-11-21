@@ -43,6 +43,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
+    UFUNCTION(BlueprintCallable)
+    bool IsWaiting() const;
+
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (ClampMin = "0", ClampMax = "600"))
     float MaxSpeed = 212.0f;
