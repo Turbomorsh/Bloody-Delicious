@@ -409,7 +409,6 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
 bool ABDAICharacter::IsWaiting() const
 {
     bool bIsWait = GetCustomerState() == EBDCustomerStates::OrderAccepted;
-    UE_LOG(LogBDAICharacter, Display, TEXT("IsWaiting %s "), *LexToString(bIsWait));
     return bIsWait;
 }
 

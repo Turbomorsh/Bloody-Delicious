@@ -164,13 +164,19 @@ void ABDGameMode::SpawnCustomers()
 {
     if (!GetWorld()) return;
 
-    for (int32 i = 0; i < GameData.CustomersNum; ++i)
+    for (const TPair<TSubclassOf<APawn>, int32>& Pair : GameData.CustomersTypeNum)
     {
-        FActorSpawnParameters SpawnInfo;
-        SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+        AICustomerPawnClass = Pair.Key;
+        int32 NumToSpawn = Pair.Value;
 
-        const auto BDAIController = GetWorld()->SpawnActor<AAIController>(AIControllerClass, SpawnInfo);
-        RestartPlayer(BDAIController);
+        for (int32 i = 0; i < NumToSpawn; ++i)
+        {
+            FActorSpawnParameters SpawnInfo;
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+            const auto BDAIController = GetWorld()->SpawnActor<AAIController>(AIControllerClass, SpawnInfo);
+            RestartPlayer(BDAIController);
+        }
     }
 }
 

@@ -23,6 +23,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
     FName FocusOnKeyName = "TargetActor";
 
+    void StartBehavior();
+    void StopBehavior();
+
     virtual void OnPossess(APawn* InPawn) override;
     virtual void Tick(float DelataTime) override;
 

@@ -77,9 +77,8 @@ struct FGameData
 {
     GENERATED_USTRUCT_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
-        meta = (ClampMin = "1", ClampMax = "20", ToolTip = "Costomers count"))
-    int32 CustomersNum = 2;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    TMap<TSubclassOf<APawn>, int32> CustomersTypeNum;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
         meta = (ClampMin = "1", ClampMax = "10", ToolTip = "Days count"))

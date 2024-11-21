@@ -4,6 +4,7 @@
 #include "AI/BDAICharacter.h"
 #include "Components/BDAIPerceptionComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
 
 ABDAIController::ABDAIController()
 {
@@ -20,6 +21,7 @@ void ABDAIController::OnPossess(APawn* InPawn)
     {
         RunBehaviorTree(AICharacter->BehsaviorTreeAsset);
     }
+    // StopBehavior();
 }
 
 void ABDAIController::Tick(float DelataTime)
@@ -35,4 +37,18 @@ TObjectPtr<AActor> ABDAIController::GetFocusOnActor() const
     if (!GetBlackboardComponent()) return nullptr;
 
     return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
+}
+
+void ABDAIController::StartBehavior() {}
+
+void ABDAIController::StopBehavior()
+{
+    FTimerHandle StartBehaviorTimerHandle;
+    GetWorldTimerManager().SetTimer(  //
+        StartBehaviorTimerHandle,
+        [this]()                                                      //
+        {                                                             //
+            BrainComponent->StopLogic(TEXT("Paused Behavior Tree"));  //
+        },
+        FMath::RandRange(1.0f, 3.0f), false);
 }

@@ -47,8 +47,8 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<AAIController> AIControllerClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Game")
-    TSubclassOf<APawn> AICustomerPawnClass;
+    // UPROPERTY(EditDefaultsOnly, Category = "Game")
+    TSubclassOf<APawn> AICustomerPawnClass = nullptr;
 
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName ToNPCStartTag{"NPC"};
