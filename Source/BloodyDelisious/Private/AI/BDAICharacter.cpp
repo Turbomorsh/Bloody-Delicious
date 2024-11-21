@@ -405,6 +405,7 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
             break;
     }
 }
+
 void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
 {
     if (InOrder) OrderType = InOrder;

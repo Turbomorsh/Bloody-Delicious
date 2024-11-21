@@ -40,7 +40,7 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
     TObjectPtr<UBehaviorTree> BehsaviorTreeAsset;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Dialogue", meta = (ExposeOnSpawn))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
 protected:
@@ -74,7 +74,7 @@ protected:
 
     FOrderStruct Order;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Order")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI")
     TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
