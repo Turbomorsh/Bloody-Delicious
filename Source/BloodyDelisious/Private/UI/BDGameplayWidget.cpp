@@ -51,7 +51,8 @@ void UBDGameplayWidget::UnSubscribeToNPCPhrases(ABDAICharacter* NPC)
 
 void UBDGameplayWidget::OnTimerChanged(float TimeRemaning, EBDCustomerTimers InETimer)
 {
-    UE_LOG(LogBDGameplayWidget, Display, TEXT("TimeRemaning: %f EBDCustomerTimers: %s"), TimeRemaning, *UEnum::GetValueAsString(InETimer));
+    // UE_LOG(LogBDGameplayWidget, Display, TEXT("TimeRemaning: %f EBDCustomerTimers: %s"), TimeRemaning,
+    // *UEnum::GetValueAsString(InETimer));
 
     switch (InETimer)
     {

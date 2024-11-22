@@ -78,6 +78,7 @@ protected:
     FOrderStruct Order;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI")
+    TArray<TObjectPtr<UBDBurgerTypeDataAsset>> OrderTypes;
     TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)

@@ -46,8 +46,6 @@ void ABDAICharacter::BeginPlay()
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
-    if (OrderType) Order = OrderType->Order;
-
     InitializeTimers();
 }
 
@@ -58,14 +56,14 @@ void ABDAICharacter::Tick(float DeltaTime)
 
 void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
 {
-    UE_LOG(LogTemp, Display, TEXT("Interact!"));
+    UE_LOG(LogBDAICharacter, Display, TEXT("Interact!"));
 
     if (Cast<USceneComponent>(Object) && CustomerState == EBDCustomerStates::Ordering)
     {
         // stop PendingTimer
         CustomerTimerEnd(EBDCustomerTimers::Pending);
 
-        UE_LOG(LogTemp, Display, TEXT("Interact Ordering"));
+        UE_LOG(LogBDAICharacter, Display, TEXT("Interact Ordering"));
         // @TODO: fix play logic
         PlayDialogue(Dialogue, DialoguePage);
 
@@ -78,7 +76,7 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
         CurrentFood = CastedFood;
         if (CustomerState == EBDCustomerStates::OrderAccepted)
         {
-            UE_LOG(LogTemp, Display, TEXT("Interact OrderAccepted"));
+            UE_LOG(LogBDAICharacter, Display, TEXT("Interact OrderAccepted"));
             TryGetOrder(CurrentFood);
         }
     }
@@ -153,11 +151,16 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
     if (Order == InOrder->GetTray())
     {
         // if order correct
-        UE_LOG(LogTemp, Display, TEXT("GetTray"));
+        UE_LOG(LogBDAICharacter, Display, TEXT("GetTray"));
         InOrder->Grab(TraySocket);
         CurrentFood = InOrder;
 
         SetCustomerState(EBDCustomerStates::OrderReady);
+    }
+    else
+    {
+        OnCustomerPhraseSay.Broadcast(FText::FromString("That's not what I ordered."), true);
+        UE_LOG(LogBDAICharacter, Display, TEXT("Wrong order"));
     }
 }
 
@@ -168,10 +171,28 @@ void ABDAICharacter::Hungry()
 
 void ABDAICharacter::Ordering()
 {
+    if (OrderTypes.Num() > 0)
+    {
+        int32 RandomIndex = FMath::RandRange(0, OrderTypes.Num() - 1);
+
+        SetOrderData(OrderTypes[RandomIndex]);
+    }
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *OrderType->OrderName.ToString());
+
     StartCustomerTimer(EBDCustomerTimers::Pending);
 
     GetGameplayWidget()->SubscribeToNPCPhrases(this);
-    OnCustomerPhraseSay.Broadcast(FText::FromString("I would like a burger!"), true);
+
+    FString OrderString;
+    OrderString.Append("I would like a ");
+    OrderString.Append(OrderType->OrderName.ToString());
+    for (const auto PartName : Order.Burger)
+    {
+        OrderString.Append("\n").Append(UEnum::GetValueAsString(PartName));
+        UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *UEnum::GetValueAsString(PartName));
+    }
+
+    OnCustomerPhraseSay.Broadcast(FText::FromString(OrderString), true);
 }
 
 void ABDAICharacter::OrderAccepted()
@@ -415,4 +436,5 @@ bool ABDAICharacter::IsWaiting() const
 void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
 {
     if (InOrder) OrderType = InOrder;
+    if (OrderType) Order = OrderType->Order;
 }
