@@ -29,7 +29,9 @@ void ABDGameMode::StartPlay()
 
     CurrentRound = 1;
     StartRound();
-    SpawnCustomers();
+    SpawnGroupController();
+
+    // SpawnCustomers();
     SetGameState(EBDGameState::GameInProgress);
     OnGameDataChanged.Broadcast(RoundCountDown);
 
@@ -135,10 +137,10 @@ void ABDGameMode::GameComplete()
 
 UClass* ABDGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
-    if (InController && InController->IsA<AAIController>())
-    {
-        return AICustomerPawnClass;
-    }
+    // if (InController && InController->IsA<AAIController>())
+    //{
+    //     return AICustomerPawnClass;
+    // }
     return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
@@ -146,7 +148,8 @@ AActor* ABDGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
     if (!Player) return Super::ChoosePlayerStart_Implementation(Player);
 
-    FName TargetTag = Player->IsA<AAIController>() ? ToNPCStartTag : Player->IsA<APlayerController>() ? ToPlayerStartTag : NAME_None;
+    // FName TargetTag = Player->IsA<AAIController>() ? ToNPCStartTag : Player->IsA<APlayerController>() ? ToPlayerStartTag : NAME_None;
+    FName TargetTag = Player->IsA<APlayerController>() ? ToPlayerStartTag : NAME_None;
 
     if (TargetTag == NAME_None) return Super::ChoosePlayerStart_Implementation(Player);
 
@@ -160,24 +163,80 @@ AActor* ABDGameMode::ChoosePlayerStart_Implementation(AController* Player)
     return Super::ChoosePlayerStart_Implementation(Player);
 }
 
-void ABDGameMode::SpawnCustomers()
+void ABDGameMode::SpawnGroupController()
 {
     if (!GetWorld()) return;
+
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    const auto BDGroupAIController = GetWorld()->SpawnActor<AAIController>(GroupAIControllerClass, SpawnInfo);
+}
+
+void ABDGameMode::SpawnCustomers()
+{
+    /*if (!GetWorld()) return;
+
+    CustomerGroups.Empty();
+    UE_LOG(LogTemp, Log, TEXT("SpawnCustomers: start creating AI character groups"));
 
     for (const TPair<TSubclassOf<APawn>, int32>& Pair : GameData.CustomersTypeNum)
     {
         AICustomerPawnClass = Pair.Key;
         int32 NumToSpawn = Pair.Value;
 
+        TArray<AAIController*> NewGroup;
+        UE_LOG(LogTemp, Log, TEXT("Creating a group for Pawn class: %s, amount: %d"), *AICustomerPawnClass->GetName(), NumToSpawn);
         for (int32 i = 0; i < NumToSpawn; ++i)
         {
             FActorSpawnParameters SpawnInfo;
             SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
             const auto BDAIController = GetWorld()->SpawnActor<AAIController>(AIControllerClass, SpawnInfo);
+
+            UE_LOG(LogTemp, Log, TEXT("AIController successfully created: %s"), *BDAIController->GetName());
+
             RestartPlayer(BDAIController);
+            NewGroup.Add(BDAIController);
+
+            APawn* ControlledPawn = BDAIController->GetPawn();
+            if (ControlledPawn)
+            {
+                UE_LOG(LogTemp, Log, TEXT("Pawn successfully created: %s, Controller: %s"), *ControlledPawn->GetName(),
+                    *BDAIController->GetName());
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Error: Controller %s doesn't control Pawn!"), *BDAIController->GetName());
+            }
         }
+        CustomerGroups.Add(AICustomerPawnClass, NewGroup);
+        UE_LOG(LogTemp, Log, TEXT("Group for %s created, amount Controllers: %d"), *AICustomerPawnClass->GetName(), NewGroup.Num());
     }
+
+    UE_LOG(LogTemp, Log, TEXT("All groupd AI characters have been created, amount of types: %d"), CustomerGroups.Num());
+
+    for (const auto& GroupPair : CustomerGroups)
+    {
+        const TSubclassOf<APawn>& PawnClass = GroupPair.Key;
+        const TArray<AAIController*>& Controllers = GroupPair.Value;
+
+        int32 NumControllers = Controllers.Num();
+        FString PawnClassName = PawnClass ? PawnClass->GetName() : TEXT("Unknown");
+        UE_LOG(LogTemp, Log, TEXT("Group for Pawn class: %s contains %d controllers"), *PawnClassName, NumControllers);
+
+        for (const AAIController* Controller : Controllers)
+        {
+            if (Controller && Controller->GetPawn())
+            {
+                UE_LOG(LogTemp, Log, TEXT(" - Controller: %s, Pawn: %s"), *Controller->GetName(), *Controller->GetPawn()->GetName());
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT(" - Controller: %s not tied to Pawn!"), *Controller->GetName());
+            }
+        }
+    }*/
 }
 
 // for test visibility manager

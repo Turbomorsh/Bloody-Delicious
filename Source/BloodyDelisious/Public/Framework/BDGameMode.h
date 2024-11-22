@@ -44,20 +44,26 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Test")
     FName ScaryTag = "Scary";  // for test visibility manager
 
+    // UPROPERTY(EditDefaultsOnly, Category = "Game")
+    // TSubclassOf<AAIController> AIControllerClass;
+
+    // group
     UPROPERTY(EditDefaultsOnly, Category = "Game")
-    TSubclassOf<AAIController> AIControllerClass;
+    TSubclassOf<AAIController> GroupAIControllerClass;
 
     // UPROPERTY(EditDefaultsOnly, Category = "Game")
-    TSubclassOf<APawn> AICustomerPawnClass = nullptr;
+    // TSubclassOf<APawn> AICustomerPawnClass = nullptr;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Game")
-    FName ToNPCStartTag{"NPC"};
+    // UPROPERTY(EditDefaultsOnly, Category = "Game")
+    // FName ToNPCStartTag{"NPC"};
 
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName ToPlayerStartTag{"Player"};
 
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FGameData GameData;
+
+    // TMap<TSubclassOf<APawn>, TArray<AAIController*>> CustomerGroups;
 
 private:
     EBDGameState GameState = EBDGameState::Waiting;
@@ -71,6 +77,7 @@ private:
     void GameOver();
     void GameComplete();
 
+    void SpawnGroupController();
     void SpawnCustomers();
     void StartRound();
     void GameTimerUpdate();
