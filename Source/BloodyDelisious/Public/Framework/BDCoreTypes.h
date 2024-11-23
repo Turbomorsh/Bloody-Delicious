@@ -14,6 +14,9 @@ enum class EBDGameState : uint8
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EBDGameState);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameDataChangedSignature, int32);
+DECLARE_MULTICAST_DELEGATE(FOnRoundEndSignature);
+DECLARE_MULTICAST_DELEGATE(FOnRoundStartSignature);
+DECLARE_MULTICAST_DELEGATE(FOnAllCustomerExitedSignature);
 
 // Timers
 UENUM()
@@ -79,9 +82,6 @@ USTRUCT(BlueprintType)
 struct FGameData
 {
     GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    TMap<TSubclassOf<APawn>, int32> CustomersTypeNum;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
         meta = (ClampMin = "1", ClampMax = "10", ToolTip = "Days count"))

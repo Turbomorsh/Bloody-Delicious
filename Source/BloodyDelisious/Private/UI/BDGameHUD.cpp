@@ -35,17 +35,26 @@ void ABDGameHUD::BeginPlay()
 
 void ABDGameHUD::OnGameStateChanged(EBDGameState State)
 {
-    if (CurrentWidget)
+    if (CurrentWidget && State != EBDGameState::Waiting)
     {
         CurrentWidget->SetVisibility(ESlateVisibility::Collapsed);
     }
-
     if (GameWidgets.Contains(State))
     {
         CurrentWidget = GameWidgets[State];
         CurrentWidget->SetVisibility(ESlateVisibility::Visible);
     }
-
-    bool bShowCursor = State != EBDGameState::GameInProgress;
+    bool bShowCursor = State != EBDGameState::GameInProgress && State != EBDGameState::Waiting;
     WorldUtils::SetUIInput(GetWorld(), bShowCursor);
+
+    RoundTransition(State == EBDGameState::Waiting);
+}
+
+void ABDGameHUD::RoundTransition(bool InbShow)
+{
+    auto GamePlayWidget = Cast<UBDGameplayWidget>(CurrentWidget);
+    if (GamePlayWidget)
+    {
+        GamePlayWidget->ShowTransitionInfo(InbShow);
+    }
 }

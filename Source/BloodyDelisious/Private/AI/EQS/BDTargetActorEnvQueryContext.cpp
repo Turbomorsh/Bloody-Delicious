@@ -35,7 +35,7 @@ void UBDTargetActorEnvQueryContext::ProvideContext(FEnvQueryInstance& QueryInsta
     }
     if (FoundActor == nullptr)
     {
-        UE_LOG(LogBDTargetActorEnvQueryContext, Display, TEXT("Actor is nullptr!"));
+        // UE_LOG(LogBDTargetActorEnvQueryContext, Display, TEXT("Actor is nullptr!"));
     }
     else
     {

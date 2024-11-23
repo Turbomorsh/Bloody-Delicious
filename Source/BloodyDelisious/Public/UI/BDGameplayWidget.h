@@ -29,6 +29,8 @@ public:
 
     void OnPhraseSay(FText InPhrase, bool bIsActive);
 
+    void ShowTransitionInfo(bool bShow);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
     UProgressBar* TimerProgressBar;
@@ -41,6 +43,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
     UTextBlock* Phrase_TextBlock;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+    UTextBlock* Transition_TextBlock;
 
 private:
     ABDAICharacter* CurrentNPC;

@@ -34,16 +34,16 @@ protected:
 
     virtual void BeginPlay() override;
 
+    void OnRoundStart();
+
+    void OnRoundEnd();
+
 private:
     AActor* GetRandomPlayerStartByTag();
 
-    void OnGameStateChanged(EBDGameState State);
-
+    bool bIsRoundEnd = false;
     TArray<AAIController*> CustomerControllers;
     TArray<AAIController*> EvilControllers;
-
     TArray<APawn*> CustomerPawns;
     TArray<APawn*> EvilPawns;
-
-    // TMap<TSubclassOf<APawn>, TArray<AAIController*>> CustomerGroups;
 };

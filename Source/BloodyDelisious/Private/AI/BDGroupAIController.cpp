@@ -14,33 +14,27 @@ void ABDGroupAIController::BeginPlay()
 {
     Super::BeginPlay();
 
+    InitializeCustomerGroup(CustomersTypeByNum, CustomerControllers, CustomerPawns);
+    InitializeCustomerGroup(EvilCustomersTypeByNum, EvilControllers, EvilPawns);
+
     const auto GameMode = Cast<ABDGameMode>(GetWorld()->GetAuthGameMode());
     if (GameMode)
     {
-        GameMode->OnGameStateChanged.AddUObject(this, &ThisClass::OnGameStateChanged);
+        GameMode->OnRoundEnd.AddUObject(this, &ThisClass::OnRoundEnd);
+        GameMode->OnRoundStart.AddUObject(this, &ThisClass::OnRoundStart);
     }
 }
 
-void ABDGroupAIController::OnGameStateChanged(EBDGameState State)
+void ABDGroupAIController::OnRoundStart()
 {
-    switch (State)
-    {
-        case EBDGameState::Waiting:
-            break;
-        case EBDGameState::GameInProgress:
-            InitializeCustomerGroup(CustomersTypeByNum, CustomerControllers, CustomerPawns);
-            InitializeCustomerGroup(EvilCustomersTypeByNum, EvilControllers, EvilPawns);
-            ActivateRandomCharacter();
-            break;
-        case EBDGameState::GamePause:
-            break;
-        case EBDGameState::GameOver:
-            break;
-        case EBDGameState::GameCompleted:
-            break;
-        default:
-            break;
-    }
+    bIsRoundEnd = false;
+    ActivateRandomCharacter();
+}
+
+void ABDGroupAIController::OnRoundEnd()
+{
+    bIsRoundEnd = true;
+    UE_LOG(LogBDGroupAIController, Display, TEXT("Round End"));
 }
 
 void ABDGroupAIController::InitializeCustomerGroup(
@@ -91,10 +85,22 @@ void ABDGroupAIController::InitializeCustomerGroup(
 
 void ABDGroupAIController::ActivateRandomCharacter()
 {
-    int32 RandomIndex = FMath::RandRange(0, CustomerPawns.Num() - 1);
-    const auto BDAICharacter = Cast<ABDAICharacter>(CustomerPawns[RandomIndex]);
-    BDAICharacter->SetCustomerState(EBDCustomerStates::Hungry);
-    UE_LOG(LogBDGroupAIController, Display, TEXT("BDAICharacter %s random picked"), *BDAICharacter->GetName());
+    if (!bIsRoundEnd)
+    {
+        int32 RandomIndex = FMath::RandRange(0, CustomerPawns.Num() - 1);
+        const auto BDAICharacter = Cast<ABDAICharacter>(CustomerPawns[RandomIndex]);
+        BDAICharacter->SetCustomerState(EBDCustomerStates::Hungry);
+        UE_LOG(LogBDGroupAIController, Display, TEXT("BDAICharacter %s random picked"), *BDAICharacter->GetName());
+    }
+    else
+    {
+        UE_LOG(LogBDGroupAIController, Warning, TEXT("BDAICharacter no picked"));
+        const auto GameMode = Cast<ABDGameMode>(GetWorld()->GetAuthGameMode());
+        if (GameMode)
+        {
+            GameMode->OnAllCustomerExited.Broadcast();
+        }
+    }
 }
 
 AActor* ABDGroupAIController::GetRandomPlayerStartByTag()
