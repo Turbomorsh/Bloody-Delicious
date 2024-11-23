@@ -29,7 +29,8 @@ void ABDGameMode::StartPlay()
 
     CurrentRound = 1;
     StartRound();
-    SpawnCustomers();
+    SpawnGroupController();
+
     SetGameState(EBDGameState::GameInProgress);
     OnGameDataChanged.Broadcast(RoundCountDown);
 
@@ -133,20 +134,12 @@ void ABDGameMode::GameComplete()
     SetGameState(EBDGameState::GameCompleted);
 }
 
-UClass* ABDGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
-{
-    if (InController && InController->IsA<AAIController>())
-    {
-        return AICustomerPawnClass;
-    }
-    return Super::GetDefaultPawnClassForController_Implementation(InController);
-}
-
 AActor* ABDGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
     if (!Player) return Super::ChoosePlayerStart_Implementation(Player);
 
-    FName TargetTag = Player->IsA<AAIController>() ? ToNPCStartTag : Player->IsA<APlayerController>() ? ToPlayerStartTag : NAME_None;
+    // FName TargetTag = Player->IsA<AAIController>() ? ToNPCStartTag : Player->IsA<APlayerController>() ? ToPlayerStartTag : NAME_None;
+    FName TargetTag = Player->IsA<APlayerController>() ? ToPlayerStartTag : NAME_None;
 
     if (TargetTag == NAME_None) return Super::ChoosePlayerStart_Implementation(Player);
 
@@ -160,18 +153,14 @@ AActor* ABDGameMode::ChoosePlayerStart_Implementation(AController* Player)
     return Super::ChoosePlayerStart_Implementation(Player);
 }
 
-void ABDGameMode::SpawnCustomers()
+void ABDGameMode::SpawnGroupController()
 {
     if (!GetWorld()) return;
 
-    for (int32 i = 0; i < GameData.CustomersNum; ++i)
-    {
-        FActorSpawnParameters SpawnInfo;
-        SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-        const auto BDAIController = GetWorld()->SpawnActor<AAIController>(AIControllerClass, SpawnInfo);
-        RestartPlayer(BDAIController);
-    }
+    const auto BDGroupAIController = GetWorld()->SpawnActor<AAIController>(GroupAIControllerClass, SpawnInfo);
 }
 
 // for test visibility manager

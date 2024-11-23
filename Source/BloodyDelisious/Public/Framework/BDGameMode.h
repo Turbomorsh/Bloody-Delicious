@@ -32,7 +32,6 @@ public:
     virtual bool SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
     virtual bool ClearPause() override;
 
-    virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
     virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
     UFUNCTION(BlueprintCallable)
@@ -44,14 +43,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Test")
     FName ScaryTag = "Scary";  // for test visibility manager
 
+    // group
     UPROPERTY(EditDefaultsOnly, Category = "Game")
-    TSubclassOf<AAIController> AIControllerClass;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Game")
-    TSubclassOf<APawn> AICustomerPawnClass;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Game")
-    FName ToNPCStartTag{"NPC"};
+    TSubclassOf<AAIController> GroupAIControllerClass;
 
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName ToPlayerStartTag{"Player"};
@@ -71,7 +65,7 @@ private:
     void GameOver();
     void GameComplete();
 
-    void SpawnCustomers();
+    void SpawnGroupController();
     void StartRound();
     void GameTimerUpdate();
 

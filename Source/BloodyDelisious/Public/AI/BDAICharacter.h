@@ -27,6 +27,7 @@ public:
     virtual void Hide() override;
 
     void MakeOrder();
+    void OnOutside();
     void SetCustomerState(EBDCustomerStates NewState);
 
     void SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder);
@@ -34,13 +35,15 @@ public:
     UFUNCTION(BlueprintCallable)
     EBDCustomerStates GetCustomerState() const { return CustomerState; };
 
+    FOnCustomerOutsideSignature OnCustomerOutside;
+    FOnCustomerStateChangedSignature OnCustomerStateChanged;
     FOnCustomerTimerChangedSignature OnCustomerTimerChanged;
     FOnCustomerTextSaySignature OnCustomerPhraseSay;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
     TObjectPtr<UBehaviorTree> BehsaviorTreeAsset;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Dialogue", meta = (ExposeOnSpawn))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Sounds)
@@ -48,15 +51,15 @@ public:
 
     void Scream();
 
+    UFUNCTION(BlueprintCallable)
+    bool IsWaiting() const;
+
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (ClampMin = "0", ClampMax = "600"))
     float MaxSpeed = 212.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "AI")
     FName CustomerStatusKeyName = "CustomerStatus";
-
-    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
-    float TimeHungryAgain = 10.0f;  // in sec
 
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
     float TimeToEat = 10.0f;  // in sec
@@ -79,7 +82,8 @@ protected:
 
     FOrderStruct Order;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Order")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI")
+    TArray<TObjectPtr<UBDBurgerTypeDataAsset>> OrderTypes;
     TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
@@ -106,13 +110,12 @@ public:
     virtual void Tick(float DeltaTime) override;
 
 private:
-    EBDCustomerStates CustomerState = EBDCustomerStates::Hungry;
+    EBDCustomerStates CustomerState = EBDCustomerStates::None;
 
     UPROPERTY()
     TObjectPtr<ABDFoodTray> CurrentFood;
 
     TMap<EBDCustomerTimers, FCustomerTimerData> CustomerTimersMap;
-    FTimerHandle HungryAgainTimerHandle;
     FTimerHandle EatTimerHandle;
 
     UBDGameplayWidget* GetGameplayWidget() const;
@@ -127,7 +130,6 @@ private:
     void PendingTimeOut();
     void CookingTimeOut();
     void EatingTimeOut();
-    void HungryAgain();
 
     bool IsOrderCorrect();
 
