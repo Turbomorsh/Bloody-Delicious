@@ -6,7 +6,6 @@
 #include "Interactibles/BDCup.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "PhysicsEngine/ShapeElem.h"
 
 ABDVendingTap::ABDVendingTap()
 {
@@ -22,10 +21,10 @@ ABDVendingTap::ABDVendingTap()
     TapMesh = CreateDefaultSubobject<UStaticMeshComponent>("TapStaticMesh");
     TapMesh->SetupAttachment(TapSocket);
 
-    CupSocket = CreateDefaultSubobject<USceneComponent>("CupScene Component");
+    CupSocket = CreateDefaultSubobject<USceneComponent>("CupSceneComponent");
     CupSocket->SetupAttachment(GetRootComponent());
 
-    Curve = CreateDefaultSubobject<UCurveFloat>("CurveFloat");
+    Curve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
 
     BindTimeLine();
 }
@@ -52,7 +51,10 @@ void ABDVendingTap::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (Timeline.IsPlaying()) Timeline.TickTimeline(DeltaTime);
+    if (Timeline.IsPlaying())
+    {
+        Timeline.TickTimeline(DeltaTime);
+    }
 }
 
 void ABDVendingTap::BindTimeLine()
@@ -64,8 +66,6 @@ void ABDVendingTap::BindTimeLine()
     FOnTimelineFloat ProgressFunction{};
     ProgressFunction.BindUFunction(this, "TimeLineUpdate");
     Timeline.AddInterpFloat(Curve, ProgressFunction, "Float1", "FloatTrack");
-
-    Timeline.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 }
 
 void ABDVendingTap::TimeLineUpdate(float Alpha)
@@ -76,8 +76,6 @@ void ABDVendingTap::TimeLineUpdate(float Alpha)
 
     TapSocket->SetRelativeRotation(FRotator(
         UKismetMathLibrary::Lerp(StartRot, EndRot, Alpha), TapSocket->GetRelativeRotation().Yaw, TapSocket->GetRelativeRotation().Roll));
-
-    GEngine->AddOnScreenDebugMessage(98, 5, FColor::Cyan, "Played");
 }
 void ABDVendingTap::TakeCup(TObjectPtr<ABDCup> InCup)
 {

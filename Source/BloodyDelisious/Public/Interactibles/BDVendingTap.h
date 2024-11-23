@@ -26,6 +26,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horror)
     bool HorrorMode = false;
 
+    virtual void Tick(float DeltaTime) override;
+
 protected:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Component)
     TObjectPtr<UStaticMeshComponent> TapMesh;
@@ -63,8 +65,6 @@ protected:
     FRotator InitialRotator;
 
     virtual void BeginPlay() override;
-
-    virtual void Tick(float DeltaTime) override;
 
     void BindTimeLine();
 

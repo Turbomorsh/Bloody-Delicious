@@ -5,6 +5,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/SceneComponent.h"
 #include "AI/BDAICharacter.h"
+#include "Framework/BDHorrorManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDOrderManager, All, All);
 
@@ -48,6 +49,12 @@ ABDOrderManager::ABDOrderManager()
 void ABDOrderManager::BeginPlay()
 {
     Super::BeginPlay();
+
+    FVector SpawnLocation = GetActorLocation();
+    FRotator SpawnRotator = GetActorRotation();
+    FActorSpawnParameters SpawnParams;
+
+    GetWorld()->SpawnActor<ABDHorrorManager>(HorrorManagerClass, SpawnLocation, SpawnRotator, SpawnParams);
 }
 
 void ABDOrderManager::MakeOrder()

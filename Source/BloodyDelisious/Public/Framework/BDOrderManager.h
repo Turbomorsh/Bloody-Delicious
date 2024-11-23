@@ -7,6 +7,7 @@
 #include "Framework/BDCoreTypes.h"
 #include "BDOrderManager.generated.h"
 
+class ABDHorrorManager;
 class ABDAICharacter;
 class UWidgetComponent;
 class UBoxComponent;
@@ -53,6 +54,11 @@ public:
 
 protected:
     virtual void BeginPlay() override;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
+    TSubclassOf<ABDHorrorManager> HorrorManagerClass;
+
+    TObjectPtr<ABDHorrorManager> HorrorManagerReference;
 
 private:
     EBDOrderStates OrderState = EBDOrderStates::NextInLine;
