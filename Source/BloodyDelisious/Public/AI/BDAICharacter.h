@@ -57,9 +57,6 @@ protected:
     FName CustomerStatusKeyName = "CustomerStatus";
 
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
-    float TimeHungryAgain = 10.0f;  // in sec
-
-    UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "600"))
     float TimeToEat = 10.0f;  // in sec
 
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "120"))
@@ -114,7 +111,6 @@ private:
     TObjectPtr<ABDFoodTray> CurrentFood;
 
     TMap<EBDCustomerTimers, FCustomerTimerData> CustomerTimersMap;
-    FTimerHandle HungryAgainTimerHandle;
     FTimerHandle EatTimerHandle;
 
     UBDGameplayWidget* GetGameplayWidget() const;
@@ -129,7 +125,6 @@ private:
     void PendingTimeOut();
     void CookingTimeOut();
     void EatingTimeOut();
-    void HungryAgain();
 
     bool IsOrderCorrect();
 

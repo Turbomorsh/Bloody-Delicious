@@ -78,7 +78,6 @@ void ABDGroupAIController::InitializeCustomerGroup(
             UE_LOG(LogBDGroupAIController, Display, TEXT("AIPawn successfully created: %s"), *BDAICustomer->GetName());
 
             BDAICustomer->OnCustomerOutside.AddUObject(this, &ThisClass::ActivateRandomCharacter);
-            // BDAICustomer->SetCustomerState(EBDCustomerStates::Relax);
             PawnsGroup.Add(BDAICustomer);
 
             if (BDAIController)
@@ -92,11 +91,9 @@ void ABDGroupAIController::InitializeCustomerGroup(
 
 void ABDGroupAIController::ActivateRandomCharacter()
 {
-    //
     int32 RandomIndex = FMath::RandRange(0, CustomerPawns.Num() - 1);
     const auto BDAICharacter = Cast<ABDAICharacter>(CustomerPawns[RandomIndex]);
     BDAICharacter->SetCustomerState(EBDCustomerStates::Hungry);
-    // Controller->GetBrainComponent()->StartLogic();
     UE_LOG(LogBDGroupAIController, Display, TEXT("BDAICharacter %s random picked"), *BDAICharacter->GetName());
 }
 

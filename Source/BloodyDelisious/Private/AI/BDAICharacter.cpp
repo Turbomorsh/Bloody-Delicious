@@ -268,11 +268,6 @@ void ABDAICharacter::EatingTimeOut()
     SetCustomerState(EBDCustomerStates::Leaving);
 }
 
-void ABDAICharacter::HungryAgain()
-{
-    SetCustomerState(EBDCustomerStates::Hungry);
-}
-
 void ABDAICharacter::OnOutside()
 {
     SetCustomerState(EBDCustomerStates::None);
