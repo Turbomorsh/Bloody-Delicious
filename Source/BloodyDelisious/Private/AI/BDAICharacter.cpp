@@ -3,6 +3,7 @@
 #include "AI/BDAICharacter.h"
 #include "AI/BDAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Interactibles/BDBurgerTypeDataAsset.h"
 #include "Interactibles/BDFoodTray.h"
@@ -45,6 +46,8 @@ void ABDAICharacter::BeginPlay()
 
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
+
+    // SetCustomerState(EBDCustomerStates::Relax);
 
     InitializeTimers();
 }
@@ -166,7 +169,9 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
 
 void ABDAICharacter::Hungry()
 {
-    UE_LOG(LogBDAICharacter, Display, TEXT("I'm so hungry!!!"));
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    UE_LOG(LogBDAICharacter, Warning, TEXT("%s: I'm so hungry!!!"), *this->GetName());
 }
 
 void ABDAICharacter::Ordering()
@@ -235,7 +240,7 @@ void ABDAICharacter::Leaving()
 {
     OnCustomerPhraseSay.Broadcast(FText::FromString("Bye!"), true);
     GetGameplayWidget()->UnSubscribeToNPCPhrases(this);
-    GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
+    // GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
 }
 
 void ABDAICharacter::MakeOrder()
@@ -266,6 +271,15 @@ void ABDAICharacter::EatingTimeOut()
 void ABDAICharacter::HungryAgain()
 {
     SetCustomerState(EBDCustomerStates::Hungry);
+}
+
+void ABDAICharacter::OnOutside()
+{
+    SetCustomerState(EBDCustomerStates::None);
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    OnCustomerOutside.Broadcast();
+    UE_LOG(LogBDAICharacter, Warning, TEXT("Customer %s Outside"), *this->GetName());
 }
 
 UBDGameplayWidget* ABDAICharacter::GetGameplayWidget() const
@@ -399,8 +413,8 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
 {
     CustomerState = NewState;
     SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
-
-    UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *UEnum::GetValueAsString(CustomerState));
+    OnCustomerStateChanged.Broadcast(CustomerState);
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s %s"), *this->GetName(), *UEnum::GetValueAsString(CustomerState));
 
     switch (CustomerState)
     {

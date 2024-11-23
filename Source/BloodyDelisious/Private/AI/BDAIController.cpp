@@ -16,12 +16,15 @@ void ABDAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
+    UE_LOG(LogTemp, Warning, TEXT("%s  OnPossess"), *InPawn->GetName());
     const auto AICharacter = Cast<ABDAICharacter>(InPawn);
     if (AICharacter)
     {
         RunBehaviorTree(AICharacter->BehsaviorTreeAsset);
+        // AICharacter->OnCustomerOutside.AddUObject(this, &ThisClass::StopBehavior);
+        UE_LOG(LogTemp, Warning, TEXT("%s  RunBehavior"), *AICharacter->GetName());
     }
-    // StopBehavior();
+    // BrainComponent->StopLogic(TEXT("Paused Behavior Tree"));
 }
 
 void ABDAIController::Tick(float DelataTime)
@@ -37,18 +40,4 @@ TObjectPtr<AActor> ABDAIController::GetFocusOnActor() const
     if (!GetBlackboardComponent()) return nullptr;
 
     return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
-}
-
-void ABDAIController::StartBehavior() {}
-
-void ABDAIController::StopBehavior()
-{
-    FTimerHandle StartBehaviorTimerHandle;
-    GetWorldTimerManager().SetTimer(  //
-        StartBehaviorTimerHandle,
-        [this]()                                                      //
-        {                                                             //
-            BrainComponent->StopLogic(TEXT("Paused Behavior Tree"));  //
-        },
-        FMath::RandRange(1.0f, 3.0f), false);
 }

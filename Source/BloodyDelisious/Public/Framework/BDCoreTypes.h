@@ -47,6 +47,8 @@ struct FCustomerTimerData
     FCustomerTimerData() : Type(EBDCustomerTimers::None), Duration(0.0f), ProgressBarUpdateInterval(0.1f) {}
 };
 
+DECLARE_MULTICAST_DELEGATE(FOnCustomerOutsideSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCustomerStateChangedSignature, EBDCustomerStates);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCustomerTimerChangedSignature, float, EBDCustomerTimers);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCustomerTextSaySignature, FText, bool);
 
@@ -59,7 +61,8 @@ enum class EBDCustomerStates : uint8
     OrderAccepted  UMETA(DisplayName = "Order Accepted"),
     OrderReady     UMETA(DisplayName = "Order Ready"),
     Eating         UMETA(DisplayName = "Eating"),
-    Leaving        UMETA(DisplayName = "Leaving")
+    Leaving        UMETA(DisplayName = "Leaving"),
+    None           UMETA(DisplayName = "None"),
     // clang-format on
 };
 

@@ -23,8 +23,11 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI|Customers")
     TMap<TSubclassOf<APawn>, int32> CustomersTypeByNum;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI|Customers")
+    TMap<TSubclassOf<APawn>, int32> EvilCustomersTypeByNum;
 
-    void InitializeGroups(const TMap<TSubclassOf<APawn>, int32>& GroupData);
+    void InitializeCustomerGroup(
+        const TMap<TSubclassOf<APawn>, int32>& GroupData, TArray<AAIController*>& ControllersArray, TArray<APawn*>& PawnsGroup);
 
 protected:
     void ActivateRandomCharacter();
@@ -36,5 +39,11 @@ private:
 
     void OnGameStateChanged(EBDGameState State);
 
-    TMap<TSubclassOf<APawn>, TArray<AAIController*>> CustomerGroups;
+    TArray<AAIController*> CustomerControllers;
+    TArray<AAIController*> EvilControllers;
+
+    TArray<APawn*> CustomerPawns;
+    TArray<APawn*> EvilPawns;
+
+    // TMap<TSubclassOf<APawn>, TArray<AAIController*>> CustomerGroups;
 };

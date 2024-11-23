@@ -27,6 +27,7 @@ public:
     virtual void Hide() override;
 
     void MakeOrder();
+    void OnOutside();
     void SetCustomerState(EBDCustomerStates NewState);
 
     void SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder);
@@ -34,6 +35,8 @@ public:
     UFUNCTION(BlueprintCallable)
     EBDCustomerStates GetCustomerState() const { return CustomerState; };
 
+    FOnCustomerOutsideSignature OnCustomerOutside;
+    FOnCustomerStateChangedSignature OnCustomerStateChanged;
     FOnCustomerTimerChangedSignature OnCustomerTimerChanged;
     FOnCustomerTextSaySignature OnCustomerPhraseSay;
 
@@ -105,7 +108,7 @@ public:
     virtual void Tick(float DeltaTime) override;
 
 private:
-    EBDCustomerStates CustomerState = EBDCustomerStates::Hungry;
+    EBDCustomerStates CustomerState = EBDCustomerStates::None;
 
     UPROPERTY()
     TObjectPtr<ABDFoodTray> CurrentFood;

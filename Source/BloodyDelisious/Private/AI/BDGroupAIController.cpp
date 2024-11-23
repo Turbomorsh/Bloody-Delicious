@@ -1,8 +1,10 @@
 // Bloody Delisious. All Rights Reserved.
 
 #include "AI/BDGroupAIController.h"
+#include "AI/BDAICharacter.h"
 #include "Framework/BDGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "BrainComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDGroupAIController, All, All);
 
@@ -26,7 +28,9 @@ void ABDGroupAIController::OnGameStateChanged(EBDGameState State)
         case EBDGameState::Waiting:
             break;
         case EBDGameState::GameInProgress:
-            InitializeGroups(CustomersTypeByNum);
+            InitializeCustomerGroup(CustomersTypeByNum, CustomerControllers, CustomerPawns);
+            InitializeCustomerGroup(EvilCustomersTypeByNum, EvilControllers, EvilPawns);
+            ActivateRandomCharacter();
             break;
         case EBDGameState::GamePause:
             break;
@@ -39,14 +43,14 @@ void ABDGroupAIController::OnGameStateChanged(EBDGameState State)
     }
 }
 
-void ABDGroupAIController::InitializeGroups(const TMap<TSubclassOf<APawn>, int32>& GroupData)
+void ABDGroupAIController::InitializeCustomerGroup(
+    const TMap<TSubclassOf<APawn>, int32>& GroupData, TArray<AAIController*>& ControllersArray, TArray<APawn*>& PawnsGroup)
 {
     if (!GetWorld()) return;
 
-    CustomerGroups.Empty();
     UE_LOG(LogBDGroupAIController, Display, TEXT("SpawnCustomers: start creating AI character groups"));
 
-    for (const TPair<TSubclassOf<APawn>, int32>& Pair : CustomersTypeByNum)
+    for (const TPair<TSubclassOf<APawn>, int32>& Pair : GroupData)
     {
         TSubclassOf<APawn> PawnClass = Pair.Key;
         int32 NumToSpawn = Pair.Value;
@@ -59,7 +63,6 @@ void ABDGroupAIController::InitializeGroups(const TMap<TSubclassOf<APawn>, int32
             SpawnRotation = GetRandomPlayerStartByTag()->GetActorRotation();
         }
 
-        TArray<AAIController*> NewGroup;
         UE_LOG(LogBDGroupAIController, Display, TEXT("Creating a group for Pawn class: %s, amount: %d"), *PawnClass->GetName(), NumToSpawn);
         for (int32 i = 0; i < NumToSpawn; ++i)
         {
@@ -70,53 +73,18 @@ void ABDGroupAIController::InitializeGroups(const TMap<TSubclassOf<APawn>, int32
             UE_LOG(LogBDGroupAIController, Display, TEXT("AIController successfully created: %s"), *BDAIController->GetName());
 
             FActorSpawnParameters SpawnPawnInfo;
-            SpawnPawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-            const auto BDAICustomer = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnLocation, SpawnRotation, SpawnInfo);
+            SpawnPawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+            const auto BDAICustomer = GetWorld()->SpawnActor<ABDAICharacter>(PawnClass, SpawnLocation, SpawnRotation, SpawnPawnInfo);
             UE_LOG(LogBDGroupAIController, Display, TEXT("AIPawn successfully created: %s"), *BDAICustomer->GetName());
+
+            BDAICustomer->OnCustomerOutside.AddUObject(this, &ThisClass::ActivateRandomCharacter);
+            // BDAICustomer->SetCustomerState(EBDCustomerStates::Relax);
+            PawnsGroup.Add(BDAICustomer);
 
             if (BDAIController)
             {
                 BDAIController->Possess(BDAICustomer);
-                NewGroup.Add(BDAIController);
-            }
-
-            APawn* ControlledPawn = BDAIController->GetPawn();
-            if (ControlledPawn)
-            {
-                UE_LOG(LogBDGroupAIController, Display, TEXT("Pawn successfully created: %s, Controller: %s"), *ControlledPawn->GetName(),
-                    *BDAIController->GetName());
-            }
-            else
-            {
-                UE_LOG(LogBDGroupAIController, Warning, TEXT("Error: Controller %s doesn't control Pawn!"), *BDAIController->GetName());
-            }
-        }
-        CustomerGroups.Add(PawnClass, NewGroup);
-        UE_LOG(
-            LogBDGroupAIController, Display, TEXT("Group for %s created, amount Controllers: %d"), *PawnClass->GetName(), NewGroup.Num());
-    }
-
-    UE_LOG(LogBDGroupAIController, Display, TEXT("All groupd AI characters have been created, amount of types: %d"), CustomerGroups.Num());
-
-    for (const auto& GroupPair : CustomerGroups)
-    {
-        const TSubclassOf<APawn>& PawnClass = GroupPair.Key;
-        const TArray<AAIController*>& Controllers = GroupPair.Value;
-
-        int32 NumControllers = Controllers.Num();
-        FString PawnClassName = PawnClass ? PawnClass->GetName() : TEXT("Unknown");
-        UE_LOG(LogBDGroupAIController, Display, TEXT("Group for Pawn class: %s contains %d controllers"), *PawnClassName, NumControllers);
-
-        for (const AAIController* Controller : Controllers)
-        {
-            if (Controller && Controller->GetPawn())
-            {
-                UE_LOG(LogBDGroupAIController, Display, TEXT(" - Controller: %s, Pawn: %s"), *Controller->GetName(),
-                    *Controller->GetPawn()->GetName());
-            }
-            else
-            {
-                UE_LOG(LogBDGroupAIController, Warning, TEXT(" - Controller: %s not tied to Pawn!"), *Controller->GetName());
+                ControllersArray.Add(BDAIController);
             }
         }
     }
@@ -125,6 +93,11 @@ void ABDGroupAIController::InitializeGroups(const TMap<TSubclassOf<APawn>, int32
 void ABDGroupAIController::ActivateRandomCharacter()
 {
     //
+    int32 RandomIndex = FMath::RandRange(0, CustomerPawns.Num() - 1);
+    const auto BDAICharacter = Cast<ABDAICharacter>(CustomerPawns[RandomIndex]);
+    BDAICharacter->SetCustomerState(EBDCustomerStates::Hungry);
+    // Controller->GetBrainComponent()->StartLogic();
+    UE_LOG(LogBDGroupAIController, Display, TEXT("BDAICharacter %s random picked"), *BDAICharacter->GetName());
 }
 
 AActor* ABDGroupAIController::GetRandomPlayerStartByTag()
