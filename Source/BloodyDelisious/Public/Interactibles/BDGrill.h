@@ -35,10 +35,16 @@ protected:
     float CookTime = 3;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
-    TObjectPtr<UBDFoodPartDataAsset> BunTransformation;
+    TObjectPtr<UBDFoodPartDataAsset> TopBunTransformation;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
-    TObjectPtr<UBDFoodPartDataAsset> CookedBunTransformation;
+    TObjectPtr<UBDFoodPartDataAsset> TopCookedBunTransformation;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
+    TObjectPtr<UBDFoodPartDataAsset> BottomBunTransformation;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
+    TObjectPtr<UBDFoodPartDataAsset> BottomCookedBunTransformation;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
     TObjectPtr<UBDFoodPartDataAsset> MeetTransformation;

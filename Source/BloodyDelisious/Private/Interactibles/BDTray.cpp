@@ -51,3 +51,8 @@ void ABDTray::TakeItem(TObjectPtr<ABDPlayerCharacter> Player)
         UsageLeft--;
     }
 }
+
+void ABDTray::ChangeTrayType(TObjectPtr<UBDFoodPartDataAsset> NewType)
+{
+    FoodDataAsset = NewType;
+}

@@ -4,10 +4,6 @@
 
 #include "Components/BoxComponent.h"
 #include "Interactibles/BDBurgerPart.h"
-#include <chrono>
-#include <thread>
-
-using namespace std::chrono_literals;
 
 ABDGrill::ABDGrill()
 {
@@ -66,15 +62,27 @@ void ABDGrill::Cook(ABDBurgerPart* BurgerPart)
     {
         switch (BurgerPart->PartType)
         {
-            case EFoodType::Bun:
+            case EFoodType::TopBun:
             {
-                if (BunTransformation) BurgerPart->ChangeType(BunTransformation);
+                if (TopBunTransformation) BurgerPart->ChangeType(TopBunTransformation);
                 StartCook(BurgerPart);
                 break;
             }
-            case EFoodType::CockedBun:
+            case EFoodType::TopCookedBun:
             {
-                if (CookedBunTransformation) BurgerPart->ChangeType(CookedBunTransformation);
+                if (TopCookedBunTransformation) BurgerPart->ChangeType(TopCookedBunTransformation);
+                StartCook(BurgerPart);
+                break;
+            }
+            case EFoodType::BottomBun:
+            {
+                if (BottomBunTransformation) BurgerPart->ChangeType(BottomBunTransformation);
+                StartCook(BurgerPart);
+                break;
+            }
+            case EFoodType::BottomCookedBun:
+            {
+                if (BottomCookedBunTransformation) BurgerPart->ChangeType(BottomCookedBunTransformation);
                 StartCook(BurgerPart);
                 break;
             }
@@ -84,7 +92,7 @@ void ABDGrill::Cook(ABDBurgerPart* BurgerPart)
                 StartCook(BurgerPart);
                 break;
             }
-            case EFoodType::CockedMeet:
+            case EFoodType::CookedMeet:
             {
                 if (CookedMeetTransformation) BurgerPart->ChangeType(CookedMeetTransformation);
                 StartCook(BurgerPart);

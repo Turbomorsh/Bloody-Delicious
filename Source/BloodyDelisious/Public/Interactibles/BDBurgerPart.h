@@ -15,16 +15,22 @@ enum EFoodType : uint8
     Tomato,
     Cucumber,
     Onion,
-    Bun,
-    BurnedBun,
-    CockedBun,
+    TopBun,
+    TopBurnedBun,
+    TopCookedBun,
     Meet,
-    CockedMeet,
+    CookedMeet,
     BurnedMeet,
     SauceYellow,
     SauceRed,
     SauceHot,
-    SauceWhite
+    SauceWhite,
+    AlterMeet,
+    AlterCookedMeet,
+    AlterCheese,
+    BottomBun,
+    BottomBurnedBun,
+    BottomCookedBun
 };
 
 /**

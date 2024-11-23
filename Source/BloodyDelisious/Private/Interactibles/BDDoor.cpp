@@ -2,8 +2,10 @@
 
 #include "Interactibles/BDDoor.h"
 
+#include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TimelineComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "UI/BDInteractionHintWidget.h"
 
@@ -92,4 +94,13 @@ void ABDDoor::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     if (Timeline.IsPlaying()) Timeline.TickTimeline(DeltaTime);
+}
+
+void ABDDoor::Scream()
+{
+    if (DoorState != EDoorStates::Closed && ScreamSound)
+    {
+        Timeline.Reverse();
+        UGameplayStatics::PlaySoundAtLocation(this, ScreamSound, GetActorLocation());
+    }
 }

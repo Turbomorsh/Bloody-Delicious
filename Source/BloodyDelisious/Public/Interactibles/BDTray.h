@@ -23,6 +23,8 @@ public:
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
 
+    void ChangeTrayType(TObjectPtr<UBDFoodPartDataAsset> NewType);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)
     TObjectPtr<UStaticMeshComponent> MeshComponent;

@@ -43,6 +43,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Dialogue", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Sounds)
+    TObjectPtr<USoundBase> ScreamSound;
+
+    void Scream();
+
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (ClampMin = "0", ClampMax = "600"))
     float MaxSpeed = 212.0f;

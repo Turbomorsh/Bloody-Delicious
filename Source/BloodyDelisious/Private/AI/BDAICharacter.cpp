@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Interactibles/BDBurgerTypeDataAsset.h"
 #include "Interactibles/BDFoodTray.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/BDDialogueWidget.h"
 #include "UI/BDInteractionHintWidget.h"
 #include "UI/BDGameplayWidget.h"
@@ -408,4 +409,8 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
 void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
 {
     if (InOrder) OrderType = InOrder;
+}
+void ABDAICharacter::Scream()
+{
+    if (ScreamSound) UGameplayStatics::PlaySoundAtLocation(this, ScreamSound, GetActorLocation());
 }

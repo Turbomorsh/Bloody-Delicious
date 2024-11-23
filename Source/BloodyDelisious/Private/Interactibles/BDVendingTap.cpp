@@ -4,6 +4,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Interactibles/BDCup.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/ShapeElem.h"
 
@@ -86,6 +87,7 @@ void ABDVendingTap::TakeCup(TObjectPtr<ABDCup> InCup)
     InCup->Type = DrinkType;
     InCup->OnGrabbed.AddDynamic(this, &ABDVendingTap::ClearCup);
     InCup->SetActorEnableCollision(true);
+    if (ScreamSound && PourSound) UGameplayStatics::PlaySoundAtLocation(this, HorrorMode ? ScreamSound : PourSound, GetActorLocation());
 }
 void ABDVendingTap::ClearCup()
 {

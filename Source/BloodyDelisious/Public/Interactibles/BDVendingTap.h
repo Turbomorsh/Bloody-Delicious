@@ -23,6 +23,9 @@ public:
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horror)
+    bool HorrorMode = false;
+
 protected:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Component)
     TObjectPtr<UStaticMeshComponent> TapMesh;
@@ -41,6 +44,12 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = States)
     TEnumAsByte<EDrinkType> DrinkType;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
+    TObjectPtr<USoundBase> ScreamSound;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
+    TObjectPtr<USoundBase> PourSound;
 
     UPROPERTY()
     TObjectPtr<ABDCup> CupReference;

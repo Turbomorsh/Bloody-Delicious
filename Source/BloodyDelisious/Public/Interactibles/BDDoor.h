@@ -46,6 +46,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
+    TObjectPtr<USoundBase> ScreamSound;
+
     UPROPERTY()
     TObjectPtr<UBDInteractionHintWidget> Hint;
 
@@ -67,4 +70,6 @@ protected:
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
+
+    void Scream();
 };
