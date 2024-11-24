@@ -49,12 +49,6 @@ ABDOrderManager::ABDOrderManager()
 void ABDOrderManager::BeginPlay()
 {
     Super::BeginPlay();
-
-    FVector SpawnLocation = GetActorLocation();
-    FRotator SpawnRotator = GetActorRotation();
-    FActorSpawnParameters SpawnParams;
-
-    GetWorld()->SpawnActor<ABDHorrorManager>(HorrorManagerClass, SpawnLocation, SpawnRotator, SpawnParams);
 }
 
 void ABDOrderManager::MakeOrder()

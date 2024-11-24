@@ -9,12 +9,8 @@
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ABDHorrorManager::ABDHorrorManager()
-{
-    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = true;
-}
-void ABDHorrorManager::AddScore(int InScore)
+UBDHorrorManager::UBDHorrorManager() {}
+void UBDHorrorManager::AddScore(int InScore)
 {
     HorrorScore += InScore;
 
@@ -24,20 +20,14 @@ void ABDHorrorManager::AddScore(int InScore)
         PlayHorrorEvent();
     }
 }
-void ABDHorrorManager::RemoveScore(int InScore)
+void UBDHorrorManager::RemoveScore(int InScore)
 {
     HorrorScore -= InScore;
 
     if (HorrorScore < HorrorLimit) HorrorLimit -= 5;
 }
 
-// Called when the game starts or when spawned
-void ABDHorrorManager::BeginPlay()
-{
-    Super::BeginPlay();
-}
-
-void ABDHorrorManager::PlayHorrorEvent()
+void UBDHorrorManager::PlayHorrorEvent()
 {
     int32 RandomInt = UKismetMathLibrary::RandomInteger(5);
 
@@ -105,10 +95,4 @@ void ABDHorrorManager::PlayHorrorEvent()
         {
         }
     }
-}
-
-// Called every frame
-void ABDHorrorManager::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
 }

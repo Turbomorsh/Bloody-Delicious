@@ -7,6 +7,7 @@
 #include "Framework/BDCoreTypes.h"
 #include "BDGameMode.generated.h"
 
+class UBDHorrorManager;
 class UBDVisibilityManager;  // for test visibility manager
 class AAIController;
 
@@ -52,6 +53,11 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FGameData GameData;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
+    TSubclassOf<UBDHorrorManager> HorrorManagerClass;
+
+    TObjectPtr<UBDHorrorManager> HorrorManagerReference;
 
 private:
     EBDGameState GameState = EBDGameState::Waiting;

@@ -55,11 +55,6 @@ public:
 protected:
     virtual void BeginPlay() override;
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
-    TSubclassOf<ABDHorrorManager> HorrorManagerClass;
-
-    TObjectPtr<ABDHorrorManager> HorrorManagerReference;
-
 private:
     EBDOrderStates OrderState = EBDOrderStates::NextInLine;
 

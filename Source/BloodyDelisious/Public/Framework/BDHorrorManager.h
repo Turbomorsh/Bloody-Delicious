@@ -3,18 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
 #include "BDHorrorManager.generated.h"
 
 class UBDFoodPartDataAsset;
 UCLASS()
-class BLOODYDELISIOUS_API ABDHorrorManager : public AActor
+class BLOODYDELISIOUS_API UBDHorrorManager : public UObject
 {
     GENERATED_BODY()
 
 public:
     // Sets default values for this actor's properties
-    ABDHorrorManager();
+    UBDHorrorManager();
 
     UFUNCTION()
     void AddScore(int InScore);
@@ -24,7 +23,6 @@ public:
 
 protected:
     // Called when the game starts or when spawned
-    virtual void BeginPlay() override;
 
     void PlayHorrorEvent();
 
@@ -37,8 +35,4 @@ protected:
     int HorrorScore = 0;
 
     int HorrorLimit = 5;
-
-public:
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
 };

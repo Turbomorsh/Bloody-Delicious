@@ -8,6 +8,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 // for test visibility manager
+#include "Framework/BDHorrorManager.h"
 #include "Framework/BDVisibilityManager.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -37,6 +38,8 @@ void ABDGameMode::StartPlay()
     // for test visibility manager
     VisibilityManager = NewObject<UBDVisibilityManager>(this);
     UGameplayStatics::GetAllActorsWithTag(GetWorld(), ScaryTag, TargetActors);
+
+    if (HorrorManagerClass) HorrorManagerReference = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
 }
 
 void ABDGameMode::StartRound()

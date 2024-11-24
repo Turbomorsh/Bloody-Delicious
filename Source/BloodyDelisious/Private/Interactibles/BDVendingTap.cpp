@@ -2,6 +2,7 @@
 
 #include "Interactibles/BDVendingTap.h"
 
+#include "Components/TimelineComponent.h"
 #include "Components/BoxComponent.h"
 #include "Interactibles/BDCup.h"
 #include "Kismet/GameplayStatics.h"
