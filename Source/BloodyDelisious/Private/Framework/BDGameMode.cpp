@@ -28,6 +28,8 @@ void ABDGameMode::StartPlay()
 {
     Super::StartPlay();
 
+    if (HorrorManagerClass) HorrorManagerReference = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
+
     CurrentRound = 1;
     SpawnGroupController();
     StartRound();
@@ -39,8 +41,6 @@ void ABDGameMode::StartPlay()
     // for test visibility manager
     VisibilityManager = NewObject<UBDVisibilityManager>(this);
     UGameplayStatics::GetAllActorsWithTag(GetWorld(), ScaryTag, TargetActors);
-
-    if (HorrorManagerClass) HorrorManagerReference = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
 }
 
 void ABDGameMode::StartRound()

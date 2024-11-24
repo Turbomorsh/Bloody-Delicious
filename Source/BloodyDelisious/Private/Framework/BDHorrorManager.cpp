@@ -9,7 +9,12 @@
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-UBDHorrorManager::UBDHorrorManager() {}
+UBDHorrorManager::UBDHorrorManager()
+{
+    OnSubmissionScoreChanged.AddUObject(this, &ThisClass::OnChangedSubmissionScore);
+    OnResistansScoreChanged.AddUObject(this, &ThisClass::OnChangedResistansScore);
+}
+
 void UBDHorrorManager::AddScore(int InScore)
 {
     HorrorScore += InScore;
@@ -27,18 +32,35 @@ void UBDHorrorManager::RemoveScore(int InScore)
     if (HorrorScore < HorrorLimit) HorrorLimit -= 5;
 }
 
+void UBDHorrorManager::OnChangedSubmissionScore(int32 InScore)
+{
+    SubmissionScore += InScore;
+
+    UE_LOG(LogTemp, Warning, TEXT("SubmissionScore %i"), SubmissionScore);
+
+    if (true)
+    {
+        PlayHorrorEvent();
+    }
+}
+
+void UBDHorrorManager::OnChangedResistansScore(int32 InScore) {}
+
 void UBDHorrorManager::PlayHorrorEvent()
 {
-    int32 RandomInt = UKismetMathLibrary::RandomInteger(5);
+    // int32 RandomInt = UKismetMathLibrary::RandomInteger(5);
+    int32 RandomInt = 1;
 
     switch (RandomInt)
     {
         case 1:
         {
+            UE_LOG(LogTemp, Warning, TEXT(" case 1"));
             TArray<AActor*> AllDoors;
             UGameplayStatics::GetAllActorsOfClass(this, ABDDoor::StaticClass(), AllDoors);
             for (int i = 0; i < AllDoors.Num(); i++)
             {
+                UE_LOG(LogTemp, Warning, TEXT(" ABDDoor !"));
                 Cast<ABDDoor>(AllDoors[i])->Scream();
             }
             break;
@@ -70,9 +92,9 @@ void UBDHorrorManager::PlayHorrorEvent()
             for (int i = 0; i < AllBurgerParts.Num(); i++)
             {
                 ABDBurgerPart* CastedFood = Cast<ABDBurgerPart>(AllBurgerParts[i]);
-                if (CastedFood->PartType == EFoodType::Meet)
+                if (CastedFood->PartType == EFoodType::Meat)
                 {
-                    CastedFood->ChangeType(AlterMeet);
+                    CastedFood->ChangeType(AlterMeat);
                 }
             }
             break;

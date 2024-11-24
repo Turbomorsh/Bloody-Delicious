@@ -12,6 +12,8 @@
 #include "UI/BDInteractionHintWidget.h"
 #include "UI/BDGameplayWidget.h"
 #include "UI/BDGameHUD.h"
+#include "Framework/BDHorrorManager.h"
+#include "Framework/BDGameMode.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDAICharacter, All, All);
 
@@ -48,9 +50,25 @@ void ABDAICharacter::BeginPlay()
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
-    // SetCustomerState(EBDCustomerStates::Relax);
+    if (GetHorrorManager())
+    {
+        HorrorManagerPtr = GetHorrorManager();
+    }
 
     InitializeTimers();
+}
+
+UBDHorrorManager* ABDAICharacter::GetHorrorManager()
+{
+    if (!GetWorld()) return nullptr;
+
+    const auto GameMode = Cast<ABDGameMode>(GetWorld()->GetAuthGameMode());
+    if (!GameMode) return nullptr;
+
+    const auto HorrorManager = GameMode->GetHorrorManager();
+    if (!HorrorManager) return nullptr;
+
+    return HorrorManager;
 }
 
 void ABDAICharacter::Tick(float DeltaTime)
@@ -62,14 +80,28 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
 {
     UE_LOG(LogBDAICharacter, Display, TEXT("Interact!"));
 
-    if (Cast<USceneComponent>(Object) && CustomerState == EBDCustomerStates::Ordering)
+    const auto CastetScene = Cast<USceneComponent>(Object);
+    if (CastetScene && CustomerState == EBDCustomerStates::Ordering)
     {
         // stop PendingTimer
         CustomerTimerEnd(EBDCustomerTimers::Pending);
 
+        const auto Character = Cast<ACharacter>(CastetScene->GetOwner());
         UE_LOG(LogBDAICharacter, Display, TEXT("Interact Ordering"));
         // @TODO: fix play logic
-        PlayDialogue(Dialogue, DialoguePage);
+        if (PlayDialogue(Dialogue, DialoguePage))
+        {
+            UE_LOG(LogBDAICharacter, Warning, TEXT("PlayDialogue"));
+            if (Character)
+            {
+                Character->GetCharacterMovement()->DisableMovement();
+            }
+        }
+        else
+        {
+            UE_LOG(LogBDAICharacter, Warning, TEXT("Dialogue over"));
+            Character->GetCharacterMovement()->SetDefaultMovementMode();
+        }
 
         // AcceptOrder
         // SetCustomerState(EBDCustomerStates::OrderAccepted);
@@ -105,9 +137,9 @@ void ABDAICharacter::Hide()
     }
 }
 
-void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
+bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 {
-    if (Page >= InDialogue.Num() && InDialogue.IsEmpty()) return;
+    if (Page >= InDialogue.Num() && InDialogue.IsEmpty()) return false;
 
     UE_LOG(LogTemp, Display, TEXT("PlayDialogue!"));
 
@@ -147,7 +179,9 @@ void ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
         DialoguePage = 0;
         SetCustomerState(EBDCustomerStates::OrderAccepted);
         UE_LOG(LogTemp, Display, TEXT("Page %i "), DialoguePage);
+        return false;
     }
+    return true;
 }
 
 void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
@@ -212,6 +246,17 @@ void ABDAICharacter::OrderReady()
     /// stop CookingTimer
     CustomerTimerEnd(EBDCustomerTimers::Cooking);
     OnCustomerPhraseSay.Broadcast(FText::FromString("O-o-oh!!! My burger!!!"), true);
+
+    // add 2 points
+    int32 Score = 2;
+    if (HorrorManagerPtr)
+    {
+        HorrorManagerPtr->OnSubmissionScoreChanged.Broadcast(Score);
+    }
+    else
+    {
+        UE_LOG(LogBDAICharacter, Error, TEXT("HorrorManager error"));
+    }
 
     // check order
     if (IsOrderCorrect())

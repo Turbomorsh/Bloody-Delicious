@@ -86,13 +86,13 @@ void ABDGrill::Cook(ABDBurgerPart* BurgerPart)
                 StartCook(BurgerPart);
                 break;
             }
-            case EFoodType::Meet:
+            case EFoodType::Meat:
             {
                 if (MeetTransformation) BurgerPart->ChangeType(MeetTransformation);
                 StartCook(BurgerPart);
                 break;
             }
-            case EFoodType::CookedMeet:
+            case EFoodType::CookedMeat:
             {
                 if (CookedMeetTransformation) BurgerPart->ChangeType(CookedMeetTransformation);
                 StartCook(BurgerPart);

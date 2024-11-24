@@ -98,9 +98,13 @@ void ABDDoor::Tick(float DeltaTime)
 
 void ABDDoor::Scream()
 {
+    UE_LOG(LogTemp, Warning, TEXT(" Scream()"));
     if (DoorState != EDoorStates::Closed && ScreamSound)
     {
+        UE_LOG(LogTemp, Warning, TEXT("DoorState != EDoorStates::Closed"));
         Timeline.Reverse();
+        DoorState = EDoorStates::Closed;
+
         UGameplayStatics::PlaySoundAtLocation(this, ScreamSound, GetActorLocation());
     }
 }

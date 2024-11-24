@@ -28,6 +28,7 @@ public:
     FGameData GetGameData() const { return GameData; }
     int32 GetCurrentRoundNum() const { return CurrentRound; }
     int32 GetRuondSecondsRemaning() const { return RoundCountDown; }
+    TObjectPtr<UBDHorrorManager> GetHorrorManager() { return HorrorManagerReference; };
 
     UPROPERTY()
     UBDVisibilityManager* VisibilityManager;  // for test visibility manager
@@ -58,8 +59,9 @@ protected:
     FGameData GameData;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
-    TSubclassOf<UBDHorrorManager> HorrorManagerClass;
+    const TSubclassOf<UBDHorrorManager> HorrorManagerClass;
 
+    UPROPERTY()
     TObjectPtr<UBDHorrorManager> HorrorManagerReference;
 
 private:

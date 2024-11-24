@@ -14,6 +14,7 @@ class UBDDialogueWidget;
 class UBDInteractionHintWidget;
 class UBDGameplayWidget;
 class UBehaviorTree;
+class UBDHorrorManager;
 
 UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract
 {
@@ -73,7 +74,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "1"))
     float TimerUpdateInterval = 0.1f;
 
-    void PlayDialogue(TArray<FText> Dialogue, int32 Page);
+    bool PlayDialogue(TArray<FText> Dialogue, int32 Page);
 
     void TryGetOrder(TObjectPtr<ABDFoodTray> InOrder);
 
@@ -118,7 +119,12 @@ private:
     TMap<EBDCustomerTimers, FCustomerTimerData> CustomerTimersMap;
     FTimerHandle EatTimerHandle;
 
+    UPROPERTY()
+    UBDHorrorManager* HorrorManagerPtr;
+
     UBDGameplayWidget* GetGameplayWidget() const;
+
+    UBDHorrorManager* GetHorrorManager();
 
     void InitializeTimers();
     void StartCustomerTimer(EBDCustomerTimers InETimer);
