@@ -43,4 +43,5 @@ private:
     TObjectPtr<UUserWidget> CurrentWidget;
 
     void OnGameStateChanged(EBDGameState State);
+    void RoundTransition(bool InbShow);
 };

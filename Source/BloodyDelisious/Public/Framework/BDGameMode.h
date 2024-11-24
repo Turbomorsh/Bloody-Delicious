@@ -21,6 +21,9 @@ public:
 
     FOnGameStateChangedSignature OnGameStateChanged;
     FOnGameDataChangedSignature OnGameDataChanged;
+    FOnAllCustomerExitedSignature OnAllCustomerExited;
+    FOnRoundEndSignature OnRoundEnd;
+    FOnRoundStartSignature OnRoundStart;
 
     FGameData GetGameData() const { return GameData; }
     int32 GetCurrentRoundNum() const { return CurrentRound; }
@@ -73,8 +76,9 @@ private:
 
     void SpawnGroupController();
     void StartRound();
+    void HandleRoundTransition();
     void GameTimerUpdate();
 
-    void ResetPlayers();
+    // void ResetPlayers();
     void ResetOnePlayer(AController* Controller);
 };

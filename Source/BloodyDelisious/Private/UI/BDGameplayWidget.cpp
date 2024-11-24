@@ -51,9 +51,6 @@ void UBDGameplayWidget::UnSubscribeToNPCPhrases(ABDAICharacter* NPC)
 
 void UBDGameplayWidget::OnTimerChanged(float TimeRemaning, EBDCustomerTimers InETimer)
 {
-    // UE_LOG(LogBDGameplayWidget, Display, TEXT("TimeRemaning: %f EBDCustomerTimers: %s"), TimeRemaning,
-    // *UEnum::GetValueAsString(InETimer));
-
     switch (InETimer)
     {
         case EBDCustomerTimers::Pending:
@@ -79,4 +76,17 @@ void UBDGameplayWidget::OnTimerChanged(float TimeRemaning, EBDCustomerTimers InE
 void UBDGameplayWidget::OnPhraseSay(FText InPhrase, bool bIsActive)
 {
     Phrase_TextBlock->SetText(InPhrase);
+}
+
+void UBDGameplayWidget::ShowTransitionInfo(bool bShow)
+{
+    UE_LOG(LogBDGameplayWidget, Display, TEXT("TransitionInfo"));
+    if (bShow)
+    {
+        Transition_TextBlock->SetVisibility(ESlateVisibility::Visible);
+    }
+    else
+    {
+        Transition_TextBlock->SetVisibility(ESlateVisibility::Collapsed);
+    }
 }

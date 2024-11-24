@@ -29,11 +29,12 @@ void ABDGameMode::StartPlay()
     Super::StartPlay();
 
     CurrentRound = 1;
-    StartRound();
     SpawnGroupController();
+    StartRound();
 
-    SetGameState(EBDGameState::GameInProgress);
     OnGameDataChanged.Broadcast(RoundCountDown);
+
+    OnAllCustomerExited.AddUObject(this, &ThisClass::HandleRoundTransition);
 
     // for test visibility manager
     VisibilityManager = NewObject<UBDVisibilityManager>(this);
@@ -46,6 +47,22 @@ void ABDGameMode::StartRound()
 {
     RoundCountDown = GameData.RoundTime;
     GetWorldTimerManager().SetTimer(GameRoundTimerHandle, this, &ThisClass::GameTimerUpdate, 1.0f, true);
+    SetGameState(EBDGameState::GameInProgress);
+    OnRoundStart.Broadcast();
+}
+
+void ABDGameMode::HandleRoundTransition()
+{
+    if (CurrentRound + 1 <= GameData.RoundsNum)
+    {
+        ++CurrentRound;
+        ResetOnePlayer(GetWorld()->GetFirstPlayerController());
+        StartRound();
+    }
+    else
+    {
+        GameOver();
+    }
 }
 
 void ABDGameMode::GameTimerUpdate()
@@ -54,29 +71,22 @@ void ABDGameMode::GameTimerUpdate()
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
 
-        if (CurrentRound + 1 <= GameData.RoundsNum)
-        {
-            ++CurrentRound;
-            ResetPlayers();
-            StartRound();
-        }
-        else
-        {
-            GameOver();
-        }
+        // round transition
+        SetGameState(EBDGameState::Waiting);
+        OnRoundEnd.Broadcast();
     }
     OnGameDataChanged.Broadcast(GetRuondSecondsRemaning());
 }
 
-void ABDGameMode::ResetPlayers()
-{
-    if (!GetWorld()) return;
-
-    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
-    {
-        ResetOnePlayer(It->Get());
-    }
-}
+// void ABDGameMode::ResetPlayers()
+//{
+//     if (!GetWorld()) return;
+//
+//     for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+//     {
+//         ResetOnePlayer(It->Get());
+//     }
+// }
 
 void ABDGameMode::ResetOnePlayer(AController* Controller)
 {
