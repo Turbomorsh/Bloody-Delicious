@@ -32,7 +32,7 @@ void ABDPickable::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (Timeline.IsPlaying()) Timeline.TickTimeline(DeltaTime);
+    if (PickableTimeline.IsPlaying()) PickableTimeline.TickTimeline(DeltaTime);
 }
 
 void ABDPickable::Interact(TObjectPtr<UObject> Object)
@@ -67,12 +67,12 @@ void ABDPickable::BindTimeLine()
     {
         Curve->FloatCurve.AddKey(0, 0);
         Curve->FloatCurve.AddKey(0.1, 1);
-        Timeline.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+        PickableTimeline.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 
-        Timeline = FTimeline{};
+        PickableTimeline = FTimeline{};
         FOnTimelineFloat ProgressFunction{};
         ProgressFunction.BindUFunction(this, "TimelineProgress");
-        Timeline.AddInterpFloat(Curve, ProgressFunction, "Float1", "FloatTrack");
+        PickableTimeline.AddInterpFloat(Curve, ProgressFunction, "Float1", "FloatTrack");
     }
 }
 
@@ -121,5 +121,5 @@ void ABDPickable::Grab(USceneComponent* Socket)
 
     OnGrabbed.Broadcast();
 
-    Timeline.PlayFromStart();
+    PickableTimeline.PlayFromStart();
 }

@@ -25,7 +25,7 @@ ABDVendingTap::ABDVendingTap()
     CupSocket = CreateDefaultSubobject<USceneComponent>("CupSceneComponent");
     CupSocket->SetupAttachment(GetRootComponent());
 
-    Curve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
+    VendingCurve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
 
     BindTimeLine();
 }
@@ -36,7 +36,7 @@ void ABDVendingTap::Interact(TObjectPtr<UObject> Object)
     if (TObjectPtr<ABDCup> CastedCup = Cast<ABDCup>(Object))
         if (CastedCup->Type == EDrinkType::Empty)
         {
-            Timeline.PlayFromStart();
+            VendingTimeline.PlayFromStart();
             TakeCup(CastedCup);
         }
 }
@@ -52,21 +52,21 @@ void ABDVendingTap::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (Timeline.IsPlaying())
+    if (VendingTimeline.IsPlaying())
     {
-        Timeline.TickTimeline(DeltaTime);
+        VendingTimeline.TickTimeline(DeltaTime);
     }
 }
 
 void ABDVendingTap::BindTimeLine()
 {
-    Curve->FloatCurve.AddKey(0, 0);
-    Curve->FloatCurve.AddKey(0.5, 1);
+    VendingCurve->FloatCurve.AddKey(0, 0);
+    VendingCurve->FloatCurve.AddKey(0.5, 1);
 
-    Timeline = FTimeline{};
+    VendingTimeline = FTimeline{};
     FOnTimelineFloat ProgressFunction{};
     ProgressFunction.BindUFunction(this, "TimeLineUpdate");
-    Timeline.AddInterpFloat(Curve, ProgressFunction, "Float1", "FloatTrack");
+    VendingTimeline.AddInterpFloat(VendingCurve, ProgressFunction, "Float1", "FloatTrack");
 }
 
 void ABDVendingTap::TimeLineUpdate(float Alpha)
@@ -91,6 +91,6 @@ void ABDVendingTap::TakeCup(TObjectPtr<ABDCup> InCup)
 void ABDVendingTap::ClearCup()
 {
     SetActorEnableCollision(true);
-    Timeline.Reverse();
+    VendingTimeline.Reverse();
     CupReference = nullptr;
 }

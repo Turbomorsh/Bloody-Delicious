@@ -57,10 +57,10 @@ protected:
     TObjectPtr<ABDCup> CupReference;
 
     UPROPERTY()
-    FTimeline Timeline;
+    FTimeline VendingTimeline;
 
     UPROPERTY()
-    TObjectPtr<UCurveFloat> Curve;
+    TObjectPtr<UCurveFloat> VendingCurve;
 
     FRotator InitialRotator;
 

@@ -12,12 +12,28 @@ class UBDInteractionHintWidget;
 class UTimelineComponent;
 
 UENUM()
-enum EDoorStates
+enum class EDoorStates : uint8
 {
     Closed,
     Opened,
     Locked,
     SlightlyOpen
+};
+
+USTRUCT(BlueprintType)
+
+struct FDoorData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sounds")
+    TObjectPtr<USoundBase> Sound;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sounds", meta = (ClampMin = "0"))
+    float PlayRate = 1.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Text")
+    FString HintText{"Interact"};
 };
 
 UCLASS()
@@ -46,8 +62,11 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sounds")
     TObjectPtr<USoundBase> ScreamSound;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Door Settings")
+    TMap<EDoorStates, FDoorData> DoorData;
 
     UPROPERTY()
     TObjectPtr<UBDInteractionHintWidget> Hint;

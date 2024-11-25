@@ -51,7 +51,7 @@ protected:
     FText HintText = FText::FromString("pick cube");
 
     UPROPERTY()
-    FTimeline Timeline;
+    FTimeline PickableTimeline;
 
     UPROPERTY()
     TObjectPtr<UCurveFloat> Curve;

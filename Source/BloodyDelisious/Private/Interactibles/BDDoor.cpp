@@ -31,14 +31,22 @@ void ABDDoor::Interact(TObjectPtr<UObject> Object)
     {
         if (DoorState == EDoorStates::Closed)
         {
+            Timeline.SetPlayRate(DoorData[DoorState].PlayRate);
             Timeline.PlayFromStart();
             DoorState = EDoorStates::Opened;
         }
         else if (DoorState == EDoorStates::Opened)
         {
+            Timeline.SetPlayRate(DoorData[DoorState].PlayRate);
             Timeline.ReverseFromEnd();
             DoorState = EDoorStates::Closed;
         }
+        float Dur = DoorData[DoorState].Sound->GetDuration();
+        UE_LOG(LogTemp, Display, TEXT("Sounds[%s] Duration: %f"), *UEnum::GetValueAsString(DoorState), Dur);
+        float Rate = Timeline.GetPlayRate();
+        float ST = Timeline.GetScaledTimelineLength();
+        UE_LOG(LogTemp, Display, TEXT("PlayRate: %f, ScaledTimeline: %f"), Rate, ST);
+        UGameplayStatics::PlaySoundAtLocation(this, DoorData[DoorState].Sound, GetActorLocation());
     }
 }
 void ABDDoor::Show()
@@ -47,7 +55,7 @@ void ABDDoor::Show()
     {
         Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
         Hint->AddToViewport();
-        Hint->SetText(FText::FromString("open door"));
+        Hint->SetText(FText::FromString(DoorData[DoorState].HintText));
     }
 }
 void ABDDoor::Hide()
@@ -69,8 +77,8 @@ void ABDDoor::BeginPlay()
 
 void ABDDoor::BIndTimeline()
 {
-    Curve->FloatCurve.AddKey(0, 0);
-    Curve->FloatCurve.AddKey(1, 1);
+    Curve->FloatCurve.AddKey(0.0f, 0.0f);
+    Curve->FloatCurve.AddKey(1.0f, 1.0f);
 
     Timeline = FTimeline{};
     FOnTimelineFloat ProgressFunction{};
@@ -80,9 +88,9 @@ void ABDDoor::BIndTimeline()
 
 void ABDDoor::TimelineProgress(float Alpha)
 {
-    int StartRot = InitRotator.Yaw;
+    double StartRot = InitRotator.Yaw;
 
-    int EndRot = InitRotator.Yaw + 90;
+    double EndRot = InitRotator.Yaw + 90;
 
     DoorSocket->SetRelativeRotation(FRotator(DoorSocket->GetRelativeRotation().Pitch, UKismetMathLibrary::Lerp(StartRot, EndRot, Alpha),
         DoorSocket->GetRelativeRotation().Roll));
