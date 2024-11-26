@@ -22,8 +22,6 @@ ABDDoor::ABDDoor()
     DoorMesh->SetupAttachment(DoorSocket);
 
     Curve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
-
-    BIndTimeline();
 }
 void ABDDoor::Interact(TObjectPtr<UObject> Object)
 {
@@ -72,11 +70,19 @@ void ABDDoor::BeginPlay()
 {
     Super::BeginPlay();
 
+    BIndTimeline();
+
     InitRotator = DoorSocket->GetRelativeRotation();
 }
 
 void ABDDoor::BIndTimeline()
 {
+    if (!Curve)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Curve is not assigned!"));
+        return;
+    }
+
     Curve->FloatCurve.AddKey(0.0f, 0.0f);
     Curve->FloatCurve.AddKey(1.0f, 1.0f);
 
@@ -90,7 +96,7 @@ void ABDDoor::TimelineProgress(float Alpha)
 {
     double StartRot = InitRotator.Yaw;
 
-    double EndRot = InitRotator.Yaw + 90;
+    double EndRot = InitRotator.Yaw + 90.0;
 
     DoorSocket->SetRelativeRotation(FRotator(DoorSocket->GetRelativeRotation().Pitch, UKismetMathLibrary::Lerp(StartRot, EndRot, Alpha),
         DoorSocket->GetRelativeRotation().Roll));
@@ -101,7 +107,10 @@ void ABDDoor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (Timeline.IsPlaying()) Timeline.TickTimeline(DeltaTime);
+    if (Timeline.IsPlaying())
+    {
+        Timeline.TickTimeline(DeltaTime);
+    }
 }
 
 void ABDDoor::Scream()
