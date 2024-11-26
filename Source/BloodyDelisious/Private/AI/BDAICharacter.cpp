@@ -11,9 +11,13 @@
 #include "UI/BDDialogueWidget.h"
 #include "UI/BDInteractionHintWidget.h"
 #include "UI/BDGameplayWidget.h"
+#include "UI/BDOrderWidget.h"
 #include "UI/BDGameHUD.h"
 #include "Framework/BDHorrorManager.h"
 #include "Framework/BDGameMode.h"
+#include "EngineUtils.h"
+#include "Components/WidgetComponent.h"
+#include "Framework/BDCoreTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDAICharacter, All, All);
 
@@ -65,6 +69,8 @@ void ABDAICharacter::BeginPlay()
     }
 
     InitializeTimers();
+
+    OrderWidget = GetOrderWidget();
 }
 
 UBDHorrorManager* ABDAICharacter::GetHorrorManager()
@@ -80,15 +86,8 @@ UBDHorrorManager* ABDAICharacter::GetHorrorManager()
     return HorrorManager;
 }
 
-void ABDAICharacter::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-}
-
 void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
 {
-    UE_LOG(LogBDAICharacter, Display, TEXT("Interact!"));
-
     const auto CastetScene = Cast<USceneComponent>(Object);
     if (CastetScene && CustomerState == EBDCustomerStates::Ordering)
     {
@@ -96,11 +95,9 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
         CustomerTimerEnd(EBDCustomerTimers::Pending);
 
         const auto Character = Cast<ACharacter>(CastetScene->GetOwner());
-        UE_LOG(LogBDAICharacter, Display, TEXT("Interact Ordering"));
-        // @TODO: fix play logic
         if (PlayDialogue(Dialogue, DialoguePage))
         {
-            UE_LOG(LogBDAICharacter, Warning, TEXT("PlayDialogue"));
+            UE_LOG(LogBDAICharacter, Display, TEXT("PlayDialogue"));
             if (Character)
             {
                 Character->GetCharacterMovement()->DisableMovement();
@@ -108,12 +105,9 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
         }
         else
         {
-            UE_LOG(LogBDAICharacter, Warning, TEXT("Dialogue over"));
+            UE_LOG(LogBDAICharacter, Display, TEXT("Dialogue over"));
             Character->GetCharacterMovement()->SetDefaultMovementMode();
         }
-
-        // AcceptOrder
-        // SetCustomerState(EBDCustomerStates::OrderAccepted);
     }
 
     if (TObjectPtr<ABDFoodTray> CastedFood = Cast<ABDFoodTray>(Object))
@@ -121,7 +115,6 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
         CurrentFood = CastedFood;
         if (CustomerState == EBDCustomerStates::OrderAccepted)
         {
-            UE_LOG(LogBDAICharacter, Display, TEXT("Interact OrderAccepted"));
             TryGetOrder(CurrentFood);
         }
     }
@@ -167,13 +160,9 @@ bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 {
     if (Page >= InDialogue.Num() && InDialogue.IsEmpty()) return false;
 
-    UE_LOG(LogTemp, Display, TEXT("PlayDialogue!"));
-
     // show DialogueWidget
-    // @TODO: fix Play logic
     if (DialogueWidget && Page == 0)
     {
-        UE_LOG(LogTemp, Display, TEXT("Page == 0"));
         DialogueWidget->SetVisibility(ESlateVisibility::Visible);
     }
 
@@ -193,18 +182,17 @@ bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
         {
             DialogueWidget->SetText(InDialogue[Page]);
             DialoguePage++;
-            UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
         }
     }
 
     if (Page == InDialogue.Num() && DialogueWidget)
     {
         // hide DialogueWidget
-        UE_LOG(LogTemp, Display, TEXT("Page %i "), Page);
+
         DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
         DialoguePage = 0;
         SetCustomerState(EBDCustomerStates::OrderAccepted);
-        UE_LOG(LogTemp, Display, TEXT("Page %i "), DialoguePage);
+
         return false;
     }
     return true;
@@ -232,7 +220,7 @@ void ABDAICharacter::Hungry()
 {
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    UE_LOG(LogBDAICharacter, Warning, TEXT("%s: I'm so hungry!!!"), *this->GetName());
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s: I'm so hungry!!!"), *this->GetName());
 }
 
 void ABDAICharacter::Ordering()
@@ -245,20 +233,20 @@ void ABDAICharacter::Ordering()
     }
     UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *OrderType->OrderName.ToString());
 
+    // order widget subscribe
+    if (OrderWidget)
+    {
+        OrderWidget->OnOrderText.Broadcast(OrderType->OrderName, GetOrderDescription(Order.Burger));
+        OnCustomerStateChanged.AddUObject(OrderWidget, &UBDOrderWidget::HandleVisibility);
+    }
+    else
+    {
+        UE_LOG(LogBDAICharacter, Warning, TEXT("OrderWidget isn't setup!"));
+    }
+
     StartCustomerTimer(EBDCustomerTimers::Pending);
 
     GetGameplayWidget()->SubscribeToNPCPhrases(this);
-
-    FString OrderString;
-    OrderString.Append("I would like a ");
-    OrderString.Append(OrderType->OrderName.ToString());
-    for (const auto PartName : Order.Burger)
-    {
-        OrderString.Append("\n").Append(UEnum::GetValueAsString(PartName));
-        UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *UEnum::GetValueAsString(PartName));
-    }
-
-    OnCustomerPhraseSay.Broadcast(FText::FromString(OrderString), true);
 }
 
 void ABDAICharacter::OrderAccepted()
@@ -274,7 +262,7 @@ void ABDAICharacter::OrderReady()
     OnCustomerPhraseSay.Broadcast(FText::FromString("O-o-oh!!! My burger!!!"), true);
 
     // add 2 points
-    int32 Score = 2;
+
     if (HorrorManagerPtr)
     {
         HorrorManagerPtr->OnSubmissionScoreChanged.Broadcast(Score);
@@ -360,6 +348,32 @@ UBDGameplayWidget* ABDAICharacter::GetGameplayWidget() const
     if (!IsValid(HUD)) return nullptr;
 
     return Cast<UBDGameplayWidget>(HUD->GetGameplayWidget());
+}
+
+UBDOrderWidget* ABDAICharacter::GetOrderWidget() const
+{
+    if (!GetWorld()) return nullptr;
+
+    AActor* WidgetActor = nullptr;
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        if (It->ActorHasTag(OrderTag))
+        {
+            WidgetActor = *It;
+            break;
+        }
+    }
+
+    if (WidgetActor)
+    {
+        const auto WidgetComp = WidgetActor->FindComponentByClass<UWidgetComponent>();
+        if (WidgetComp)
+        {
+            return Cast<UBDOrderWidget>(WidgetComp->GetUserWidgetObject());
+        }
+    }
+
+    return nullptr;
 }
 
 void ABDAICharacter::InitializeTimers()
@@ -480,7 +494,6 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
 {
     CustomerState = NewState;
     SetBlackboardEnumData(CustomerStatusKeyName, CustomerState);
-    OnCustomerStateChanged.Broadcast(CustomerState);
     UE_LOG(LogBDAICharacter, Display, TEXT("%s %s"), *this->GetName(), *UEnum::GetValueAsString(CustomerState));
 
     switch (CustomerState)
@@ -506,6 +519,7 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
         default:
             break;
     }
+    OnCustomerStateChanged.Broadcast(CustomerState);
 }
 
 bool ABDAICharacter::IsWaiting() const
@@ -526,4 +540,17 @@ void ABDAICharacter::PigScream()
 void ABDAICharacter::WhisperScream()
 {
     if (ScreamSound) UGameplayStatics::PlaySoundAtLocation(this, ScreamSound, GetActorLocation());
+}
+
+FText ABDAICharacter::GetOrderDescription(const TArray<TEnumAsByte<EFoodType>>& inBurger)
+{
+    TArray<FText> IngredientsTexts;
+
+    for (const TEnumAsByte<EFoodType>& Food : inBurger)
+    {
+        FText FoodName = UEnum::GetDisplayValueAsText(Food.GetValue());
+        IngredientsTexts.Add(FoodName);
+    }
+
+    return FText::Join(FText::FromString("\n"), IngredientsTexts);
 }

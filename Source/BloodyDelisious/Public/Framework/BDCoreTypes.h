@@ -91,3 +91,5 @@ struct FGameData
         meta = (ClampMin = "3", ClampMax = "300", ToolTip = "Day time in sec"))
     int32 RoundTime = 10;  // in seconds;
 };
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnOrderTextSignature, FText, FText);

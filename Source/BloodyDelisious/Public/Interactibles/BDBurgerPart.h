@@ -11,27 +11,29 @@ class UBDFoodPartDataAsset;
 UENUM(BlueprintType)
 enum EFoodType : uint8
 {
-    Cheese,
-    Salad,
-    Tomato,
-    Cucumber,
-    Onion,
-    TopBun,
-    TopBurnedBun,
-    TopCookedBun,
-    Meat,
-    CookedMeat,
-    BurnedMeat,
-    SauceYellow,
-    SauceRed,
-    SauceHot,
-    SauceWhite,
-    AlterMeat,
-    AlterCookedMeat,
-    AlterCheese,
-    BottomBun,
-    BottomBurnedBun,
-    BottomCookedBun
+    // clang-format off
+    Cheese = 0              UMETA(DisplayName = "Cheese"),
+    Salad                   UMETA(DisplayName = "Salad"),
+    Tomato                  UMETA(DisplayName = "Tomato"),
+    Cucumber                UMETA(DisplayName = "Cucumber"),
+    Onion                   UMETA(DisplayName = "Onion"),
+    TopBun                  UMETA(DisplayName = "Top Bun"),
+    TopBurnedBun            UMETA(DisplayName = "Top Burned Bun"),
+    TopCookedBun            UMETA(DisplayName = "Top Cooked Bun"),
+    Meat                    UMETA(DisplayName = "Meat"),
+    CookedMeat              UMETA(DisplayName = "Cooked Meat"),
+    BurnedMeat              UMETA(DisplayName = "Burned Meat"),
+    SauceYellow             UMETA(DisplayName = "Sauce Yellow"),
+    SauceRed                UMETA(DisplayName = "Sauce Red"),
+    SauceHot                UMETA(DisplayName = "Sauce Hot"),
+    SauceWhite              UMETA(DisplayName = "Sauce White"),
+    AlterMeat               UMETA(DisplayName = "Alter Meat"),
+    AlterCookedMeat         UMETA(DisplayName = "Alter Cooked Meat"),
+    AlterCheese             UMETA(DisplayName = "Alter Cheese"),
+    BottomBun               UMETA(DisplayName = "Bottom Bun"),
+    BottomBurnedBun         UMETA(DisplayName = "Bottom Burned Bun"),
+    BottomCookedBun         UMETA(DisplayName = "Bottom Cooked Bun")
+    // clang-format on
 };
 
 /**

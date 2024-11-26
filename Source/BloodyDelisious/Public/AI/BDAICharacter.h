@@ -16,6 +16,8 @@ class UBDInteractionHintWidget;
 class UBDGameplayWidget;
 class UBehaviorTree;
 class UBDHorrorManager;
+class UUserWidget;
+class UBDOrderWidget;
 
 UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract, public IBDHorrorInterface
 {
@@ -52,9 +54,6 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (ExposeOnSpawn))
     TArray<FText> Dialogue;
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Sounds)
-    TObjectPtr<USoundBase> ScreamSound;
-
     void PigScream();
 
     void WhisperScream();
@@ -81,34 +80,40 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "1"))
     float TimerUpdateInterval = 0.1f;
 
-    bool PlayDialogue(TArray<FText> Dialogue, int32 Page);
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "AI")
+    FName OrderTag{"Order display"};
 
-    void TryGetOrder(TObjectPtr<ABDFoodTray> InOrder);
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Sounds")
+    TObjectPtr<USoundBase> ScreamSound;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Components)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
     TObjectPtr<USceneComponent> TraySocket;
-
-    FOrderStruct Order;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI")
     TArray<TObjectPtr<UBDBurgerTypeDataAsset>> OrderTypes;
     TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Hint)
+    // @TODO: move to order structure
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI",
+        meta = (ClampMin = "0", ClampMax = "10", ToolTip = "Number of points for order fulfillment"))
+    int32 Score = 2;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Hint")
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
 
     UPROPERTY()
     TObjectPtr<UBDInteractionHintWidget> Hint;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Dialogue)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dialogue")
     TSubclassOf<UBDDialogueWidget> DialogueWidgetClass = nullptr;
 
     UPROPERTY()
     TObjectPtr<UBDDialogueWidget> DialogueWidget;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hint)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hint")
     FText HintText = FText::FromString("pick cube");
 
+    FOrderStruct Order;
     int32 DialoguePage = 0;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
@@ -122,9 +127,9 @@ protected:
 
     virtual void BeginPlay() override;
 
-public:
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
+    bool PlayDialogue(TArray<FText> Dialogue, int32 Page);
+
+    void TryGetOrder(TObjectPtr<ABDFoodTray> InOrder);
 
 private:
     EBDCustomerStates CustomerState = EBDCustomerStates::None;
@@ -138,7 +143,11 @@ private:
     UPROPERTY()
     UBDHorrorManager* HorrorManagerPtr;
 
+    UPROPERTY()
+    TObjectPtr<UBDOrderWidget> OrderWidget;
+
     UBDGameplayWidget* GetGameplayWidget() const;
+    UBDOrderWidget* GetOrderWidget() const;
 
     UBDHorrorManager* GetHorrorManager();
 
@@ -161,4 +170,6 @@ private:
     void OrderReady();
     void Eating();
     void Leaving();
+
+    FText GetOrderDescription(const TArray<TEnumAsByte<EFoodType>>& inBurger);
 };
