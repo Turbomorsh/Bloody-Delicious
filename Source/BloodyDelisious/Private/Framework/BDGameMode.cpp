@@ -53,7 +53,8 @@ void ABDGameMode::StartRound()
 
 void ABDGameMode::HandleRoundTransition()
 {
-    if (CurrentRound + 1 <= GameData.RoundsNum)
+    bool bIsNextRoundExist = CurrentRound + 1 <= GameData.RoundsNum;
+    if (bIsNextRoundExist)
     {
         ++CurrentRound;
         ResetOnePlayer(GetWorld()->GetFirstPlayerController());
@@ -71,11 +72,35 @@ void ABDGameMode::GameTimerUpdate()
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
 
+        if (IsLimitsOver())
+        {
+            GameOver();
+            return;
+        }
+
         // round transition
         SetGameState(EBDGameState::Waiting);
         OnRoundEnd.Broadcast();
     }
     OnGameDataChanged.Broadcast(GetRuondSecondsRemaning());
+}
+
+bool ABDGameMode::IsLimitsOver()
+{
+    if (!HorrorManagerReference) return false;
+    // get screem score
+    int32 HScore = HorrorManagerReference->GetHorrorScore();
+    int32 HLimit = HorrorManagerReference->GetHorrorLimit();
+    int32 FScore = HorrorManagerReference->GetFineScore();
+    int32 FLimit = HorrorManagerReference->GetFineLimit();
+
+    bool IsHorrorLimitOver = HScore >= HLimit;
+    bool IsFineLimitOver = FScore >= FLimit;
+
+    UE_LOG(LogBDGameMode, Warning, TEXT("HScore: %i, HLimit: %i, FScore: %i, FLimit: %i, IsLimitOver: %s"),  //
+        HScore, HLimit, FScore, FLimit, *LexToString(IsHorrorLimitOver || IsFineLimitOver));
+
+    return IsHorrorLimitOver || IsFineLimitOver;
 }
 
 // void ABDGameMode::ResetPlayers()
@@ -139,7 +164,17 @@ void ABDGameMode::GameOver()
         }
     }
 
-    SetGameState(EBDGameState::GameOver);
+    // SetGameState(EBDGameState::GameOver);
+
+    const auto Character = Cast<ABDPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    if (Character->GetHaveCassete())
+    {
+        SetGameState(EBDGameState::GameCompleted);
+    }
+    else
+    {
+        SetGameState(EBDGameState::GameOver);
+    }
 }
 
 void ABDGameMode::GameComplete()

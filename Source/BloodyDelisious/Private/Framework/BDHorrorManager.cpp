@@ -13,11 +13,24 @@ UBDHorrorManager::UBDHorrorManager()
 {
     OnSubmissionScoreChanged.AddUObject(this, &ThisClass::OnChangedSubmissionScore);
     OnResistansScoreChanged.AddUObject(this, &ThisClass::OnChangedResistansScore);
+
+    OnOrderScoreChanged.AddUObject(this, &ThisClass::OrderScoreChanged);
+}
+
+void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore)
+{
+    ///
+    HorrorScore += InHorrorScore;
+    HorrorScore += InAntiHorrorScore;
+    FineScore += InFineScore;
+
+    UE_LOG(LogTemp, Warning, TEXT("HorrorScore %i, FineScore %i"), HorrorScore, FineScore);
 }
 
 void UBDHorrorManager::AddScore(int InScore)
 {
     HorrorScore += InScore;
+    // UE_LOG(LogTemp, Warning, TEXT("HorrorScore %i, FineScore %i"), HorrorScore, FineScore);
 
     if (HorrorScore >= HorrorLimit)
     {
@@ -38,6 +51,7 @@ void UBDHorrorManager::RemoveScore(int InScore)
 void UBDHorrorManager::OnChangedSubmissionScore(int32 InScore)
 {
     SubmissionScore += InScore;
+    HorrorScore += InScore;
 
     UE_LOG(LogTemp, Warning, TEXT("SubmissionScore %i"), SubmissionScore);
 
@@ -47,16 +61,20 @@ void UBDHorrorManager::OnChangedSubmissionScore(int32 InScore)
     }
 }
 
-void UBDHorrorManager::OnChangedResistansScore(int32 InScore) {}
+void UBDHorrorManager::OnChangedResistansScore(int32 InScore)
+{
+    FineScore += InScore;
+}
 
 void UBDHorrorManager::StartUpHorrorEvent()
 {
     int32 Random = UKismetMathLibrary::RandomInteger(4);
 
-    switch (Random)
+    switch (6)
     {
         case 1:
         {
+            // door sound
             TArray<AActor*> HorrorArray;
             UGameplayStatics::GetAllActorsOfClass(this, ABDDoor::StaticClass(), HorrorArray);
             PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
@@ -64,6 +82,7 @@ void UBDHorrorManager::StartUpHorrorEvent()
         }
         case 2:
         {
+            // lihgt swich
             TArray<AActor*> HorrorArray;
             UGameplayStatics::GetAllActorsOfClass(this, ABDVendingTap::StaticClass(), HorrorArray);
             PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
@@ -71,6 +90,7 @@ void UBDHorrorManager::StartUpHorrorEvent()
         }
         case 3:
         {
+            // burger sound
             TArray<AActor*> HorrorArray;
             UGameplayStatics::GetAllActorsOfClass(this, ABDBurgerPart::StaticClass(), HorrorArray);
             if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
@@ -88,6 +108,7 @@ void UBDHorrorManager::StartUpHorrorEvent()
         }
         case 4:
         {
+            // cheese
             TArray<AActor*> HorrorArray;
             UGameplayStatics::GetAllActorsOfClass(this, ABDAICharacter::StaticClass(), HorrorArray);
             if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
@@ -101,6 +122,12 @@ void UBDHorrorManager::StartUpHorrorEvent()
             {
                 StartUpHorrorEvent();
             }
+            break;
+        }
+        case 5:
+        {
+            // pig
+
             break;
         }
         default:

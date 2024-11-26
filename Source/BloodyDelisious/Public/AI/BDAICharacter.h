@@ -93,11 +93,6 @@ protected:
     TArray<TObjectPtr<UBDBurgerTypeDataAsset>> OrderTypes;
     TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
-    // @TODO: move to order structure
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI",
-        meta = (ClampMin = "0", ClampMax = "10", ToolTip = "Number of points for order fulfillment"))
-    int32 Score = 2;
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Hint")
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
 
@@ -133,6 +128,7 @@ protected:
 
 private:
     EBDCustomerStates CustomerState = EBDCustomerStates::None;
+    bool bIsEat = false;
 
     UPROPERTY()
     TObjectPtr<ABDFoodTray> CurrentFood;

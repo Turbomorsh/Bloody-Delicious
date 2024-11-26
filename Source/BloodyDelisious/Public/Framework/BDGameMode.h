@@ -59,7 +59,7 @@ protected:
     FGameData GameData;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
-    const TSubclassOf<UBDHorrorManager> HorrorManagerClass;
+    TSubclassOf<UBDHorrorManager> HorrorManagerClass;
 
     UPROPERTY()
     TObjectPtr<UBDHorrorManager> HorrorManagerReference;
@@ -75,6 +75,7 @@ private:
     void SetGameState(EBDGameState State);
     void GameOver();
     void GameComplete();
+    bool IsLimitsOver();
 
     void SpawnGroupController();
     void StartRound();

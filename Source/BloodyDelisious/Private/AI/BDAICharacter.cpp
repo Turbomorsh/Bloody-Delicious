@@ -218,6 +218,7 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
 
 void ABDAICharacter::Hungry()
 {
+    bIsEat = false;
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     UE_LOG(LogBDAICharacter, Display, TEXT("%s: I'm so hungry!!!"), *this->GetName());
@@ -261,11 +262,11 @@ void ABDAICharacter::OrderReady()
     CustomerTimerEnd(EBDCustomerTimers::Cooking);
     OnCustomerPhraseSay.Broadcast(FText::FromString("O-o-oh!!! My burger!!!"), true);
 
-    // add 2 points
-
+    // add 2 HorrorScore
     if (HorrorManagerPtr)
     {
-        HorrorManagerPtr->OnSubmissionScoreChanged.Broadcast(Score);
+        // HorrorManagerPtr->OnSubmissionScoreChanged.Broadcast(Order.HorrorScore);
+        HorrorManagerPtr->OnOrderScoreChanged.Broadcast(Order.HorrorScore, 0, 0);
     }
     else
     {
@@ -292,12 +293,28 @@ bool ABDAICharacter::IsOrderCorrect()
 
 void ABDAICharacter::Eating()
 {
+    bIsEat = true;
     OnCustomerPhraseSay.Broadcast(FText::FromString("All correct! Good! Bye!"), true);
     GetWorldTimerManager().SetTimer(EatTimerHandle, this, &ThisClass::EatingTimeOut, TimeToEat, false);
 }
 
 void ABDAICharacter::Leaving()
 {
+    // add FineScore
+    if (HorrorManagerPtr && !bIsEat)
+    {
+        // HorrorManagerPtr->OnResistansScoreChanged.Broadcast(Order.FineScore);
+        HorrorManagerPtr->OnOrderScoreChanged.Broadcast(0, 0, Order.FineScore);
+        if (Order.HorrorScore > 0)
+        {
+            HorrorManagerPtr->OnOrderScoreChanged.Broadcast(0, Order.AntiHorrorScore, 0);
+        }
+    }
+    else
+    {
+        UE_LOG(LogBDAICharacter, Error, TEXT("HorrorManager error"));
+    }
+
     OnCustomerPhraseSay.Broadcast(FText::FromString("Bye!"), true);
     GetGameplayWidget()->UnSubscribeToNPCPhrases(this);
     // GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
