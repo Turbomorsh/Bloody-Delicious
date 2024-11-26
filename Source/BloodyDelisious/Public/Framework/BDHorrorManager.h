@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "BDHorrorManager.generated.h"
 
+class IBDHorrorInterface;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSubmissionScoreChangedSignature, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnResistansScoreChangedSignature, int32);
 
 class UBDFoodPartDataAsset;
-UCLASS()
+UCLASS(meta = (IsBlueprintBase = true))
 class BLOODYDELISIOUS_API UBDHorrorManager : public UObject
 {
     GENERATED_BODY()
@@ -33,13 +34,10 @@ public:
 protected:
     // Called when the game starts or when spawned
 
-    void PlayHorrorEvent();
+    UFUNCTION()
+    void StartUpHorrorEvent();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
-    TObjectPtr<UBDFoodPartDataAsset> AlterMeat;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
-    TObjectPtr<UBDFoodPartDataAsset> AlterCheese;
+    void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
 
     int HorrorScore = 0;
 
@@ -47,4 +45,7 @@ protected:
 
     int32 SubmissionScore = 0;
     int32 ResistansScore = 0;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
+    float DelayTime = 1.f;
 };

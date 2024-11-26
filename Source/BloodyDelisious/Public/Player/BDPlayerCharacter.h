@@ -29,6 +29,10 @@ public:
 
     void GrabItem(TObjectPtr<ABDPickable> Item);
 
+    void SetHaveCassete(bool InBool) { HasCassete = InBool; }
+
+    bool GetHaveCassete() { return HasCassete; };
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UCameraComponent* CameraComponent;
@@ -71,6 +75,8 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "BDPlayer | Walk speed", meta = (ClampMin = "0", ClampMax = "600"))
     float MaxSpeed = 212.0f;
+
+    bool HasCassete = false;
 
     UFUNCTION()
     void Move(const FInputActionValue& InputActionValue);

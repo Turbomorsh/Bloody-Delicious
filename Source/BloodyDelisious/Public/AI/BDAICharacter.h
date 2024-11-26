@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Framework/BDCoreTypes.h"
+#include "Framework/BDHorrorInterface.h"
 #include "Interactibles/BDFoodTray.h"
 #include "Interactibles/BDInteract.h"
 #include "BDAICharacter.generated.h"
@@ -16,16 +17,20 @@ class UBDGameplayWidget;
 class UBehaviorTree;
 class UBDHorrorManager;
 
-UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract
+UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
 public:
     ABDAICharacter();
 
+    virtual void PostInitProperties() override;
+
     virtual void Interact(TObjectPtr<UObject> Object) override;
     virtual void Show() override;
     virtual void Hide() override;
+
+    virtual bool Scream(int32 HorrorValue) override;
 
     void MakeOrder();
     void OnOutside();
@@ -50,7 +55,9 @@ public:
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Sounds)
     TObjectPtr<USoundBase> ScreamSound;
 
-    void Scream();
+    void PigScream();
+
+    void WhisperScream();
 
     UFUNCTION(BlueprintCallable)
     bool IsWaiting() const;
@@ -103,6 +110,15 @@ protected:
     FText HintText = FText::FromString("pick cube");
 
     int32 DialoguePage = 0;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    int32 PigScreamCost = 10;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    int32 WhisperScreamCost = 5;
+
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Horror)
+    TObjectPtr<UStaticMeshComponent> PigHead;
 
     virtual void BeginPlay() override;
 

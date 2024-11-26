@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "BDCup.h"
 #include "Components/TimelineComponent.h"
+#include "Framework/BDHorrorInterface.h"
 #include "Interactibles/BDStaticInteractionActor.h"
 #include "BDVendingTap.generated.h"
 
@@ -14,7 +15,7 @@ class UBoxComponent;
  *
  */
 UCLASS()
-class BLOODYDELISIOUS_API ABDVendingTap : public ABDStaticInteractionActor
+class BLOODYDELISIOUS_API ABDVendingTap : public ABDStaticInteractionActor, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
@@ -23,8 +24,7 @@ public:
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horror)
-    bool HorrorMode = false;
+    virtual bool Scream(int32 HorrorValue) override;
 
     virtual void Tick(float DeltaTime) override;
 
@@ -63,6 +63,9 @@ protected:
     TObjectPtr<UCurveFloat> VendingCurve;
 
     FRotator InitialRotator;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horror)
+    bool HorrorMode = false;
 
     virtual void BeginPlay() override;
 

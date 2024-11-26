@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Framework/BDHorrorInterface.h"
 #include "Interactibles/BDPickable.h"
 #include "BDBurgerPart.generated.h"
 
@@ -37,7 +38,7 @@ enum EFoodType : uint8
  *
  */
 UCLASS()
-class BLOODYDELISIOUS_API ABDBurgerPart : public ABDPickable
+class BLOODYDELISIOUS_API ABDBurgerPart : public ABDPickable, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
@@ -46,11 +47,20 @@ public:
 
     void ChangeType(TObjectPtr<UBDFoodPartDataAsset> Data);
 
+    virtual bool Scream(int32 HorrorValue) override;
+
     EFoodType PartType;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sockets)
     TObjectPtr<USceneComponent> FoodSocket;
 
 protected:
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    int32 AlterTransformCost = 10;
+
+    TObjectPtr<UBDFoodPartDataAsset> AlterTransformData;
+
+    void AlterTransform();
+
     virtual void BeginPlay() override;
 };

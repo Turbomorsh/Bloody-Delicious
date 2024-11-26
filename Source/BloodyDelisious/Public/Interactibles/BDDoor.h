@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "BDInteract.h"
 #include "Components/TimelineComponent.h"
+#include "Framework/BDHorrorInterface.h"
 #include "GameFramework/Actor.h"
 #include "BDDoor.generated.h"
 
@@ -37,7 +38,7 @@ struct FDoorData
 };
 
 UCLASS()
-class BLOODYDELISIOUS_API ABDDoor : public AActor, public IBDInteract
+class BLOODYDELISIOUS_API ABDDoor : public AActor, public IBDInteract, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
@@ -48,6 +49,8 @@ public:
     virtual void Interact(TObjectPtr<UObject> Object) override;
     virtual void Show() override;
     virtual void Hide() override;
+
+    virtual bool Scream(int32 HorrorValue) override;
 
 protected:
     // Called when the game starts or when spawned
@@ -90,5 +93,5 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    void Scream();
+    void DoorCreak();
 };

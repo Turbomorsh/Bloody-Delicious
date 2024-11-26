@@ -40,6 +40,11 @@ void ABDVendingTap::Interact(TObjectPtr<UObject> Object)
             TakeCup(CastedCup);
         }
 }
+bool ABDVendingTap::Scream(int32 HorrorValue)
+{
+    HorrorMode = true;
+    return true;
+}
 
 void ABDVendingTap::BeginPlay()
 {
@@ -60,8 +65,8 @@ void ABDVendingTap::Tick(float DeltaTime)
 
 void ABDVendingTap::BindTimeLine()
 {
-    VendingCurve->FloatCurve.AddKey(0, 0);
-    VendingCurve->FloatCurve.AddKey(0.5, 1);
+    VendingCurve->FloatCurve.AddKey(0.f, 0.f);
+    VendingCurve->FloatCurve.AddKey(0.5f, 1.f);
 
     VendingTimeline = FTimeline{};
     FOnTimelineFloat ProgressFunction{};

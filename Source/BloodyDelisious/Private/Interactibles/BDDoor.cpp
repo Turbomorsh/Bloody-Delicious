@@ -66,6 +66,11 @@ void ABDDoor::Hide()
         Hint = nullptr;
     }
 }
+bool ABDDoor::Scream(int32 HorrorValue)
+{
+    DoorCreak();
+    return true;
+}
 
 // Called when the game starts or when spawned
 void ABDDoor::BeginPlay()
@@ -104,7 +109,7 @@ void ABDDoor::Tick(float DeltaTime)
     if (Timeline.IsPlaying()) Timeline.TickTimeline(DeltaTime);
 }
 
-void ABDDoor::Scream()
+void ABDDoor::DoorCreak()
 {
     UE_LOG(LogTemp, Warning, TEXT(" Scream()"));
     if (DoorState != EDoorStates::Closed && ScreamSound)

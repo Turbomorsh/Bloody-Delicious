@@ -22,7 +22,10 @@ void UBDHorrorManager::AddScore(int InScore)
     if (HorrorScore >= HorrorLimit)
     {
         HorrorLimit += 5;
-        PlayHorrorEvent();
+        FTimerHandle Handle;
+        FTimerDelegate Delegate;
+        Delegate.BindUFunction(this, "StartUpHorrorEvent");
+        GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, DelayTime, false);
     }
 }
 void UBDHorrorManager::RemoveScore(int InScore)
@@ -40,81 +43,77 @@ void UBDHorrorManager::OnChangedSubmissionScore(int32 InScore)
 
     if (true)
     {
-        PlayHorrorEvent();
+        StartUpHorrorEvent();
     }
 }
 
 void UBDHorrorManager::OnChangedResistansScore(int32 InScore) {}
 
-void UBDHorrorManager::PlayHorrorEvent()
+void UBDHorrorManager::StartUpHorrorEvent()
 {
-    // int32 RandomInt = UKismetMathLibrary::RandomInteger(5);
-    int32 RandomInt = 1;
+    int32 Random = UKismetMathLibrary::RandomInteger(4);
 
-    switch (RandomInt)
+    switch (Random)
     {
         case 1:
         {
-            UE_LOG(LogTemp, Warning, TEXT(" case 1"));
-            TArray<AActor*> AllDoors;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDDoor::StaticClass(), AllDoors);
-            for (int i = 0; i < AllDoors.Num(); i++)
-            {
-                UE_LOG(LogTemp, Warning, TEXT(" ABDDoor !"));
-                Cast<ABDDoor>(AllDoors[i])->Scream();
-            }
+            TArray<AActor*> HorrorArray;
+            UGameplayStatics::GetAllActorsOfClass(this, ABDDoor::StaticClass(), HorrorArray);
+            PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
             break;
         }
         case 2:
         {
-            TArray<AActor*> AllVendingTaps;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDVendingTap::StaticClass(), AllVendingTaps);
-            for (int i = 0; i < AllVendingTaps.Num(); i++)
-            {
-                Cast<ABDVendingTap>(AllVendingTaps[i])->HorrorMode = true;
-            }
+            TArray<AActor*> HorrorArray;
+            UGameplayStatics::GetAllActorsOfClass(this, ABDVendingTap::StaticClass(), HorrorArray);
+            PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
             break;
         }
         case 3:
         {
-            TArray<AActor*> AllPeople;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDAICharacter::StaticClass(), AllPeople);
-            for (int i = 0; i < AllPeople.Num(); i++)
+            TArray<AActor*> HorrorArray;
+            UGameplayStatics::GetAllActorsOfClass(this, ABDBurgerPart::StaticClass(), HorrorArray);
+            if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
             {
-                Cast<ABDAICharacter>(AllPeople[i])->Scream();
+                for (int32 i = 0; i < HorrorArray.Num() - 1; i++)
+                {
+                    Cast<IBDHorrorInterface>(HorrorArray[i])->Scream(HorrorScore);
+                }
+            }
+            else
+            {
+                StartUpHorrorEvent();
             }
             break;
         }
         case 4:
         {
-            TArray<AActor*> AllBurgerParts;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDBurgerPart::StaticClass(), AllBurgerParts);
-            for (int i = 0; i < AllBurgerParts.Num(); i++)
+            TArray<AActor*> HorrorArray;
+            UGameplayStatics::GetAllActorsOfClass(this, ABDAICharacter::StaticClass(), HorrorArray);
+            if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
             {
-                ABDBurgerPart* CastedFood = Cast<ABDBurgerPart>(AllBurgerParts[i]);
-                if (CastedFood->PartType == EFoodType::Meat)
+                for (int32 i = 0; i < HorrorArray.Num() - 1; i++)
                 {
-                    CastedFood->ChangeType(AlterMeat);
+                    Cast<IBDHorrorInterface>(HorrorArray[i])->Scream(HorrorScore);
                 }
             }
-            break;
-        }
-        case 5:
-        {
-            TArray<AActor*> AllBurgerParts;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDBurgerPart::StaticClass(), AllBurgerParts);
-            for (int i = 0; i < AllBurgerParts.Num(); i++)
+            else
             {
-                ABDBurgerPart* CastedFood = Cast<ABDBurgerPart>(AllBurgerParts[i]);
-                if (CastedFood->PartType == EFoodType::Cheese)
-                {
-                    CastedFood->ChangeType(AlterCheese);
-                }
+                StartUpHorrorEvent();
             }
             break;
         }
         default:
         {
+            break;
         }
+    }
+}
+
+void UBDHorrorManager::PlayHorrorEvent(IBDHorrorInterface* InterfaceActor)
+{
+    if (!InterfaceActor->Scream(HorrorScore))
+    {
+        StartUpHorrorEvent();
     }
 }

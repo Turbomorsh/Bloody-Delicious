@@ -33,6 +33,15 @@ ABDAICharacter::ABDAICharacter()
 
     TraySocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
     if (GetMesh()) TraySocket->SetupAttachment(GetMesh(), "Wirst_L");
+
+    PigHead = CreateDefaultSubobject<UStaticMeshComponent>("PigMesh");
+    PigHead->SetupAttachment(GetMesh());
+    PigHead->SetVisibility(false);
+}
+void ABDAICharacter::PostInitProperties()
+{
+    Super::PostInitProperties();
+    PigHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Head_M");
 }
 
 void ABDAICharacter::BeginPlay()
@@ -134,6 +143,23 @@ void ABDAICharacter::Hide()
     {
         Hint->RemoveFromParent();
         Hint = nullptr;
+    }
+}
+bool ABDAICharacter::Scream(int32 HorrorValue)
+{
+    if (HorrorValue >= WhisperScreamCost && HorrorValue < PigScreamCost)
+    {
+        WhisperScream();
+        return true;
+    }
+    else if (HorrorValue >= PigScreamCost)
+    {
+        PigScream();
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -493,7 +519,11 @@ void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
     if (InOrder) OrderType = InOrder;
     if (OrderType) Order = OrderType->Order;
 }
-void ABDAICharacter::Scream()
+void ABDAICharacter::PigScream()
+{
+    PigHead->SetVisibility(true);
+}
+void ABDAICharacter::WhisperScream()
 {
     if (ScreamSound) UGameplayStatics::PlaySoundAtLocation(this, ScreamSound, GetActorLocation());
 }

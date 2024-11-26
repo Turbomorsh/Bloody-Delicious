@@ -24,4 +24,7 @@ public:
 
     UPROPERTY(EditDefaultsOnly)
     TObjectPtr<UMaterial> Material;
+
+    UPROPERTY(EditDefaultsOnly)
+    TObjectPtr<UBDFoodPartDataAsset> AlterTransform;
 };
