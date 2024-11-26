@@ -22,5 +22,5 @@ class BLOODYDELISIOUS_API IBDHorrorInterface
 
     // Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-    virtual bool Scream(int32 HorrorValue) = 0;
+    virtual void Scream() = 0;
 };

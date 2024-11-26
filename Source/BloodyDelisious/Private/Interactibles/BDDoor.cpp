@@ -64,10 +64,9 @@ void ABDDoor::Hide()
         Hint = nullptr;
     }
 }
-bool ABDDoor::Scream(int32 HorrorValue)
+void ABDDoor::Scream()
 {
     DoorCreak();
-    return true;
 }
 
 // Called when the game starts or when spawned

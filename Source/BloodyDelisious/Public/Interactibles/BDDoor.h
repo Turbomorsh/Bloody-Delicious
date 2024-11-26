@@ -50,7 +50,7 @@ public:
     virtual void Show() override;
     virtual void Hide() override;
 
-    virtual bool Scream(int32 HorrorValue) override;
+    virtual void Scream() override;
 
 protected:
     // Called when the game starts or when spawned

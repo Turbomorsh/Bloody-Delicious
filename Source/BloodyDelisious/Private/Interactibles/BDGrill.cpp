@@ -2,8 +2,10 @@
 
 #include "Interactibles/BDGrill.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Interactibles/BDBurgerPart.h"
+#include "Kismet/GameplayStatics.h"
 
 ABDGrill::ABDGrill()
 {
@@ -12,11 +14,18 @@ ABDGrill::ABDGrill()
 
     CookCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
     CookCollision->SetupAttachment(RootComponent);
+
+    AudioComponent = CreateDefaultSubobject<UAudioComponent>("Audio");
+    AudioComponent->SetupAttachment(GetRootComponent());
 }
 
 void ABDGrill::Interact(TObjectPtr<UObject> Object)
 {
     Super::Interact(Object);
+}
+void ABDGrill::Scream()
+{
+    HorrorMode = true;
 }
 
 void ABDGrill::BeginPlay()
@@ -44,7 +53,11 @@ void ABDGrill::ObjectEndOverlap(
 {
     if (TObjectPtr<ABDBurgerPart> CastedOtherActor = Cast<ABDBurgerPart>(OtherActor))
     {
-        CookingParts.Remove(CastedOtherActor);
+        if (CookingParts.IsEmpty())
+        {
+            CookingParts.Remove(CastedOtherActor);
+            AudioComponent->Stop();
+        }
     }
 }
 
@@ -54,6 +67,14 @@ void ABDGrill::StartCook(ABDBurgerPart* OtherActor)
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindUFunction(this, "Cook", OtherActor);
     GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, CookTime, false);
+    if (ScreamSound && CookSound)
+    {
+        if (CookingParts.Num() == 1)
+        {
+            AudioComponent->SetSound(HorrorMode ? ScreamSound : CookSound);
+            AudioComponent->Play();
+        }
+    }
 }
 
 void ABDGrill::Cook(ABDBurgerPart* BurgerPart)

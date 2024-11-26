@@ -39,6 +39,9 @@ protected:
 
     void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
 
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    TMap<TSubclassOf<AActor>, int32> HorrorMap;
+
     int HorrorScore = 0;
 
     int HorrorLimit = 5;

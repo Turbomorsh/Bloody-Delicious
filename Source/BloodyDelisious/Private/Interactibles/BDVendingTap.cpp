@@ -40,10 +40,9 @@ void ABDVendingTap::Interact(TObjectPtr<UObject> Object)
             TakeCup(CastedCup);
         }
 }
-bool ABDVendingTap::Scream(int32 HorrorValue)
+void ABDVendingTap::Scream()
 {
     HorrorMode = true;
-    return true;
 }
 
 void ABDVendingTap::BeginPlay()

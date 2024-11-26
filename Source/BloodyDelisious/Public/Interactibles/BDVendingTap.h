@@ -24,7 +24,7 @@ public:
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
 
-    virtual bool Scream(int32 HorrorValue) override;
+    virtual void Scream() override;
 
     virtual void Tick(float DeltaTime) override;
 

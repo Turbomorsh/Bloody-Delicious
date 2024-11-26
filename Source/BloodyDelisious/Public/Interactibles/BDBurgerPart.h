@@ -49,7 +49,7 @@ public:
 
     void ChangeType(TObjectPtr<UBDFoodPartDataAsset> Data);
 
-    virtual bool Scream(int32 HorrorValue) override;
+    virtual void Scream() override;
 
     EFoodType PartType;
 
