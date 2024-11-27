@@ -49,6 +49,15 @@ void ABDGrill::StartCookOverlapped(UPrimitiveComponent* OverlappedComponent, AAc
         FTimerDelegate TimerDelegate;
         TimerDelegate.BindUFunction(this, "Cook", CastedOtherActor);
         GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, CookTime, false);
+
+        if (ScreamSound && CookSound)
+        {
+            if (CookingParts.Num() == 1)
+            {
+                AudioComponent->SetSound(HorrorMode ? ScreamSound : CookSound);
+                AudioComponent->Play();
+            }
+        }
     }
 }
 
@@ -57,9 +66,9 @@ void ABDGrill::ObjectEndOverlap(
 {
     if (TObjectPtr<ABDBurgerPart> CastedOtherActor = Cast<ABDBurgerPart>(OtherActor))
     {
+        CookingParts.Remove(CastedOtherActor);
         if (CookingParts.IsEmpty())
         {
-            CookingParts.Remove(CastedOtherActor);
             AudioComponent->Stop();
         }
     }
@@ -71,14 +80,6 @@ void ABDGrill::StartCook(ABDBurgerPart* OtherActor)
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindUFunction(this, "Cook", OtherActor);
     GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, CookTime, false);
-    if (ScreamSound && CookSound)
-    {
-        if (CookingParts.Num() == 1)
-        {
-            AudioComponent->SetSound(HorrorMode ? ScreamSound : CookSound);
-            AudioComponent->Play();
-        }
-    }
 }
 
 void ABDGrill::Cook(ABDBurgerPart* BurgerPart)
