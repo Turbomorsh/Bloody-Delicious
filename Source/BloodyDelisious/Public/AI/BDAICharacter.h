@@ -26,8 +26,6 @@ UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IB
 public:
     ABDAICharacter();
 
-    virtual void PostInitProperties() override;
-
     virtual void Interact(TObjectPtr<UObject> Object) override;
     virtual void Show() override;
     virtual void Hide() override;
@@ -111,13 +109,13 @@ protected:
     FOrderStruct Order;
     int32 DialoguePage = 0;
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    int32 PigScreamCost = 10;
+    // UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    // int32 PigScreamCost = 10;
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    int32 WhisperScreamCost = 5;
+    // UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    // int32 WhisperScreamCost = 5;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Horror)
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Horror")
     TObjectPtr<UStaticMeshComponent> PigHead;
 
     virtual void BeginPlay() override;
@@ -157,8 +155,6 @@ private:
     void PendingTimeOut();
     void CookingTimeOut();
     void EatingTimeOut();
-
-    bool IsOrderCorrect();
 
     void Hungry();
     void Ordering();

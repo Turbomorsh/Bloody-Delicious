@@ -7,10 +7,10 @@
 #include "AIController.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
-// for test visibility manager
 #include "Framework/BDHorrorManager.h"
 #include "Framework/BDVisibilityManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Interactibles/BDCassete.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDGameMode, All, All);
 
@@ -19,9 +19,6 @@ ABDGameMode::ABDGameMode()
     DefaultPawnClass = ABDPlayerCharacter::StaticClass();
     PlayerControllerClass = ABDPlayerController::StaticClass();
     HUDClass = ABDGameHUD::StaticClass();
-
-    // for test visibility manager
-    //  PrimaryActorTick.bCanEverTick = true;
 }
 
 void ABDGameMode::StartPlay()
@@ -38,9 +35,8 @@ void ABDGameMode::StartPlay()
 
     OnAllCustomerExited.AddUObject(this, &ThisClass::HandleRoundTransition);
 
-    // for test visibility manager
+    // visibility manager
     VisibilityManager = NewObject<UBDVisibilityManager>(this);
-    UGameplayStatics::GetAllActorsWithTag(GetWorld(), ScaryTag, TargetActors);
 }
 
 void ABDGameMode::StartRound()
@@ -49,14 +45,27 @@ void ABDGameMode::StartRound()
     GetWorldTimerManager().SetTimer(GameRoundTimerHandle, this, &ThisClass::GameTimerUpdate, 1.0f, true);
     SetGameState(EBDGameState::GameInProgress);
     OnRoundStart.Broadcast();
+
+    const auto Character = Cast<ABDPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    if (Character)
+    {
+        UE_LOG(LogBDGameMode, Display, TEXT("Has cassete: %s"), *LexToString(Character->GetHaveCassete()));
+    }
 }
 
 void ABDGameMode::HandleRoundTransition()
 {
-    bool bIsNextRoundExist = CurrentRound + 1 <= GameData.RoundsNum;
-    if (bIsNextRoundExist)
+
+    if (IsNextRoundExist() && !IsLimitsOver())
     {
         ++CurrentRound;
+
+        // last round
+        if (!IsNextRoundExist())
+        {
+            SpawnCassete();
+        }
+
         ResetOnePlayer(GetWorld()->GetFirstPlayerController());
         StartRound();
     }
@@ -72,12 +81,6 @@ void ABDGameMode::GameTimerUpdate()
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
 
-        if (IsLimitsOver())
-        {
-            GameOver();
-            return;
-        }
-
         // round transition
         SetGameState(EBDGameState::Waiting);
         OnRoundEnd.Broadcast();
@@ -88,7 +91,7 @@ void ABDGameMode::GameTimerUpdate()
 bool ABDGameMode::IsLimitsOver()
 {
     if (!HorrorManagerReference) return false;
-    // get screem score
+    // get screem scores
     int32 HScore = HorrorManagerReference->GetHorrorScore();
     int32 HLimit = HorrorManagerReference->GetHorrorLimit();
     int32 FScore = HorrorManagerReference->GetFineScore();
@@ -97,21 +100,11 @@ bool ABDGameMode::IsLimitsOver()
     bool IsHorrorLimitOver = HScore >= HLimit;
     bool IsFineLimitOver = FScore >= FLimit;
 
-    UE_LOG(LogBDGameMode, Warning, TEXT("HScore: %i, HLimit: %i, FScore: %i, FLimit: %i, IsLimitOver: %s"),  //
+    UE_LOG(LogBDGameMode, Display, TEXT("HScore: %i, HLimit: %i, FScore: %i, FLimit: %i, IsLimitOver: %s"),  //
         HScore, HLimit, FScore, FLimit, *LexToString(IsHorrorLimitOver || IsFineLimitOver));
 
     return IsHorrorLimitOver || IsFineLimitOver;
 }
-
-// void ABDGameMode::ResetPlayers()
-//{
-//     if (!GetWorld()) return;
-//
-//     for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
-//     {
-//         ResetOnePlayer(It->Get());
-//     }
-// }
 
 void ABDGameMode::ResetOnePlayer(AController* Controller)
 {
@@ -164,10 +157,8 @@ void ABDGameMode::GameOver()
         }
     }
 
-    // SetGameState(EBDGameState::GameOver);
-
     const auto Character = Cast<ABDPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-    if (Character->GetHaveCassete())
+    if (Character->GetHaveCassete() && !IsNextRoundExist())
     {
         SetGameState(EBDGameState::GameCompleted);
     }
@@ -211,18 +202,44 @@ void ABDGameMode::SpawnGroupController()
     const auto BDGroupAIController = GetWorld()->SpawnActor<AAIController>(GroupAIControllerClass, SpawnInfo);
 }
 
-// for test visibility manager
-void ABDGameMode::VisibilitiManagerLog()
+void ABDGameMode::SpawnCassete()
 {
-    VisibilityManager->CameraLog();
+    if (!GetWorld()) return;
+
+    FTransform SpwnTransform;
+    SpwnTransform = GetCasseteSpawnTransform();
+
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+    if (CasseteToWin)
+    {
+        GetWorld()->SpawnActor<ABDCassete>(CasseteToWin, SpwnTransform, SpawnInfo);
+        UE_LOG(LogBDGameMode, Display, TEXT("Cassete was spawn in %s"), *SpwnTransform.ToString());
+    }
+    else
+    {
+        UE_LOG(LogBDGameMode, Warning, TEXT("Cassete class not setup"));
+    }
 }
 
-void ABDGameMode::Tick(float DeltaTime)
+FTransform ABDGameMode::GetCasseteSpawnTransform()
 {
-    Super::Tick(DeltaTime);
+    if (!GetWorld()) return FTransform::Identity;
 
-    for (auto TargetActor : TargetActors)
+    AActor* CasseteTargetSpawnActor = nullptr;
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
     {
-        VisibilityManager->IsActorVisible(TargetActor);
+        if (It->ActorHasTag(CasseteSpawnTag))
+        {
+            CasseteTargetSpawnActor = *It;
+            break;
+        }
+        else
+        {
+            UE_LOG(LogBDGameMode, Warning, TEXT("No actor with tag %s"), *CasseteSpawnTag.ToString());
+        }
     }
+
+    return CasseteTargetSpawnActor ? CasseteTargetSpawnActor->GetActorTransform() : FTransform::Identity;
 }

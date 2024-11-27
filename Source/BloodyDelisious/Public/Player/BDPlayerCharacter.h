@@ -29,7 +29,7 @@ public:
 
     void GrabItem(TObjectPtr<ABDPickable> Item);
 
-    void SetHaveCassete(bool InBool) { HasCassete = InBool; }
+    void SetHaveCassete(bool InBool);
 
     bool GetHaveCassete() { return HasCassete; };
 
