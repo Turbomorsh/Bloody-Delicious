@@ -16,7 +16,40 @@ UBDHorrorManager::UBDHorrorManager()
     OnOrderScoreChanged.AddUObject(this, &ThisClass::OrderScoreChanged);
 }
 
-void UBDHorrorManager::InitializeHorrorActors() {}
+void UBDHorrorManager::InitializeHorrorActors()
+{
+    HorrorActors.Empty();
+
+    for (const auto& Pair : HorrorMap)
+    {
+        TSubclassOf<AActor> HorrorClass = Pair.Key;
+        int32 RequiredScore = Pair.Value;
+
+        if (!HorrorClass)
+        {
+            UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorClass is invalid!"));
+            continue;
+        }
+
+        TArray<AActor*> FoundActors;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), HorrorClass, FoundActors);
+
+        for (AActor* HorrorActor : FoundActors)
+        {
+            if (HorrorActor)
+            {
+                HorrorActors.Add(HorrorActor, RequiredScore);
+                UE_LOG(LogBDHorrorManager, Display, TEXT("Added HorrorActor %s with RequiredScore %d"), *HorrorActor->GetName(),
+                    RequiredScore);
+            }
+        }
+    }
+
+    if (HorrorActors.Num() == 0)
+    {
+        UE_LOG(LogBDHorrorManager, Warning, TEXT("No HorrorActors found for the given classes!"));
+    }
+}
 
 void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore)
 {
@@ -24,14 +57,14 @@ void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorror
     HorrorScore += InAntiHorrorScore;
     FineScore += InFineScore;
 
-    if (HorrorScore >= HorrorLimit)
-    {
-        HorrorLimit += 5;
-        FTimerHandle Handle;
-        FTimerDelegate Delegate;
-        Delegate.BindUFunction(this, "StartUpHorrorEvent");
-        GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, ScreamDelayTime, false);
-    }
+    // if (HorrorScore >= HorrorLimit)
+    //{
+    //     HorrorLimit += 5;
+    //     FTimerHandle Handle;
+    //     FTimerDelegate Delegate;
+    //     Delegate.BindUFunction(this, "StartUpHorrorEvent");
+    //     GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, ScreamDelayTime, false);
+    // }
 
     UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorScore %i, FineScore %i"), HorrorScore, FineScore);
 
@@ -40,51 +73,23 @@ void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorror
 
 void UBDHorrorManager::StartUpHorrorEvent(int32 NewHorrorScore)
 {
-    TArray<TSubclassOf<AActor>> Keys;
-    int32 Random = UKismetMathLibrary::RandomInteger(Keys.Num() - 1);
-    HorrorMap.GetKeys(Keys);
-
-    for (const auto& Pair : HorrorMap)
+    for (const auto& Pair : HorrorActors)
     {
-        TSubclassOf<AActor> HorrorClass = Pair.Key;
+        AActor* HorrorActor = Pair.Key;
         int32 RequiredScore = Pair.Value;
 
         if (NewHorrorScore >= RequiredScore)
         {
-            TArray<AActor*> HorrorActors;
-            UGameplayStatics::GetAllActorsOfClass(this, HorrorClass, HorrorActors);
-            for (AActor* HorrorActor : HorrorActors)
-            {
-                if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
-                {
-                    CastedActor->Scream();
-                    UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorActor of class %s screamed!"), *HorrorActor->GetName());
-                }
-                else
-                {
-                    UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorActor does not implement IBDHorrorInterface!"));
-                }
-            }
-        }
-    }
-
-    if (HorrorScore >= HorrorMap.FindRef(Keys[Random]))
-    {
-        TArray<AActor*> HorrorActors;
-        UGameplayStatics::GetAllActorsOfClass(this, Keys[Random], HorrorActors);
-
-        for (AActor* HorrorActor : HorrorActors)
-        {
             if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
             {
                 CastedActor->Scream();
+                UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorActor of class %s screamed!"), *HorrorActor->GetName());
+            }
+            else
+            {
+                UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorActor does not implement IBDHorrorInterface!"));
             }
         }
-
-        FTimerHandle Handle;
-        FTimerDelegate Delegate;
-        Delegate.BindUFunction(this, "DisableHorrorEvent", HorrorActors);
-        GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, NormalDelayTime, false);
     }
 }
 

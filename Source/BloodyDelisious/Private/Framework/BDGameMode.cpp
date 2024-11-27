@@ -25,6 +25,10 @@ void ABDGameMode::StartPlay()
 {
     Super::StartPlay();
 
+    // visibility manager
+    VisibilityManager = NewObject<UBDVisibilityManager>(this);
+
+    // horror manager
     if (HorrorManagerClass)
     {
         HorrorManager = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
@@ -32,6 +36,7 @@ void ABDGameMode::StartPlay()
     if (HorrorManager)
     {
         HorrorManager->InitializeHorrorActors();
+        UE_LOG(LogBDGameMode, Display, TEXT("HorrorManager init"));
     }
 
     CurrentRound = 1;
@@ -41,9 +46,6 @@ void ABDGameMode::StartPlay()
     OnGameDataChanged.Broadcast(RoundCountDown);
 
     OnAllCustomerExited.AddUObject(this, &ThisClass::HandleRoundTransition);
-
-    // visibility manager
-    VisibilityManager = NewObject<UBDVisibilityManager>(this);
 }
 
 void ABDGameMode::StartRound()

@@ -90,6 +90,9 @@ protected:
     UFUNCTION()
     void TimelineProgress(float Alpha);
 
+private:
+    void ToggleOpenDoor();
+
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;

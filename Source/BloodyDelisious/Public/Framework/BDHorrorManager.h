@@ -48,7 +48,6 @@ protected:
     void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
     void OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore);
 
-<<<<<<< Updated upstream
     UFUNCTION()
     void DisableHorrorEvent(TArray<AActor*> HorroredActors);
 
@@ -61,8 +60,7 @@ protected:
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
     float NormalDelayTime = 1.f;
 
-    == == == = private :
->>>>>>> Stashed changes
-        int32 HorrorScore = 0;
+    int32 HorrorScore = 0;
     int32 FineScore = 0;
+    TMap<AActor*, int32> HorrorActors;
 };

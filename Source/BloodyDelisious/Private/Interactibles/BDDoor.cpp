@@ -9,6 +9,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "UI/BDInteractionHintWidget.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBDDoor, All, All);
+
 // Sets default values
 ABDDoor::ABDDoor()
 {
@@ -23,7 +25,32 @@ ABDDoor::ABDDoor()
 
     Curve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
 }
+
 void ABDDoor::Interact(TObjectPtr<UObject> Object)
+{
+    ToggleOpenDoor();
+}
+
+void ABDDoor::Show()
+{
+    if (!Hint && HintWidgetClass)
+    {
+        Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
+        Hint->AddToViewport();
+        Hint->SetText(FText::FromString(DoorData[DoorState].HintText));
+    }
+}
+
+void ABDDoor::Hide()
+{
+    if (Hint && HintWidgetClass)
+    {
+        Hint->RemoveFromParent();
+        Hint = nullptr;
+    }
+}
+
+void ABDDoor::ToggleOpenDoor()
 {
     if (DoorState != EDoorStates::Locked && !Timeline.IsPlaying())
     {
@@ -40,34 +67,20 @@ void ABDDoor::Interact(TObjectPtr<UObject> Object)
             DoorState = EDoorStates::Closed;
         }
         float Dur = DoorData[DoorState].Sound->GetDuration();
-        UE_LOG(LogTemp, Display, TEXT("Sounds[%s] Duration: %f"), *UEnum::GetValueAsString(DoorState), Dur);
+        UE_LOG(LogBDDoor, Display, TEXT("Sounds[%s] Duration: %f"), *UEnum::GetValueAsString(DoorState), Dur);
         float Rate = Timeline.GetPlayRate();
         float ST = Timeline.GetScaledTimelineLength();
-        UE_LOG(LogTemp, Display, TEXT("PlayRate: %f, ScaledTimeline: %f"), Rate, ST);
+        UE_LOG(LogBDDoor, Display, TEXT("PlayRate: %f, ScaledTimeline: %f"), Rate, ST);
         UGameplayStatics::PlaySoundAtLocation(this, DoorData[DoorState].Sound, GetActorLocation());
     }
 }
-void ABDDoor::Show()
-{
-    if (!Hint && HintWidgetClass)
-    {
-        Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
-        Hint->AddToViewport();
-        Hint->SetText(FText::FromString(DoorData[DoorState].HintText));
-    }
-}
-void ABDDoor::Hide()
-{
-    if (Hint && HintWidgetClass)
-    {
-        Hint->RemoveFromParent();
-        Hint = nullptr;
-    }
-}
+
 void ABDDoor::Scream()
 {
-    DoorCreak();
+    ToggleOpenDoor();
+    // DoorCreak();
 }
+
 void ABDDoor::DisableScream() {}
 
 // Called when the game starts or when spawned
