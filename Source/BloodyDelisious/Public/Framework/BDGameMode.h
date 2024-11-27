@@ -8,8 +8,9 @@
 #include "BDGameMode.generated.h"
 
 class UBDHorrorManager;
-class UBDVisibilityManager;  // for test visibility manager
+class UBDVisibilityManager;  // visibility manager
 class AAIController;
+class ABDCassete;
 
 UCLASS()
 class BLOODYDELISIOUS_API ABDGameMode : public AGameModeBase
@@ -31,7 +32,7 @@ public:
     TObjectPtr<UBDHorrorManager> GetHorrorManager() { return HorrorManagerReference; };
 
     UPROPERTY()
-    UBDVisibilityManager* VisibilityManager;  // for test visibility manager
+    UBDVisibilityManager* VisibilityManager;  // visibility manager
 
     virtual void StartPlay() override;
     virtual bool SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
@@ -39,11 +40,9 @@ public:
 
     virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
-    virtual void Tick(float DeltaTime) override;
-
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "Test")
-    FName ScaryTag = "Scary";  // for test visibility manager
+    FName ScaryTag = "Scary";  // visibility manager
 
     // group
     UPROPERTY(EditDefaultsOnly, Category = "Game")
@@ -53,10 +52,16 @@ protected:
     FName ToPlayerStartTag{"Player"};
 
     UPROPERTY(EditDefaultsOnly, Category = "Game")
+    FName CasseteSpawnTag{"Cassete"};
+
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
     FGameData GameData;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
     TSubclassOf<UBDHorrorManager> HorrorManagerClass;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Game")
+    TSubclassOf<ABDCassete> CasseteToWin;
 
     UPROPERTY()
     TObjectPtr<UBDHorrorManager> HorrorManagerReference;
@@ -67,18 +72,19 @@ private:
     int32 RoundCountDown = 0;
     FTimerHandle GameRoundTimerHandle;
 
-    UPROPERTY()
-    TArray<AActor*> TargetActors;  // for test visibility manager
-
     void SetGameState(EBDGameState State);
     void GameOver();
     void GameComplete();
+    bool IsNextRoundExist() { return CurrentRound + 1 <= GameData.RoundsNum; };
+    bool IsLimitsOver();
 
     void SpawnGroupController();
     void StartRound();
     void HandleRoundTransition();
     void GameTimerUpdate();
 
-    // void ResetPlayers();
     void ResetOnePlayer(AController* Controller);
+
+    FTransform GetCasseteSpawnTransform();
+    void SpawnCassete();
 };

@@ -61,6 +61,8 @@ bool UBDVisibilityManager::IsActorVisible(AActor* Actor)
     UE_LOG(LogBDVisibilityManager, Display, TEXT("Actor %s is %s"), *Actor->GetName(),
         VisiblePoints.IsEmpty() ? TEXT("HIDDEN") : TEXT("VISIBLE"));
 
+    CameraLog();
+
     return !VisiblePoints.IsEmpty();
 }
 

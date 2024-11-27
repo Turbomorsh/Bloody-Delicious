@@ -190,3 +190,10 @@ void ABDPlayerCharacter::InteractionRaycast()
         Cast<IBDInteract>(InteractibleObj)->Show();
     }
 }
+
+void ABDPlayerCharacter::SetHaveCassete(bool InBool)
+{
+    HasCassete = InBool;
+
+    UE_LOG(LogBDCharacter, Display, TEXT("HaveCassete: %s"), *LexToString(HasCassete));
+}

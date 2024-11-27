@@ -3,51 +3,51 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
 #include "BDHorrorManager.generated.h"
 
-class IBDHorrorInterface;
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSubmissionScoreChangedSignature, int32);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnResistansScoreChangedSignature, int32);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnOrderScoreChangedSignature, int32, int32, int32);
 
+class IBDHorrorInterface;
 class UBDFoodPartDataAsset;
+
 UCLASS(meta = (IsBlueprintBase = true))
 class BLOODYDELISIOUS_API UBDHorrorManager : public UObject
 {
     GENERATED_BODY()
 
 public:
-    // Sets default values for this actor's properties
     UBDHorrorManager();
 
-    FOnSubmissionScoreChangedSignature OnSubmissionScoreChanged;
-    FOnResistansScoreChangedSignature OnResistansScoreChanged;
+    FOnOrderScoreChangedSignature OnOrderScoreChanged;
 
-    UFUNCTION()
-    void AddScore(int InScore);
+    int32 GetHorrorScore() { return HorrorScore; };
+    int32 GetHorrorLimit() { return HorrorLimit; };
 
-    UFUNCTION()
-    void RemoveScore(int InScore);
-
-    void OnChangedSubmissionScore(int32 InScore);
-    void OnChangedResistansScore(int32 InScore);
+    int32 GetFineScore() { return FineScore; };
+    int32 GetFineLimit() { return FineLimit; };
 
 protected:
-    // Called when the game starts or when spawned
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror")
+    TMap<TSubclassOf<AActor>, int32> HorrorMap;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings")
+    int32 HorrorLimit = 5;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings")
+    int32 FineLimit = 5;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Timers")
+    float DelayTime = 1.f;
 
     UFUNCTION()
     void StartUpHorrorEvent();
 
     void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
+    void OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore);
 
     UFUNCTION()
     void DisableHorrorEvent(TArray<AActor*> HorroredActors);
-
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    TMap<TSubclassOf<AActor>, int32> HorrorMap;
-
-    int HorrorScore = 0;
-
-    int HorrorLimit = 5;
 
     int32 SubmissionScore = 0;
     int32 ResistansScore = 0;
@@ -57,4 +57,7 @@ protected:
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
     float NormalDelayTime = 1.f;
+
+    int32 HorrorScore = 0;
+    int32 FineScore = 0;
 };

@@ -23,6 +23,15 @@ struct FOrderStruct
     UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere)
     TArray<TEnumAsByte<EFoodType>> Burger;
 
+    UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere, meta = (ClampMin = "0", ClampMax = "20"))
+    int32 HorrorScore = 0;
+
+    UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere, meta = (ClampMin = "-20", ClampMax = "0"))
+    int32 AntiHorrorScore = 0;
+
+    UPROPERTY(BlueprintReadWrite, BlueprintType, EditAnywhere, meta = (ClampMin = "0", ClampMax = "20"))
+    int32 FineScore = 2;
+
     FOrderStruct()
     {
         Drink = EDrinkType::Empty;

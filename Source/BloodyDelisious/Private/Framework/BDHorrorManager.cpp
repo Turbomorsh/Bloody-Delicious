@@ -9,16 +9,18 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Framework/BDHorrorInterface.h"
 
-// Sets default values
+DEFINE_LOG_CATEGORY_STATIC(LogBDHorrorManager, All, All);
+
 UBDHorrorManager::UBDHorrorManager()
 {
-    OnSubmissionScoreChanged.AddUObject(this, &ThisClass::OnChangedSubmissionScore);
-    OnResistansScoreChanged.AddUObject(this, &ThisClass::OnChangedResistansScore);
+    OnOrderScoreChanged.AddUObject(this, &ThisClass::OrderScoreChanged);
 }
 
-void UBDHorrorManager::AddScore(int InScore)
+void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore)
 {
-    HorrorScore += InScore;
+    HorrorScore += InHorrorScore;
+    HorrorScore += InAntiHorrorScore;
+    FineScore += InFineScore;
 
     if (HorrorScore >= HorrorLimit)
     {
@@ -28,27 +30,9 @@ void UBDHorrorManager::AddScore(int InScore)
         Delegate.BindUFunction(this, "StartUpHorrorEvent");
         GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, ScreamDelayTime, false);
     }
+
+    UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorScore %i, FineScore %i"), HorrorScore, FineScore);
 }
-void UBDHorrorManager::RemoveScore(int InScore)
-{
-    HorrorScore -= InScore;
-
-    if (HorrorScore < HorrorLimit) HorrorLimit -= 5;
-}
-
-void UBDHorrorManager::OnChangedSubmissionScore(int32 InScore)
-{
-    SubmissionScore += InScore;
-
-    UE_LOG(LogTemp, Warning, TEXT("SubmissionScore %i"), SubmissionScore);
-
-    if (true)
-    {
-        StartUpHorrorEvent();
-    }
-}
-
-void UBDHorrorManager::OnChangedResistansScore(int32 InScore) {}
 
 void UBDHorrorManager::StartUpHorrorEvent()
 {

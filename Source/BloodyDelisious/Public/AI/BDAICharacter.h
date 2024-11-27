@@ -26,8 +26,6 @@ UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IB
 public:
     ABDAICharacter();
 
-    virtual void PostInitProperties() override;
-
     virtual void Interact(TObjectPtr<UObject> Object) override;
     virtual void Show() override;
     virtual void Hide() override;
@@ -94,11 +92,6 @@ protected:
     TArray<TObjectPtr<UBDBurgerTypeDataAsset>> OrderTypes;
     TObjectPtr<UBDBurgerTypeDataAsset> OrderType;
 
-    // @TODO: move to order structure
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AI",
-        meta = (ClampMin = "0", ClampMax = "10", ToolTip = "Number of points for order fulfillment"))
-    int32 Score = 2;
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Hint")
     TSubclassOf<UBDInteractionHintWidget> HintWidgetClass = nullptr;
 
@@ -117,13 +110,13 @@ protected:
     FOrderStruct Order;
     int32 DialoguePage = 0;
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    int32 PigScreamCost = 10;
+    // UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    // int32 PigScreamCost = 10;
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    int32 WhisperScreamCost = 5;
+    // UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    // int32 WhisperScreamCost = 5;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Horror)
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Horror")
     TObjectPtr<UStaticMeshComponent> PigHead;
 
     virtual void BeginPlay() override;
@@ -134,6 +127,7 @@ protected:
 
 private:
     EBDCustomerStates CustomerState = EBDCustomerStates::None;
+    bool bIsEat = false;
 
     UPROPERTY()
     TObjectPtr<ABDFoodTray> CurrentFood;
@@ -162,8 +156,6 @@ private:
     void PendingTimeOut();
     void CookingTimeOut();
     void EatingTimeOut();
-
-    bool IsOrderCorrect();
 
     void Hungry();
     void Ordering();

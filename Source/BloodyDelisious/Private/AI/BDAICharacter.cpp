@@ -34,6 +34,8 @@ ABDAICharacter::ABDAICharacter()
         GetCharacterMovement()->bUseControllerDesiredRotation = true;
         GetCharacterMovement()->RotationRate = FRotator(0.0f, 200.0f, 0.0f);
     }
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
     TraySocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
     if (GetMesh()) TraySocket->SetupAttachment(GetMesh(), "Wirst_L");
@@ -41,16 +43,14 @@ ABDAICharacter::ABDAICharacter()
     PigHead = CreateDefaultSubobject<UStaticMeshComponent>("PigMesh");
     PigHead->SetupAttachment(GetMesh());
     PigHead->SetVisibility(false);
-}
-void ABDAICharacter::PostInitProperties()
-{
-    Super::PostInitProperties();
-    PigHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Head_M");
+    PigHead->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void ABDAICharacter::BeginPlay()
 {
     Super::BeginPlay();
+
+    PigHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Head_M");
 
     // create dialogue widget
     if (DialogueWidgetClass)
@@ -138,6 +138,7 @@ void ABDAICharacter::Hide()
         Hint = nullptr;
     }
 }
+
 void ABDAICharacter::Scream()
 {
     WhisperScream();
@@ -192,16 +193,15 @@ bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 
 void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
 {
-    if (Order == InOrder->GetTray())
+    if (Order == InOrder->GetTray())  // order correct
     {
-        // if order correct
-        UE_LOG(LogBDAICharacter, Display, TEXT("GetTray"));
+        UE_LOG(LogBDAICharacter, Display, TEXT("GetTray order correct"));
         InOrder->Grab(TraySocket);
         CurrentFood = InOrder;
 
         SetCustomerState(EBDCustomerStates::OrderReady);
     }
-    else
+    else  // order wrong
     {
         OnCustomerPhraseSay.Broadcast(FText::FromString("That's not what I ordered."), true);
         UE_LOG(LogBDAICharacter, Display, TEXT("Wrong order"));
@@ -210,9 +210,10 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
 
 void ABDAICharacter::Hungry()
 {
-    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    bIsEat = false;
+
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    UE_LOG(LogBDAICharacter, Display, TEXT("%s: I'm so hungry!!!"), *this->GetName());
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s: I'm so hungry!!!"), *GetName());
 }
 
 void ABDAICharacter::Ordering()
@@ -253,46 +254,44 @@ void ABDAICharacter::OrderReady()
     CustomerTimerEnd(EBDCustomerTimers::Cooking);
     OnCustomerPhraseSay.Broadcast(FText::FromString("O-o-oh!!! My burger!!!"), true);
 
-    // add 2 points
-
+    // add HorrorScore
     if (HorrorManagerPtr)
     {
-        HorrorManagerPtr->OnSubmissionScoreChanged.Broadcast(Score);
+        HorrorManagerPtr->OnOrderScoreChanged.Broadcast(Order.HorrorScore, 0, 0);
     }
     else
     {
         UE_LOG(LogBDAICharacter, Error, TEXT("HorrorManager error"));
     }
 
-    // check order
-    if (IsOrderCorrect())
-    {
-        SetCustomerState(EBDCustomerStates::Eating);
-    }
-    else
-    {
-        UE_LOG(LogBDAICharacter, Display, TEXT("This is the wrong burger! I'm upset!"));
-        SetCustomerState(EBDCustomerStates::Leaving);
-    }
-}
-
-bool ABDAICharacter::IsOrderCorrect()
-{
-
-    return true;
+    SetCustomerState(EBDCustomerStates::Eating);
 }
 
 void ABDAICharacter::Eating()
 {
+    bIsEat = true;
     OnCustomerPhraseSay.Broadcast(FText::FromString("All correct! Good! Bye!"), true);
     GetWorldTimerManager().SetTimer(EatTimerHandle, this, &ThisClass::EatingTimeOut, TimeToEat, false);
 }
 
 void ABDAICharacter::Leaving()
 {
+    // add FineScore
+    if (HorrorManagerPtr && !bIsEat)
+    {
+        HorrorManagerPtr->OnOrderScoreChanged.Broadcast(0, 0, Order.FineScore);
+        if (Order.HorrorScore > 0)
+        {
+            HorrorManagerPtr->OnOrderScoreChanged.Broadcast(0, Order.AntiHorrorScore, 0);
+        }
+    }
+    else
+    {
+        UE_LOG(LogBDAICharacter, Error, TEXT("HorrorManager error"));
+    }
+
     OnCustomerPhraseSay.Broadcast(FText::FromString("Bye!"), true);
     GetGameplayWidget()->UnSubscribeToNPCPhrases(this);
-    // GetWorldTimerManager().SetTimer(HungryAgainTimerHandle, this, &ThisClass::HungryAgain, TimeHungryAgain, false);
 }
 
 void ABDAICharacter::MakeOrder()
@@ -312,8 +311,6 @@ void ABDAICharacter::CookingTimeOut()
 
 void ABDAICharacter::EatingTimeOut()
 {
-    // @TODO: fix Drop
-    // CurrentFood->Drop(GetActorRotation(), GetActorLocation());
     CurrentFood->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
     CurrentFood = nullptr;
 
@@ -323,10 +320,9 @@ void ABDAICharacter::EatingTimeOut()
 void ABDAICharacter::OnOutside()
 {
     SetCustomerState(EBDCustomerStates::None);
-    GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     OnCustomerOutside.Broadcast();
-    UE_LOG(LogBDAICharacter, Warning, TEXT("Customer %s Outside"), *this->GetName());
+    UE_LOG(LogBDAICharacter, Warning, TEXT("Customer %s Outside"), *GetName());
 }
 
 UBDGameplayWidget* ABDAICharacter::GetGameplayWidget() const
@@ -525,10 +521,12 @@ void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
     if (InOrder) OrderType = InOrder;
     if (OrderType) Order = OrderType->Order;
 }
+
 void ABDAICharacter::PigScream()
 {
     PigHead->SetVisibility(true);
 }
+
 void ABDAICharacter::WhisperScream()
 {
     if (ScreamSound) UGameplayStatics::PlaySoundAtLocation(this, ScreamSound, GetActorLocation());
