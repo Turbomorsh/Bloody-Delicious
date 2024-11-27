@@ -18,6 +18,7 @@ class UBehaviorTree;
 class UBDHorrorManager;
 class UUserWidget;
 class UBDOrderWidget;
+class UWidgetComponent;
 
 UCLASS() class BLOODYDELISIOUS_API ABDAICharacter : public ACharacter, public IBDInteract, public IBDHorrorInterface
 {
@@ -107,14 +108,14 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hint")
     FText HintText = FText::FromString("pick cube");
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Phrases")
+    TMap<EBDCustomerStates, FDialugueData> PhrasesMap;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UWidgetComponent* PhraseWidgetComponent;
+
     FOrderStruct Order;
     int32 DialoguePage = 0;
-
-    // UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    // int32 PigScreamCost = 10;
-
-    // UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
-    // int32 WhisperScreamCost = 5;
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Horror")
     TObjectPtr<UStaticMeshComponent> PigHead;
@@ -162,6 +163,9 @@ private:
     void PendingTimeOut();
     void CookingTimeOut();
     void EatingTimeOut();
+
+    FText GetRandomPhraseForState(const EBDCustomerStates State, const TMap<EBDCustomerStates, FDialugueData>& PhrasesMap);
+    void SayPhrase(EBDCustomerStates& NewState);
 
     void Hungry();
     void Ordering();

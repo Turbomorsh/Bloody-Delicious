@@ -65,8 +65,8 @@ void ABDPickable::BindTimeLine()
 {
     if (Curve)
     {
-        Curve->FloatCurve.AddKey(0, 0);
-        Curve->FloatCurve.AddKey(0.1, 1);
+        Curve->FloatCurve.AddKey(0.0f, 0.0f);
+        Curve->FloatCurve.AddKey(0.1f, 1.0f);
         PickableTimeline.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 
         PickableTimeline = FTimeline{};

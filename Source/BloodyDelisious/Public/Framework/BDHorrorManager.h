@@ -45,7 +45,6 @@ protected:
     UFUNCTION()
     void StartUpHorrorEvent(int32 NewHorrorScore);
 
-    void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
     void OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore);
 
     UFUNCTION()

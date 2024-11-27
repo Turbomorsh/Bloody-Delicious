@@ -12,6 +12,7 @@
 #include "UI/BDInteractionHintWidget.h"
 #include "UI/BDGameplayWidget.h"
 #include "UI/BDOrderWidget.h"
+#include "UI/BDPhraseWidget.h"
 #include "UI/BDGameHUD.h"
 #include "Framework/BDHorrorManager.h"
 #include "Framework/BDGameMode.h"
@@ -44,6 +45,11 @@ ABDAICharacter::ABDAICharacter()
     PigHead->SetupAttachment(GetMesh());
     PigHead->SetVisibility(false);
     PigHead->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+    PhraseWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("PhraseWidgetComponent");
+    PhraseWidgetComponent->SetupAttachment(GetRootComponent());
+    PhraseWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+    PhraseWidgetComponent->SetDrawAtDesiredSize(true);
 }
 
 void ABDAICharacter::BeginPlay()
@@ -59,6 +65,8 @@ void ABDAICharacter::BeginPlay()
         DialogueWidget->AddToViewport();
         DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
     }
+
+    UE_LOG(LogBDAICharacter, Warning, TEXT("%s"), *PhraseWidgetComponent->GetName());
 
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
@@ -510,6 +518,36 @@ void ABDAICharacter::SetCustomerState(EBDCustomerStates NewState)
             break;
     }
     OnCustomerStateChanged.Broadcast(CustomerState);
+    SayPhrase(NewState);
+}
+
+void ABDAICharacter::SayPhrase(EBDCustomerStates& NewState)
+{
+    if (NewState == EBDCustomerStates::Leaving && bIsEat) return;
+    if (NewState != EBDCustomerStates::Ordering &&    //
+        NewState != EBDCustomerStates::OrderReady &&  //
+        NewState != EBDCustomerStates::Leaving)
+        return;
+    const auto PhraseWidget = Cast<UBDPhraseWidget>(PhraseWidgetComponent->GetUserWidgetObject());
+    if (!PhraseWidget) return;
+
+    FText Phrase = GetRandomPhraseForState(NewState, PhrasesMap);
+    PhraseWidget->SetPhrase(Phrase, 2.0f);
+}
+
+FText ABDAICharacter::GetRandomPhraseForState(const EBDCustomerStates State, const TMap<EBDCustomerStates, FDialugueData>& InPhrasesMap)
+{
+    if (const FDialugueData* DialogueData = InPhrasesMap.Find(State))
+    {
+        const TArray<FText>& Phrases = DialogueData->Phrases;
+        if (Phrases.Num() > 0)
+        {
+            const int32 RandomIndex = FMath::RandRange(0, Phrases.Num() - 1);
+            return Phrases[RandomIndex];
+        }
+    }
+
+    return FText::FromString(TEXT("Hmm-hmm-hmm..."));
 }
 
 bool ABDAICharacter::IsWaiting() const

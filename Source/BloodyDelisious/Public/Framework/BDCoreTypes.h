@@ -93,3 +93,12 @@ struct FGameData
 };
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnOrderTextSignature, FText, FText);
+
+USTRUCT(BlueprintType)
+struct FDialugueData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    TArray<FText> Phrases;
+};

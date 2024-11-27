@@ -26,8 +26,6 @@ ABDVendingTap::ABDVendingTap()
     CupSocket->SetupAttachment(GetRootComponent());
 
     VendingCurve = CreateDefaultSubobject<UCurveFloat>("TimelineCurve");
-
-    BindTimeLine();
 }
 void ABDVendingTap::Interact(TObjectPtr<UObject> Object)
 {
@@ -53,6 +51,7 @@ void ABDVendingTap::BeginPlay()
 {
     Super::BeginPlay();
 
+    BindTimeLine();
     InitialRotator = TapSocket->GetRelativeRotation();
 }
 
@@ -79,9 +78,9 @@ void ABDVendingTap::BindTimeLine()
 
 void ABDVendingTap::TimeLineUpdate(float Alpha)
 {
-    int StartRot = InitialRotator.Pitch;
+    double StartRot = InitialRotator.Pitch;
 
-    int EndRot = InitialRotator.Pitch - 40;
+    double EndRot = InitialRotator.Pitch - 40.0;
 
     TapSocket->SetRelativeRotation(FRotator(
         UKismetMathLibrary::Lerp(StartRot, EndRot, Alpha), TapSocket->GetRelativeRotation().Yaw, TapSocket->GetRelativeRotation().Roll));
