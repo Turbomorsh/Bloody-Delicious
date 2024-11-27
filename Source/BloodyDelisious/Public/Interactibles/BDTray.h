@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BDStaticInteractionActor.h"
+#include "Framework/BDHorrorInterface.h"
 #include "Interactibles/BDPickable.h"
 #include "BDTray.generated.h"
 
@@ -14,7 +15,7 @@ class UBDFoodPartDataAsset;
  *
  */
 UCLASS()
-class BLOODYDELISIOUS_API ABDTray : public ABDStaticInteractionActor
+class BLOODYDELISIOUS_API ABDTray : public ABDStaticInteractionActor, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
@@ -22,6 +23,10 @@ public:
     ABDTray();
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
+
+    virtual void Scream() override;
+
+    virtual void DisableScream() override;
 
     void ChangeTrayType(TObjectPtr<UBDFoodPartDataAsset> NewType);
 
@@ -41,6 +46,10 @@ protected:
     int32 UsageLeft = 5;
 
     virtual void BeginPlay() override;
+
+    void TransformToAlterFood();
+
+    void TransformToNormalFood();
 
     void TakeItem(TObjectPtr<ABDPlayerCharacter> Player);
 };

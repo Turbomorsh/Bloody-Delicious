@@ -5,6 +5,7 @@
 #include "Interactibles/BDBurgerPart.h"
 #include "Interactibles/BDBox.h"
 #include "Interactibles/BDFoodPartDataAsset.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/BDPlayerCharacter.h"
 
 ABDTray::ABDTray()
@@ -34,10 +35,51 @@ void ABDTray::Interact(TObjectPtr<UObject> Object)
     }
 }
 
+void ABDTray::Scream()
+{
+    TransformToAlterFood();
+}
+
+void ABDTray::DisableScream() {}
+
 void ABDTray::BeginPlay()
 {
     Super::BeginPlay();
 }
+
+void ABDTray::TransformToAlterFood()
+{
+    TArray<AActor*> AllFood;
+    UGameplayStatics::GetAllActorsOfClass(this, FoodClass, AllFood);
+
+    for (AActor* ThisFood : AllFood)
+    {
+        if (TObjectPtr<ABDBurgerPart> CastedFood = Cast<ABDBurgerPart>(ThisFood))
+        {
+            if (FoodDataAsset)
+                if (CastedFood->PartType == FoodDataAsset->Type)
+                {
+                    CastedFood->Scream();
+                }
+        }
+    }
+}
+void ABDTray::TransformToNormalFood()
+{
+    // TArray<AActor*> AllFood;
+    // UGameplayStatics::GetAllActorsOfClass(this, FoodClass, AllFood);
+
+    //    for (AActor* ThisFood : AllFood)
+    //  {
+    //    TObjectPtr<ABDBurgerPart> CastedFood = Cast<ABDBurgerPart>(ThisFood);
+    //
+    //      if (CastedFood->PartType == FoodDataAsset->AlterTransform->Type)
+    //    {
+    //      CastedFood->;
+    //}
+    //}
+}
+
 void ABDTray::TakeItem(TObjectPtr<ABDPlayerCharacter> Player)
 {
     if (FoodClass && FoodDataAsset)
