@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Framework/BDHorrorInterface.h"
 #include "Interactibles/BDStaticInteractionActor.h"
 #include "BDGrill.generated.h"
 
@@ -13,7 +14,7 @@ class UBoxComponent;
  *
  */
 UCLASS()
-class BLOODYDELISIOUS_API ABDGrill : public ABDStaticInteractionActor
+class BLOODYDELISIOUS_API ABDGrill : public ABDStaticInteractionActor, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
@@ -21,6 +22,8 @@ public:
     ABDGrill();
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
+
+    virtual void Scream() override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)
@@ -51,6 +54,20 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
     TObjectPtr<UBDFoodPartDataAsset> CookedMeetTransformation;
+
+    UPROPERTY()
+    TObjectPtr<UAudioComponent> AudioComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
+    TObjectPtr<USoundBase> ScreamSound;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
+    TObjectPtr<USoundBase> CookSound;
+
+    bool HorrorMode;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
+    int32 HorrorCost = 2;
 
     virtual void BeginPlay() override;
 

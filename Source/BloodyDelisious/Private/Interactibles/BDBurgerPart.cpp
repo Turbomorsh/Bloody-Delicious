@@ -25,17 +25,9 @@ void ABDBurgerPart::ChangeType(TObjectPtr<UBDFoodPartDataAsset> Data)
         AlterTransformData = Data->AlterTransform;
     }
 }
-bool ABDBurgerPart::Scream(int32 HorrorValue)
+void ABDBurgerPart::Scream()
 {
-    if (HorrorValue >= AlterTransformCost)
-    {
-        AlterTransform();
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    AlterTransform();
 }
 
 void ABDBurgerPart::AlterTransform()

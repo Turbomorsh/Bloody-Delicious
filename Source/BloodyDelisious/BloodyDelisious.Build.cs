@@ -17,7 +17,8 @@ public class BloodyDelisious : ModuleRules
             "UMG",
             "EnhancedInput",
             "GameplayTasks",
-            "NavigationSystem"
+            "NavigationSystem",
+            "Paper2D"
         });
         PublicIncludePaths.AddRange(new string[] { "BloodyDelisious" });
         PrivateDependencyModuleNames.AddRange(new string[] { });

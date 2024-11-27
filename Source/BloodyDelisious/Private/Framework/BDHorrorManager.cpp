@@ -7,6 +7,7 @@
 #include "Interactibles/BDVendingTap.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Framework/BDHorrorInterface.h"
 
 // Sets default values
 UBDHorrorManager::UBDHorrorManager()
@@ -68,79 +69,90 @@ void UBDHorrorManager::OnChangedResistansScore(int32 InScore)
 
 void UBDHorrorManager::StartUpHorrorEvent()
 {
-    int32 Random = UKismetMathLibrary::RandomInteger(4);
+    TArray<TSubclassOf<AActor>> Keys;
+    int32 Random = UKismetMathLibrary::RandomInteger(Keys.Num() - 1);
+    HorrorMap.GetKeys(Keys);
 
+<<<<<<< HEAD
     switch (6)
-    {
-        case 1:
+        == == == = if (HorrorScore >= HorrorMap.FindRef(Keys[Random]))
+>>>>>>> main
         {
-            // door sound
-            TArray<AActor*> HorrorArray;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDDoor::StaticClass(), HorrorArray);
-            PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
-            break;
-        }
-        case 2:
-        {
-            // lihgt swich
-            TArray<AActor*> HorrorArray;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDVendingTap::StaticClass(), HorrorArray);
-            PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
-            break;
-        }
-        case 3:
-        {
-            // burger sound
-            TArray<AActor*> HorrorArray;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDBurgerPart::StaticClass(), HorrorArray);
-            if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
-            {
-                for (int32 i = 0; i < HorrorArray.Num() - 1; i++)
-                {
-                    Cast<IBDHorrorInterface>(HorrorArray[i])->Scream(HorrorScore);
-                }
-            }
-            else
-            {
-                StartUpHorrorEvent();
-            }
-            break;
-        }
-        case 4:
-        {
-            // cheese
-            TArray<AActor*> HorrorArray;
-            UGameplayStatics::GetAllActorsOfClass(this, ABDAICharacter::StaticClass(), HorrorArray);
-            if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
-            {
-                for (int32 i = 0; i < HorrorArray.Num() - 1; i++)
-                {
-                    Cast<IBDHorrorInterface>(HorrorArray[i])->Scream(HorrorScore);
-                }
-            }
-            else
-            {
-                StartUpHorrorEvent();
-            }
-            break;
-        }
-        case 5:
-        {
-            // pig
+            TArray<AActor*> HorrorActors;
+            UGameplayStatics::GetAllActorsOfClass(this, Keys[Random], HorrorActors);
 
-            break;
+            for (AActor* HorrorActor : HorrorActors)
+            {
+<<<<<<< HEAD
+                // door sound
+                TArray<AActor*> HorrorArray;
+                UGameplayStatics::GetAllActorsOfClass(this, ABDDoor::StaticClass(), HorrorArray);
+                PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
+                break;
+            }
+            case 2:
+            {
+                // lihgt swich
+                TArray<AActor*> HorrorArray;
+                UGameplayStatics::GetAllActorsOfClass(this, ABDVendingTap::StaticClass(), HorrorArray);
+                PlayHorrorEvent(Cast<IBDHorrorInterface>(HorrorArray[UKismetMathLibrary::RandomInteger(HorrorArray.Num() - 1)]));
+                break;
+            }
+            case 3:
+            {
+                // burger sound
+                TArray<AActor*> HorrorArray;
+                UGameplayStatics::GetAllActorsOfClass(this, ABDBurgerPart::StaticClass(), HorrorArray);
+                if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
+                    == == == = if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
+>>>>>>> main
+                    {
+                        CastedActor->Scream();
+                    }
+<<<<<<< HEAD
+                else
+                {
+                    StartUpHorrorEvent();
+                }
+                break;
+            }
+            case 4:
+            {
+                // cheese
+                TArray<AActor*> HorrorArray;
+                UGameplayStatics::GetAllActorsOfClass(this, ABDAICharacter::StaticClass(), HorrorArray);
+                if (Cast<IBDHorrorInterface>(HorrorArray[0])->Scream(HorrorScore))
+                {
+                    for (int32 i = 0; i < HorrorArray.Num() - 1; i++)
+                    {
+                        Cast<IBDHorrorInterface>(HorrorArray[i])->Scream(HorrorScore);
+                    }
+                }
+                else
+                {
+                    StartUpHorrorEvent();
+                }
+                break;
+            }
+            case 5:
+            {
+                // pig
+
+                break;
+            }
+            default:
+            {
+                break;
+                == == == =
+>>>>>>> main
+            }
         }
-        default:
-        {
-            break;
-        }
-    }
 }
 
 void UBDHorrorManager::PlayHorrorEvent(IBDHorrorInterface* InterfaceActor)
 {
-    if (!InterfaceActor->Scream(HorrorScore))
-    {
-        StartUpHorrorEvent();
-    }
+    // if (!InterfaceActor->Scream(HorrorScore))
+    //{
+    //     StartUpHorrorEvent();
+    // }
 }

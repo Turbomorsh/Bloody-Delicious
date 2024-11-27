@@ -138,22 +138,10 @@ void ABDAICharacter::Hide()
         Hint = nullptr;
     }
 }
-bool ABDAICharacter::Scream(int32 HorrorValue)
+void ABDAICharacter::Scream()
 {
-    if (HorrorValue >= WhisperScreamCost && HorrorValue < PigScreamCost)
-    {
-        WhisperScream();
-        return true;
-    }
-    else if (HorrorValue >= PigScreamCost)
-    {
-        PigScream();
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    WhisperScream();
+    PigScream();
 }
 
 bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
