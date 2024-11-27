@@ -57,9 +57,15 @@ void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorror
     HorrorScore += InAntiHorrorScore;
     FineScore += InFineScore;
 
+    HorrorLimit += 5;
+    FTimerHandle Handle;
+    FTimerDelegate Delegate;
+    Delegate.BindUFunction(this, "StartUpHorrorEvent", HorrorScore);
+    GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, ScreamDelayTime, false);
+
     UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorScore %i, FineScore %i"), HorrorScore, FineScore);
 
-    StartUpHorrorEvent(HorrorScore);
+    // StartUpHorrorEvent(HorrorScore);
 }
 
 void UBDHorrorManager::StartUpHorrorEvent(int32 NewHorrorScore)
