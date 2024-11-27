@@ -27,6 +27,10 @@ void ABDGrill::Scream()
 {
     HorrorMode = true;
 }
+void ABDGrill::DisableScream()
+{
+    HorrorMode = true;
+}
 
 void ABDGrill::BeginPlay()
 {

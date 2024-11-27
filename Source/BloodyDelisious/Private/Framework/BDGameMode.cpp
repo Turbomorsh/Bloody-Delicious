@@ -176,12 +176,6 @@ void ABDGameMode::SpawnGroupController()
     const auto BDGroupAIController = GetWorld()->SpawnActor<AAIController>(GroupAIControllerClass, SpawnInfo);
 }
 
-// for test visibility manager
-void ABDGameMode::VisibilitiManagerLog()
-{
-    VisibilityManager->CameraLog();
-}
-
 void ABDGameMode::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);

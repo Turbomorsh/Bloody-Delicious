@@ -51,6 +51,8 @@ public:
 
     virtual void Scream() override;
 
+    virtual void DisableScream() override;
+
     EFoodType PartType;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sockets)

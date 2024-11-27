@@ -17,6 +17,7 @@ class BLOODYDELISIOUS_API ABDBlood : public APaperSpriteActor, public IBDHorrorI
 
 public:
     virtual void Scream() override;
+    virtual void DisableScream() override;
 
 protected:
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)

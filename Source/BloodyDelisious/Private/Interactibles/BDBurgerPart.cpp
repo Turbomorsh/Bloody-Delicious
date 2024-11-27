@@ -29,6 +29,7 @@ void ABDBurgerPart::Scream()
 {
     AlterTransform();
 }
+void ABDBurgerPart::DisableScream() {}
 
 void ABDBurgerPart::AlterTransform()
 {

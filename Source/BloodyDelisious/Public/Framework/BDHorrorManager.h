@@ -39,6 +39,9 @@ protected:
 
     void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
 
+    UFUNCTION()
+    void DisableHorrorEvent(TArray<AActor*> HorroredActors);
+
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
     TMap<TSubclassOf<AActor>, int32> HorrorMap;
 
@@ -50,5 +53,8 @@ protected:
     int32 ResistansScore = 0;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
-    float DelayTime = 1.f;
+    float ScreamDelayTime = 1.f;
+
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
+    float NormalDelayTime = 1.f;
 };

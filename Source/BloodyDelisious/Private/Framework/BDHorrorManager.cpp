@@ -26,7 +26,7 @@ void UBDHorrorManager::AddScore(int InScore)
         FTimerHandle Handle;
         FTimerDelegate Delegate;
         Delegate.BindUFunction(this, "StartUpHorrorEvent");
-        GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, DelayTime, false);
+        GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, ScreamDelayTime, false);
     }
 }
 void UBDHorrorManager::RemoveScore(int InScore)
@@ -68,6 +68,11 @@ void UBDHorrorManager::StartUpHorrorEvent()
                 CastedActor->Scream();
             }
         }
+
+        FTimerHandle Handle;
+        FTimerDelegate Delegate;
+        Delegate.BindUFunction(this, "DisableHorrorEvent", HorrorActors);
+        GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, NormalDelayTime, false);
     }
 }
 
@@ -77,4 +82,14 @@ void UBDHorrorManager::PlayHorrorEvent(IBDHorrorInterface* InterfaceActor)
     //{
     //     StartUpHorrorEvent();
     // }
+}
+void UBDHorrorManager::DisableHorrorEvent(TArray<AActor*> HorroredActors)
+{
+    for (AActor* HorrorActor : HorroredActors)
+    {
+        if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
+        {
+            CastedActor->DisableScream();
+        }
+    }
 }

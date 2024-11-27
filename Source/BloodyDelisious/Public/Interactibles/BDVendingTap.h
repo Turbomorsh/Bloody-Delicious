@@ -25,6 +25,7 @@ public:
     virtual void Interact(TObjectPtr<UObject> Object) override;
 
     virtual void Scream() override;
+    virtual void DisableScream() override;
 
     virtual void Tick(float DeltaTime) override;
 

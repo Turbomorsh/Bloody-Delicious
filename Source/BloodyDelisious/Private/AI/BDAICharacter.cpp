@@ -143,6 +143,10 @@ void ABDAICharacter::Scream()
     WhisperScream();
     PigScream();
 }
+void ABDAICharacter::DisableScream()
+{
+    PigHead->SetVisibility(true);
+}
 
 bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 {

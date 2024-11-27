@@ -51,6 +51,7 @@ public:
     virtual void Hide() override;
 
     virtual void Scream() override;
+    virtual void DisableScream() override;
 
 protected:
     // Called when the game starts or when spawned

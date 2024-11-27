@@ -44,6 +44,10 @@ void ABDVendingTap::Scream()
 {
     HorrorMode = true;
 }
+void ABDVendingTap::DisableScream()
+{
+    HorrorMode = false;
+}
 
 void ABDVendingTap::BeginPlay()
 {

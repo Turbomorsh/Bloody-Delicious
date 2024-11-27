@@ -39,9 +39,6 @@ public:
 
     virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
-    UFUNCTION(BlueprintCallable)
-    void VisibilitiManagerLog();  // for test visibility manager
-
     virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -59,7 +56,7 @@ protected:
     FGameData GameData;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror Manager")
-    const TSubclassOf<UBDHorrorManager> HorrorManagerClass;
+    TSubclassOf<UBDHorrorManager> HorrorManagerClass;
 
     UPROPERTY()
     TObjectPtr<UBDHorrorManager> HorrorManagerReference;
@@ -70,6 +67,7 @@ private:
     int32 RoundCountDown = 0;
     FTimerHandle GameRoundTimerHandle;
 
+    UPROPERTY()
     TArray<AActor*> TargetActors;  // for test visibility manager
 
     void SetGameState(EBDGameState State);

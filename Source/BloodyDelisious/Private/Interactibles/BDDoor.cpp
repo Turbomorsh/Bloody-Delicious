@@ -68,6 +68,7 @@ void ABDDoor::Scream()
 {
     DoorCreak();
 }
+void ABDDoor::DisableScream() {}
 
 // Called when the game starts or when spawned
 void ABDDoor::BeginPlay()

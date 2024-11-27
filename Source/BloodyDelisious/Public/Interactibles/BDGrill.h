@@ -24,6 +24,7 @@ public:
     virtual void Interact(TObjectPtr<UObject> Object) override;
 
     virtual void Scream() override;
+    virtual void DisableScream() override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)

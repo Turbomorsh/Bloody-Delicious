@@ -33,6 +33,7 @@ public:
     virtual void Hide() override;
 
     virtual void Scream() override;
+    virtual void DisableScream() override;
 
     void MakeOrder();
     void OnOutside();
