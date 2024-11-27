@@ -32,23 +32,6 @@ void UBDGameplayWidget::UnSubscribeFromNPCTimers(ABDAICharacter* NPC)
     }
 }
 
-void UBDGameplayWidget::SubscribeToNPCPhrases(ABDAICharacter* NPC)
-{
-    if (!NPC) return;
-
-    CustomerPhraseHandle = NPC->OnCustomerPhraseSay.AddUObject(this, &ThisClass::OnPhraseSay);
-    Phrase_TextBlock->SetVisibility(ESlateVisibility::Visible);
-}
-
-void UBDGameplayWidget::UnSubscribeToNPCPhrases(ABDAICharacter* NPC)
-{
-    if (NPC && CustomerPhraseHandle.IsValid())
-    {
-        NPC->OnCustomerPhraseSay.Remove(CustomerPhraseHandle);
-        Phrase_TextBlock->SetVisibility(ESlateVisibility::Collapsed);
-    }
-}
-
 void UBDGameplayWidget::OnTimerChanged(float TimeRemaning, EBDCustomerTimers InETimer)
 {
     switch (InETimer)
@@ -71,11 +54,6 @@ void UBDGameplayWidget::OnTimerChanged(float TimeRemaning, EBDCustomerTimers InE
     {
         UnSubscribeFromNPCTimers(CurrentNPC);
     }
-}
-
-void UBDGameplayWidget::OnPhraseSay(FText InPhrase, bool bIsActive)
-{
-    Phrase_TextBlock->SetText(InPhrase);
 }
 
 void UBDGameplayWidget::ShowTransitionInfo(bool bShow)

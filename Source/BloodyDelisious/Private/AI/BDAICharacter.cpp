@@ -213,7 +213,7 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
     }
     else  // order wrong
     {
-        OnCustomerPhraseSay.Broadcast(FText::FromString("That's not what I ordered."), true);
+        //"That's not what I ordered."
         UE_LOG(LogBDAICharacter, Display, TEXT("Wrong order"));
     }
 }
@@ -248,21 +248,19 @@ void ABDAICharacter::Ordering()
     }
 
     StartCustomerTimer(EBDCustomerTimers::Pending);
-
-    GetGameplayWidget()->SubscribeToNPCPhrases(this);
 }
 
 void ABDAICharacter::OrderAccepted()
 {
     StartCustomerTimer(EBDCustomerTimers::Cooking);
-    OnCustomerPhraseSay.Broadcast(FText::FromString("Ok! I'll wait!"), true);
+    //"Ok! I'll wait!"
 }
 
 void ABDAICharacter::OrderReady()
 {
     /// stop CookingTimer
     CustomerTimerEnd(EBDCustomerTimers::Cooking);
-    OnCustomerPhraseSay.Broadcast(FText::FromString("O-o-oh!!! My burger!!!"), true);
+    //"O-o-oh!!! My burger!!!"
 
     // add HorrorScore
     if (HorrorManagerPtr)
@@ -280,7 +278,7 @@ void ABDAICharacter::OrderReady()
 void ABDAICharacter::Eating()
 {
     bIsEat = true;
-    OnCustomerPhraseSay.Broadcast(FText::FromString("All correct! Good! Bye!"), true);
+    //"All correct! Good! Bye!"
     GetWorldTimerManager().SetTimer(EatTimerHandle, this, &ThisClass::EatingTimeOut, TimeToEat, false);
 }
 
@@ -300,8 +298,7 @@ void ABDAICharacter::Leaving()
         UE_LOG(LogBDAICharacter, Error, TEXT("HorrorManager error"));
     }
 
-    OnCustomerPhraseSay.Broadcast(FText::FromString("Bye!"), true);
-    GetGameplayWidget()->UnSubscribeToNPCPhrases(this);
+    //"Bye!"
 }
 
 void ABDAICharacter::MakeOrder()

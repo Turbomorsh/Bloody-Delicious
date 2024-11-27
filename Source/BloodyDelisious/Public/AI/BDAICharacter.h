@@ -16,7 +16,6 @@ class UBDInteractionHintWidget;
 class UBDGameplayWidget;
 class UBehaviorTree;
 class UBDHorrorManager;
-class UUserWidget;
 class UBDOrderWidget;
 class UWidgetComponent;
 
@@ -46,7 +45,6 @@ public:
     FOnCustomerOutsideSignature OnCustomerOutside;
     FOnCustomerStateChangedSignature OnCustomerStateChanged;
     FOnCustomerTimerChangedSignature OnCustomerTimerChanged;
-    FOnCustomerTextSaySignature OnCustomerPhraseSay;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
     TObjectPtr<UBehaviorTree> BehsaviorTreeAsset;

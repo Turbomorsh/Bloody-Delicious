@@ -22,12 +22,7 @@ public:
     void SubscribeToNPCTimers(ABDAICharacter* NPC);
     void UnSubscribeFromNPCTimers(ABDAICharacter* NPC);
 
-    void SubscribeToNPCPhrases(ABDAICharacter* NPC);
-    void UnSubscribeToNPCPhrases(ABDAICharacter* NPC);
-
     void OnTimerChanged(float TimeRemaning, EBDCustomerTimers InETimer);
-
-    void OnPhraseSay(FText InPhrase, bool bIsActive);
 
     void ShowTransitionInfo(bool bShow);
 
@@ -42,13 +37,9 @@ protected:
     FLinearColor CookingColor = FLinearColor::Red;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-    UTextBlock* Phrase_TextBlock;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
     UTextBlock* Transition_TextBlock;
 
 private:
     ABDAICharacter* CurrentNPC;
     FDelegateHandle CustomerTimerChangedHandle;
-    FDelegateHandle CustomerPhraseHandle;
 };
