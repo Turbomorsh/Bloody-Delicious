@@ -33,15 +33,16 @@ void ABDGameMode::StartPlay()
     {
         HorrorManager = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
     }
+
+    CurrentRound = 1;
+    SpawnGroupController();
+    StartRound();
+
     if (HorrorManager)
     {
         HorrorManager->InitializeHorrorActors();
         UE_LOG(LogBDGameMode, Display, TEXT("HorrorManager init"));
     }
-
-    CurrentRound = 1;
-    SpawnGroupController();
-    StartRound();
 
     OnGameDataChanged.Broadcast(RoundCountDown);
 

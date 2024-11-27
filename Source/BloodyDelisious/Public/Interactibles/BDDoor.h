@@ -58,6 +58,9 @@ protected:
     virtual void BeginPlay() override;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mesh)
+    TObjectPtr<UStaticMeshComponent> OutDoorMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mesh)
     TObjectPtr<UStaticMeshComponent> DoorMesh;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mesh)

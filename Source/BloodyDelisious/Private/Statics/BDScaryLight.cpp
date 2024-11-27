@@ -13,16 +13,16 @@ ABDScaryLight::ABDScaryLight()
     Scene = CreateDefaultSubobject<USceneComponent>("Root");
     SetRootComponent(Scene);
 
-    SpotLight = CreateDefaultSubobject<USpotLightComponent>("SpotLight1");
+    SpotLight = CreateDefaultSubobject<USpotLightComponent>("SpotLight");
     SpotLight->SetupAttachment(GetRootComponent());
 
-    SpotLight1 = CreateDefaultSubobject<USpotLightComponent>("SpotLight2");
+    SpotLight1 = CreateDefaultSubobject<USpotLightComponent>("SpotLight1");
     SpotLight1->SetupAttachment(GetRootComponent());
 
-    SpotLight2 = CreateDefaultSubobject<USpotLightComponent>("SpotLight3");
+    SpotLight2 = CreateDefaultSubobject<USpotLightComponent>("SpotLight2");
     SpotLight2->SetupAttachment(GetRootComponent());
 
-    SpotLight3 = CreateDefaultSubobject<USpotLightComponent>("SpotLight4");
+    SpotLight3 = CreateDefaultSubobject<USpotLightComponent>("SpotLight3");
     SpotLight3->SetupAttachment(GetRootComponent());
 }
 
@@ -46,48 +46,9 @@ void ABDScaryLight::SetupLight()
     LightComponents.Add(SpotLight3);
 }
 
-void ABDScaryLight::LightOffOneTime(float Delay)
-{
-    // for(int32 i = 0; i < LightComponents.Num(); i++)
-    //{
-    FTimerHandle LightHandle;
-    FTimerDelegate LightDelegate;
+void ABDScaryLight::LightOffOneTime_Implementation(float Delay) {}
 
-    LightDelegate.BindUFunction(this, "ChangeLightStateWithCout", SpotLight, 0, Delay);
-    GetWorldTimerManager().SetTimer(LightHandle, LightDelegate, Delay, false);
-    //}
-}
-
-void ABDScaryLight::LightOffDelayed(float Delay, int32 Times)
-{
-    // for(int32 i = 0; i < LightComponents.Num(); i++)
-    //{
-    FTimerHandle LightHandle;
-    FTimerDelegate LightDelegate;
-
-    LightDelegate.BindUFunction(this, "ChangeLightStateWithCout", SpotLight, Times, Delay);
-    GetWorldTimerManager().SetTimer(LightHandle, LightDelegate, Delay, false);
-    //}
-}
-
-void ABDScaryLight::ChangeLightStateWithCout(USpotLightComponent* InSpotlight, int32 Cout, float Delay)
-{
-    if (InSpotlight)
-    {
-        InSpotlight->SetVisibility(!InSpotlight->IsVisible());
-    }
-
-    if (Cout > 0)
-    {
-        Cout--;
-
-        FTimerHandle LightHandle;
-        FTimerDelegate LightDelegate;
-
-        LightDelegate.BindUFunction(this, "ChangeLightStateWithCout", Cout, Delay);
-        GetWorldTimerManager().SetTimer(LightHandle, LightDelegate, Delay, false);
-    }
-}
+void ABDScaryLight::LightOffDelayed_Implementation(float Delay, int32 Times) {}
 
 // Called every frame
 void ABDScaryLight::Tick(float DeltaTime)

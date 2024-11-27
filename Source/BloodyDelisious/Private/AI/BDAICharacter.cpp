@@ -144,9 +144,11 @@ void ABDAICharacter::Scream()
     WhisperScream();
     PigScream();
 }
+
 void ABDAICharacter::DisableScream()
 {
     PigHead->SetVisibility(true);
+    if (NormalMaterial) GetMesh()->SetMaterial(0, NormalMaterial);
 }
 
 bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
@@ -525,6 +527,7 @@ void ABDAICharacter::SetOrderData(TObjectPtr<UBDBurgerTypeDataAsset> InOrder)
 void ABDAICharacter::PigScream()
 {
     PigHead->SetVisibility(true);
+    if (PigMaterial) GetMesh()->SetMaterial(0, PigMaterial);
 }
 
 void ABDAICharacter::WhisperScream()

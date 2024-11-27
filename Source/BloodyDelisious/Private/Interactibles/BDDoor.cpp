@@ -17,6 +17,9 @@ ABDDoor::ABDDoor()
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
+    OutDoorMesh = CreateDefaultSubobject<UStaticMeshComponent>("OutDoor");
+    SetRootComponent(OutDoorMesh);
+
     DoorSocket = CreateDefaultSubobject<USceneComponent>("SceneComponent");
     DoorSocket->SetupAttachment(RootComponent);
 

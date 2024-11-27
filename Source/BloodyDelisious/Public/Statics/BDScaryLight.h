@@ -21,6 +21,14 @@ public:
     virtual void Scream() override;
     virtual void DisableScream() override;
 
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+    void LightOffOneTime(float Delay = 0.2f);
+    void LightOffOneTime_Implementation(float Delay = 0.2f);
+
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+    void LightOffDelayed(float Delay = 0.2f, int32 Times = 5);
+    void LightOffDelayed_Implementation(float Delay = 0.2f, int32 Times = 5);
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -46,15 +54,6 @@ protected:
     TObjectPtr<USpotLightComponent> SpotLight3;
 
     void SetupLight();
-
-    UFUNCTION()
-    void LightOffOneTime(float Delay = 0.2f);
-
-    UFUNCTION(BlueprintCallable)
-    void LightOffDelayed(float Delay = 0.2f, int32 Times = 5);
-
-    UFUNCTION()
-    void ChangeLightStateWithCout(USpotLightComponent* InSpotlight, int32 Cout, float Delay);
 
 public:
     // Called every frame

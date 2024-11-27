@@ -119,6 +119,12 @@ protected:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Horror")
     TObjectPtr<UStaticMeshComponent> PigHead;
 
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Horror")
+    TObjectPtr<UMaterialInstance> PigMaterial;
+
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Horror")
+    TObjectPtr<UMaterialInstance> NormalMaterial;
+
     virtual void BeginPlay() override;
 
     bool PlayDialogue(TArray<FText> Dialogue, int32 Page);
