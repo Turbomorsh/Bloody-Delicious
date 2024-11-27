@@ -27,6 +27,8 @@ public:
     int32 GetFineScore() { return FineScore; };
     int32 GetFineLimit() { return FineLimit; };
 
+    void InitializeHorrorActors();
+
 protected:
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror")
     TMap<TSubclassOf<AActor>, int32> HorrorMap;
@@ -41,11 +43,12 @@ protected:
     float DelayTime = 1.f;
 
     UFUNCTION()
-    void StartUpHorrorEvent();
+    void StartUpHorrorEvent(int32 NewHorrorScore);
 
     void PlayHorrorEvent(IBDHorrorInterface* InterfaceActor);
     void OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore);
 
+<<<<<<< Updated upstream
     UFUNCTION()
     void DisableHorrorEvent(TArray<AActor*> HorroredActors);
 
@@ -58,6 +61,8 @@ protected:
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
     float NormalDelayTime = 1.f;
 
-    int32 HorrorScore = 0;
+    == == == = private :
+>>>>>>> Stashed changes
+        int32 HorrorScore = 0;
     int32 FineScore = 0;
 };

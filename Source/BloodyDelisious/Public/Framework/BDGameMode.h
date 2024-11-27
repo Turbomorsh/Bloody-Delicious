@@ -29,7 +29,7 @@ public:
     FGameData GetGameData() const { return GameData; }
     int32 GetCurrentRoundNum() const { return CurrentRound; }
     int32 GetRuondSecondsRemaning() const { return RoundCountDown; }
-    TObjectPtr<UBDHorrorManager> GetHorrorManager() { return HorrorManagerReference; };
+    TObjectPtr<UBDHorrorManager> GetHorrorManager() { return HorrorManager; };
 
     UPROPERTY()
     UBDVisibilityManager* VisibilityManager;  // visibility manager
@@ -64,7 +64,7 @@ protected:
     TSubclassOf<ABDCassete> CasseteToWin;
 
     UPROPERTY()
-    TObjectPtr<UBDHorrorManager> HorrorManagerReference;
+    TObjectPtr<UBDHorrorManager> HorrorManager;
 
 private:
     EBDGameState GameState = EBDGameState::Waiting;

@@ -25,7 +25,14 @@ void ABDGameMode::StartPlay()
 {
     Super::StartPlay();
 
-    if (HorrorManagerClass) HorrorManagerReference = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
+    if (HorrorManagerClass)
+    {
+        HorrorManager = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
+    }
+    if (HorrorManager)
+    {
+        HorrorManager->InitializeHorrorActors();
+    }
 
     CurrentRound = 1;
     SpawnGroupController();
@@ -90,12 +97,12 @@ void ABDGameMode::GameTimerUpdate()
 
 bool ABDGameMode::IsLimitsOver()
 {
-    if (!HorrorManagerReference) return false;
+    if (!HorrorManager) return false;
     // get screem scores
-    int32 HScore = HorrorManagerReference->GetHorrorScore();
-    int32 HLimit = HorrorManagerReference->GetHorrorLimit();
-    int32 FScore = HorrorManagerReference->GetFineScore();
-    int32 FLimit = HorrorManagerReference->GetFineLimit();
+    int32 HScore = HorrorManager->GetHorrorScore();
+    int32 HLimit = HorrorManager->GetHorrorLimit();
+    int32 FScore = HorrorManager->GetFineScore();
+    int32 FLimit = HorrorManager->GetFineLimit();
 
     bool IsHorrorLimitOver = HScore >= HLimit;
     bool IsFineLimitOver = FScore >= FLimit;
