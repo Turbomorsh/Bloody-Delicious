@@ -48,14 +48,7 @@ void ABDTrashBeen::ClearTray(TObjectPtr<ABDFoodTray> InTray)
     {
         if (ABDPlate* CastedPlate = Cast<ABDPlate>(ThisItem))
         {
-            TArray<AActor*> Burger;
-            CastedPlate->GetAttachedActors(Burger);
-            CastedPlate->Grab(TrashSocket);
-
-            for (AActor* BurgerPart : Burger)
-            {
-                BurgerPart->Destroy();
-            }
+            ClearPlate(CastedPlate);
         }
         else
         {

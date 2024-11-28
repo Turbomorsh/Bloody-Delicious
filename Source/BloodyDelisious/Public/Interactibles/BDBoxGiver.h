@@ -30,7 +30,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)
     TObjectPtr<UStaticMeshComponent> MeshComponent;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Data)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
     TSubclassOf<ABDBox> BoxClass;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
