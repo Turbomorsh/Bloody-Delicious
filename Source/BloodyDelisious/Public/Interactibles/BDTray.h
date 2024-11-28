@@ -30,9 +30,14 @@ public:
 
     void ChangeTrayType(TObjectPtr<UBDFoodPartDataAsset> NewType);
 
+    virtual void Tick(float DeltaTime) override;
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)
-    TObjectPtr<UStaticMeshComponent> MeshComponent;
+    TObjectPtr<UStaticMeshComponent> CapMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Mesh)
+    TObjectPtr<UStaticMeshComponent> TrayMesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
     TObjectPtr<UBDFoodPartDataAsset> FoodDataAsset;

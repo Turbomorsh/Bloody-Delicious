@@ -2,6 +2,7 @@
 
 #include "Interactibles/BDTrashBeen.h"
 
+#include "Interactibles/BDFoodTray.h"
 #include "Interactibles/BDPlate.h"
 
 ABDTrashBeen::ABDTrashBeen()
@@ -18,6 +19,11 @@ void ABDTrashBeen::Interact(TObjectPtr<UObject> Object)
     {
         ClearPlate(CastedPlate);
     }
+
+    if (TObjectPtr<ABDFoodTray> CastedTray = Cast<ABDFoodTray>(Object))
+    {
+        ClearTray(CastedTray);
+    }
 }
 void ABDTrashBeen::ClearPlate(TObjectPtr<ABDPlate> InPlate)
 {
@@ -31,4 +37,31 @@ void ABDTrashBeen::ClearPlate(TObjectPtr<ABDPlate> InPlate)
     }
 
     InPlate->Destroy();
+}
+void ABDTrashBeen::ClearTray(TObjectPtr<ABDFoodTray> InTray)
+{
+    TArray<AActor*> Items;
+    InTray->GetAttachedActors(Items);
+    InTray->Grab(TrashSocket);
+
+    for (AActor* ThisItem : Items)
+    {
+        if (ABDPlate* CastedPlate = Cast<ABDPlate>(ThisItem))
+        {
+            TArray<AActor*> Burger;
+            CastedPlate->GetAttachedActors(Burger);
+            CastedPlate->Grab(TrashSocket);
+
+            for (AActor* BurgerPart : Burger)
+            {
+                BurgerPart->Destroy();
+            }
+        }
+        else
+        {
+            ThisItem->Destroy();
+        }
+    }
+
+    InTray->Destroy();
 }

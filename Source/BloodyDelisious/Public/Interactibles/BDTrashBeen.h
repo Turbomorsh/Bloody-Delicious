@@ -6,6 +6,7 @@
 #include "Interactibles/BDStaticInteractionActor.h"
 #include "BDTrashBeen.generated.h"
 
+class ABDFoodTray;
 class ABDPlate;
 /**
  *
@@ -28,4 +29,6 @@ protected:
     TObjectPtr<UStaticMeshComponent> Mesh;
 
     void ClearPlate(TObjectPtr<ABDPlate> InPlate);
+
+    void ClearTray(TObjectPtr<ABDFoodTray> InTray);
 };
