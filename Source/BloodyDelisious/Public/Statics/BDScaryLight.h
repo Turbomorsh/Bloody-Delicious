@@ -21,7 +21,7 @@ public:
     virtual void Scream() override;
     virtual void DisableScream() override;
 
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+    UFUNCTION(BlueprintNativeEvent)
     void LightOffOneTime(float Delay = 0.2f);
     void LightOffOneTime_Implementation(float Delay = 0.2f);
 

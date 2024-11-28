@@ -8,6 +8,18 @@
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnOrderScoreChangedSignature, int32, int32, int32);
 
+USTRUCT(BlueprintType)
+struct FDelayTime
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Delay", meta = (ClampMin = "0", ClampMax = "10"))
+    float Min = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Delay", meta = (ClampMin = "0", ClampMax = "10"))
+    float Max = 5.0f;
+};
+
 class IBDHorrorInterface;
 class UBDFoodPartDataAsset;
 
@@ -42,6 +54,12 @@ protected:
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Timers")
     float DelayTime = 1.f;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Timers")
+    FDelayTime ScreamTimer;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Timers")
+    FDelayTime NormalTimer;
+
     UFUNCTION()
     void StartUpHorrorEvent(int32 NewHorrorScore);
 
@@ -49,15 +67,6 @@ protected:
 
     UFUNCTION()
     void DisableHorrorEvent(TArray<AActor*> HorroredActors);
-
-    int32 SubmissionScore = 0;
-    int32 ResistansScore = 0;
-
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
-    float ScreamDelayTime = 1.f;
-
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Timers)
-    float NormalDelayTime = 1.f;
 
     int32 HorrorScore = 0;
     int32 FineScore = 0;
