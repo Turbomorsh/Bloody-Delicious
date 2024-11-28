@@ -81,7 +81,7 @@ enum class EBDOrderStates : uint8
 USTRUCT(BlueprintType)
 struct FGameData
 {
-    GENERATED_USTRUCT_BODY()
+    GENERATED_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game",  //
         meta = (ClampMin = "1", ClampMax = "10", ToolTip = "Days count"))
@@ -97,7 +97,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnOrderTextSignature, FText, FText);
 USTRUCT(BlueprintType)
 struct FDialugueData
 {
-    GENERATED_USTRUCT_BODY()
+    GENERATED_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
     TArray<FText> Phrases;

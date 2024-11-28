@@ -4,7 +4,8 @@
 
 #include "Components/SpotLightComponent.h"
 
-// Sets default values
+DEFINE_LOG_CATEGORY_STATIC(LogBDScaryLight, All, All);
+
 ABDScaryLight::ABDScaryLight()
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -26,7 +27,12 @@ ABDScaryLight::ABDScaryLight()
     SpotLight3->SetupAttachment(GetRootComponent());
 }
 
-void ABDScaryLight::Scream() {}
+void ABDScaryLight::Scream()
+{
+    float Dur = FMath::RandRange(1.0f, 3.0f);
+    LightOffDelayed(Dur);
+    UE_LOG(LogBDScaryLight, Display, TEXT("Scream %f"), Dur);
+}
 
 void ABDScaryLight::DisableScream() {}
 
@@ -46,7 +52,10 @@ void ABDScaryLight::SetupLight()
     LightComponents.Add(SpotLight3);
 }
 
-void ABDScaryLight::LightOffOneTime_Implementation(float Delay) {}
+void ABDScaryLight::LightOffOneTime_Implementation(float Delay)
+{
+    // UE_LOG(LogTemp, Log, TEXT("Light turned off after delay: %f"), Delay);
+}
 
 void ABDScaryLight::LightOffDelayed_Implementation(float Delay, int32 Times) {}
 
