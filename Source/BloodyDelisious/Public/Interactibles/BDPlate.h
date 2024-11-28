@@ -19,6 +19,8 @@ class BLOODYDELISIOUS_API ABDPlate : public ABDPickable
 public:
     ABDPlate();
 
+    virtual void Tick(float DeltaTime) override;
+
     void Interact(TObjectPtr<UObject> Object) override;
 
     TArray<TEnumAsByte<EFoodType>> GetBurger();

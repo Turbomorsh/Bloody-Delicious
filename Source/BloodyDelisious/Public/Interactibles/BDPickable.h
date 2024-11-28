@@ -61,6 +61,9 @@ protected:
 
     FVector InitGrabLocation;
 
+    UFUNCTION()
+    void Destruct();
+
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;

@@ -26,6 +26,11 @@ void ABDPlate::BeginPlay()
     Super::BeginPlay();
 }
 
+void ABDPlate::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+}
+
 void ABDPlate::PlaceItem(TObjectPtr<ABDBurgerPart> BurgerPart)
 {
     if (BurgerPart)

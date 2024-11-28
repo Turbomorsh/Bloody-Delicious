@@ -12,8 +12,12 @@ ABDTray::ABDTray()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-    SetRootComponent(MeshComponent);
+    TrayMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+    SetRootComponent(TrayMesh);
+
+    CapMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CapMesh"));
+    CapMesh->SetupAttachment(GetRootComponent());
+    CapMesh->SetVisibility(false);
 }
 
 void ABDTray::Interact(TObjectPtr<UObject> Object)
@@ -26,6 +30,7 @@ void ABDTray::Interact(TObjectPtr<UObject> Object)
             {
                 UsageLeft = MaxUsage;
                 CastedBox->Destroy();
+                CapMesh->SetVisibility(false);
             }
         }
     }
@@ -91,10 +96,20 @@ void ABDTray::TakeItem(TObjectPtr<ABDPlayerCharacter> Player)
         Player->GrabItem(NewFoodPart);
 
         UsageLeft--;
+
+        if (UsageLeft == 0)
+        {
+            CapMesh->SetVisibility(true);
+        }
     }
 }
 
 void ABDTray::ChangeTrayType(TObjectPtr<UBDFoodPartDataAsset> NewType)
 {
     FoodDataAsset = NewType;
+}
+
+void ABDTray::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
 }

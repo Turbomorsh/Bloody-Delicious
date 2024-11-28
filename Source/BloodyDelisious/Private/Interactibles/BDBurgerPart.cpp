@@ -3,6 +3,7 @@
 #include "Interactibles/BDBurgerPart.h"
 
 #include "Interactibles/BDFoodPartDataAsset.h"
+#include "Framework/BDGameMode.h"
 
 ABDBurgerPart::ABDBurgerPart()
 {

@@ -6,6 +6,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/BDPlayerCharacter.h"
 #include "UI/BDInteractionHintWidget.h"
+#include "Framework/BDGameMode.h"
 
 // Sets default values
 ABDPickable::ABDPickable()
@@ -24,7 +25,15 @@ void ABDPickable::BeginPlay()
 {
     Super::BeginPlay();
 
+    Cast<ABDGameMode>(GetWorld()->GetAuthGameMode())->OnRoundStart.AddUFunction(this, "Destruct");
+
     BindTimeLine();
+}
+
+void ABDPickable::Destruct()
+{
+    OnGrabbed.Broadcast();
+    Destroy();
 }
 
 // Called every frame
