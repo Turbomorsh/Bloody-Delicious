@@ -1,7 +1,7 @@
 // Bloody Delisious. All Rights Reserved.
 
 #include "UI/BDGameCompletedWidget.h"
-#include "Components/Button.h"
+#include "UI/BDButton.h"
 #include "Kismet/GameplayStatics.h"
 
 void UBDGameCompletedWidget::NativeOnInitialized()

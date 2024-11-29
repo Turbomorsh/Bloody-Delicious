@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BDMenuWidget.generated.h"
 
-class UButton;
+class UBDButton;
 
 UCLASS()
 class BLOODYDELISIOUS_API UBDMenuWidget : public UUserWidget
@@ -15,10 +15,10 @@ class BLOODYDELISIOUS_API UBDMenuWidget : public UUserWidget
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> StartGameButton;
+    TObjectPtr<UBDButton> StartGameButton;
 
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> CloseGameButton;
+    TObjectPtr<UBDButton> CloseGameButton;
 
     UPROPERTY(EditDefaultsOnly)
     TSoftObjectPtr<UWorld> GameLevel;
