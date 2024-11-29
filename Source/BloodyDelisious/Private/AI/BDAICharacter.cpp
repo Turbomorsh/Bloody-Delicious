@@ -8,7 +8,6 @@
 #include "Interactibles/BDBurgerTypeDataAsset.h"
 #include "Interactibles/BDFoodTray.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/BDDialogueWidget.h"
 #include "UI/BDInteractionHintWidget.h"
 #include "UI/BDGameplayWidget.h"
 #include "UI/BDOrderWidget.h"
@@ -57,14 +56,6 @@ void ABDAICharacter::BeginPlay()
     Super::BeginPlay();
 
     PigHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Head_M");
-
-    // create dialogue widget
-    if (DialogueWidgetClass)
-    {
-        DialogueWidget = CreateWidget<UBDDialogueWidget>(GetWorld()->GetFirstPlayerController(), DialogueWidgetClass);
-        DialogueWidget->AddToViewport();
-        DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
-    }
 
     UE_LOG(LogBDAICharacter, Warning, TEXT("%s"), *PhraseWidgetComponent->GetName());
 
@@ -163,13 +154,7 @@ bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
 {
     if (Page >= InDialogue.Num() && InDialogue.IsEmpty()) return false;
 
-    // show DialogueWidget
-    if (DialogueWidget && Page == 0)
-    {
-        DialogueWidget->SetVisibility(ESlateVisibility::Visible);
-    }
-
-    if (DialogueWidget && Page < InDialogue.Num())
+    if (Page < InDialogue.Num())
     {
         if (InDialogue[Page].ToString().GetCharArray().Num() == 0)
         {
@@ -178,21 +163,20 @@ bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
             FormatArguments.Add(OrderType->OrderName);
 
             // Leave one Dialogue Array field empty to NPC says his order name
-            DialogueWidget->SetText(FText::Join(FText::FromString(TEXT("I want ")), FormatArguments));
+            FText PhraseText = FText::Join(FText::FromString(TEXT("I want ")), FormatArguments);
+            SayPhrase(PhraseText);
             DialoguePage++;
         }
         else
         {
-            DialogueWidget->SetText(InDialogue[Page]);
+            FText PhraseText = InDialogue[Page];
+            SayPhrase(PhraseText);
             DialoguePage++;
         }
     }
 
-    if (Page == InDialogue.Num() && DialogueWidget)
+    if (Page == InDialogue.Num())
     {
-        // hide DialogueWidget
-
-        DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
         DialoguePage = 0;
         SetCustomerState(EBDCustomerStates::OrderAccepted);
 
@@ -529,7 +513,15 @@ void ABDAICharacter::SayPhrase(EBDCustomerStates& NewState)
     if (!PhraseWidget) return;
 
     FText Phrase = GetRandomPhraseForState(NewState, PhrasesMap);
-    PhraseWidget->SetPhrase(Phrase, 2.0f);
+    PhraseWidget->SetPhrase(Phrase, VisibleDuration);
+}
+
+void ABDAICharacter::SayPhrase(FText& InPhrase)
+{
+    const auto PhraseWidget = Cast<UBDPhraseWidget>(PhraseWidgetComponent->GetUserWidgetObject());
+    if (!PhraseWidget) return;
+
+    PhraseWidget->SetPhrase(InPhrase, VisibleDuration);
 }
 
 FText ABDAICharacter::GetRandomPhraseForState(const EBDCustomerStates State, const TMap<EBDCustomerStates, FDialugueData>& InPhrasesMap)
