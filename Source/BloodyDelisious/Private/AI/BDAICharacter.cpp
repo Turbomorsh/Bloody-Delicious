@@ -574,10 +574,22 @@ FText ABDAICharacter::GetOrderDescription(const TArray<TEnumAsByte<EFoodType>>& 
 {
     TArray<FText> IngredientsTexts;
 
-    for (const TEnumAsByte<EFoodType>& Food : inBurger)
+    if (true)  // bIsInvese
     {
-        FText FoodName = UEnum::GetDisplayValueAsText(Food.GetValue());
-        IngredientsTexts.Add(FoodName);
+        for (int32 Index = inBurger.Num() - 1; Index >= 0; --Index)
+        {
+            const TEnumAsByte<EFoodType>& Food = inBurger[Index];
+            FText FoodName = UEnum::GetDisplayValueAsText(Food.GetValue());
+            IngredientsTexts.Add(FoodName);
+        }
+    }
+    else
+    {
+        for (const TEnumAsByte<EFoodType>& Food : inBurger)
+        {
+            FText FoodName = UEnum::GetDisplayValueAsText(Food.GetValue());
+            IngredientsTexts.Add(FoodName);
+        }
     }
 
     return FText::Join(FText::FromString("\n"), IngredientsTexts);
