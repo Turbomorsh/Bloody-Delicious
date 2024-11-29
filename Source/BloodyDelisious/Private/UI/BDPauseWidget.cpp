@@ -1,7 +1,7 @@
 // Bloody Delisious. All Rights Reserved.
 
 #include "UI/BDPauseWidget.h"
-#include "Components/Button.h"
+#include "UI/BDButton.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameModeBase.h"
 

@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BDPauseWidget.generated.h"
 
-class UButton;
+class UBDButton;
 
 UCLASS()
 class BLOODYDELISIOUS_API UBDPauseWidget : public UUserWidget
@@ -15,13 +15,13 @@ class BLOODYDELISIOUS_API UBDPauseWidget : public UUserWidget
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> ResumeButton;
+    TObjectPtr<UBDButton> ResumeButton;
 
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> ResetButton;
+    TObjectPtr<UBDButton> ResetButton;
 
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> MainMenuButton;
+    TObjectPtr<UBDButton> MainMenuButton;
 
     UPROPERTY(EditDefaultsOnly)
     TSoftObjectPtr<UWorld> MenuLevel;

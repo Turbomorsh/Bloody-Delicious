@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BDGameOverWidget.generated.h"
 
-class UButton;
+class UBDButton;
 
 UCLASS()
 class BLOODYDELISIOUS_API UBDGameOverWidget : public UUserWidget
@@ -15,10 +15,10 @@ class BLOODYDELISIOUS_API UBDGameOverWidget : public UUserWidget
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> BackToMenuButton;
+    TObjectPtr<UBDButton> BackToMenuButton;
 
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<UButton> AgainButton;
+    TObjectPtr<UBDButton> AgainButton;
 
     UPROPERTY(EditDefaultsOnly)
     TSoftObjectPtr<UWorld> MenuLevel;

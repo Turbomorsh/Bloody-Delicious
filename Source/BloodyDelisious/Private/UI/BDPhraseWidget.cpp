@@ -8,6 +8,8 @@
 void UBDPhraseWidget::SetPhrase(FText InPhrase, float InDuration)
 {
     Phrase_TextBlock->SetText(InPhrase);
+    Phrase_TextBlock->SetAutoWrapText(true);
+    Phrase_TextBlock->SetWrapTextAt(300.0f);
     SetVisibility(ESlateVisibility::Visible);
 
     FTimerHandle TimerHandle;

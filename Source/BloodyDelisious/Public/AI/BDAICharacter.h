@@ -11,7 +11,6 @@
 #include "BDAICharacter.generated.h"
 
 class UBDBurgerTypeDataAsset;
-class UBDDialogueWidget;
 class UBDInteractionHintWidget;
 class UBDGameplayWidget;
 class UBehaviorTree;
@@ -97,17 +96,14 @@ protected:
     UPROPERTY()
     TObjectPtr<UBDInteractionHintWidget> Hint;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dialogue")
-    TSubclassOf<UBDDialogueWidget> DialogueWidgetClass = nullptr;
-
-    UPROPERTY()
-    TObjectPtr<UBDDialogueWidget> DialogueWidget;
-
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hint")
     FText HintText = FText::FromString("pick cube");
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Phrases")
     TMap<EBDCustomerStates, FDialugueData> PhrasesMap;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI|Phrases")
+    float VisibleDuration = 2.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UWidgetComponent* PhraseWidgetComponent;
@@ -164,6 +160,7 @@ private:
 
     FText GetRandomPhraseForState(const EBDCustomerStates State, const TMap<EBDCustomerStates, FDialugueData>& PhrasesMap);
     void SayPhrase(EBDCustomerStates& NewState);
+    void SayPhrase(FText& InPhrase);
 
     void Hungry();
     void Ordering();
