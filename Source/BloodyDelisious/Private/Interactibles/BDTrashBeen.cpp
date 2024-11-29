@@ -24,6 +24,12 @@ void ABDTrashBeen::Interact(TObjectPtr<UObject> Object)
     {
         ClearTray(CastedTray);
     }
+
+    if (TObjectPtr<ABDBurgerPart> CastedFood = Cast<ABDBurgerPart>(Object))
+    {
+        CastedFood->Grab(TrashSocket);
+        CastedFood->Destroy();
+    }
 }
 void ABDTrashBeen::ClearPlate(TObjectPtr<ABDPlate> InPlate)
 {
