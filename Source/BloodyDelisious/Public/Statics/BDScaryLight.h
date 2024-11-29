@@ -4,58 +4,47 @@
 
 #include "CoreMinimal.h"
 #include "Framework/BDHorrorInterface.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "BDScaryLight.generated.h"
 
-class USpotLightComponent;
-class UPointLightComponent;
+class ULocalLightComponent;
+class UCurveFloat;
+
 UCLASS()
 class BLOODYDELISIOUS_API ABDScaryLight : public AActor, public IBDHorrorInterface
 {
     GENERATED_BODY()
 
 public:
-    // Sets default values for this actor's properties
     ABDScaryLight();
 
     virtual void Scream() override;
     virtual void DisableScream() override;
 
-    UFUNCTION(BlueprintNativeEvent)
-    void LightOffOneTime(float Delay = 0.2f);
-    void LightOffOneTime_Implementation(float Delay = 0.2f);
-
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-    void LightOffDelayed(float Delay = 0.2f, int32 Times = 5);
-    void LightOffDelayed_Implementation(float Delay = 0.2f, int32 Times = 5);
-
 protected:
-    // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Root")
-    TObjectPtr<USceneComponent> Scene;
+    UPROPERTY(EditDefaultsOnly, Category = "Light Control")
+    UCurveFloat* LightIntensityCurve;  // Curve for change in intensity
 
-    TArray<USpotLightComponent*> LightComponents;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Light Control", meta = (ClampMin = "0.1", ClampMax = "10.0"))
+    float FadeOutSpeed = 1.0f;  // light attenuation rate
 
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Timeline")
-    TObjectPtr<UCurveFloat> CurveClass;
+private:
+    TMap<ULocalLightComponent*, float> LightSources;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Light")
-    TObjectPtr<USpotLightComponent> SpotLight;
+    FTimeline LightTimeline;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Light")
-    TObjectPtr<USpotLightComponent> SpotLight1;
+    bool bDecreaseIntensity = true;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Light")
-    TObjectPtr<USpotLightComponent> SpotLight2;
+    UFUNCTION()
+    void OnTimelineTick(float Value);
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Light")
-    TObjectPtr<USpotLightComponent> SpotLight3;
+    void CollectLightSources();
 
-    void SetupLight();
+    void StartLightFade(bool bDecrease);
 
 public:
-    // Called every frame
     virtual void Tick(float DeltaTime) override;
 };
