@@ -78,6 +78,10 @@ protected:
 
     bool HasCassete = false;
 
+    UFUNCTION(BlueprintNativeEvent)
+    void StartFade();
+    void StartFade_Implementation();
+
     UFUNCTION()
     void Move(const FInputActionValue& InputActionValue);
 

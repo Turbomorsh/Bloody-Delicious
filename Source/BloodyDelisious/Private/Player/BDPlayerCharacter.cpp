@@ -7,10 +7,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Framework/BDGameMode.h"
 #include "Interactibles/BDInteract.h"
 #include "Interactibles/BDPickable.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDCharacter, All, All);
 
@@ -55,6 +57,8 @@ void ABDPlayerCharacter::BeginPlay()
         UE_LOG(LogBDCharacter, Display, TEXT("ViewPitchMax: %f | ViewPitchMin: %f"),  //
             PC->PlayerCameraManager->ViewPitchMax, PC->PlayerCameraManager->ViewPitchMin);
     }
+
+    Cast<ABDGameMode>(UGameplayStatics::GetGameMode(this))->OnRoundStart.AddUFunction(this, "StartFade");
 
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
@@ -109,6 +113,8 @@ void ABDPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
         UE_LOG(LogBDCharacter, Error, TEXT("DropAction isn't set!"));
     }
 }
+
+void ABDPlayerCharacter::StartFade_Implementation() {}
 
 void ABDPlayerCharacter::Move(const FInputActionValue& InputActionValue)
 {
