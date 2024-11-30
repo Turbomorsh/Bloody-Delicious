@@ -65,7 +65,6 @@ void ABDGameMode::StartRound()
 
 void ABDGameMode::HandleRoundTransition()
 {
-
     if (IsNextRoundExist() && !IsLimitsOver())
     {
         ++CurrentRound;

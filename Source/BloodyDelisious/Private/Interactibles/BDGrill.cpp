@@ -25,11 +25,11 @@ void ABDGrill::Interact(TObjectPtr<UObject> Object)
 }
 void ABDGrill::Scream()
 {
-    HorrorMode = true;
+    bIsHorrorMode = true;
 }
 void ABDGrill::DisableScream()
 {
-    HorrorMode = true;
+    bIsHorrorMode = false;
 }
 
 void ABDGrill::BeginPlay()
@@ -54,7 +54,7 @@ void ABDGrill::StartCookOverlapped(UPrimitiveComponent* OverlappedComponent, AAc
         {
             if (CookingParts.Num() == 1)
             {
-                AudioComponent->SetSound(HorrorMode ? ScreamSound : CookSound);
+                AudioComponent->SetSound(bIsHorrorMode ? ScreamSound : CookSound);
                 AudioComponent->Play();
             }
         }

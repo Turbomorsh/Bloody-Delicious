@@ -65,8 +65,9 @@ protected:
 
     void OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorrorScore, int32 InFineScore);
 
-    UFUNCTION()
-    void DisableHorrorEvent(TArray<AActor*> HorroredActors);
+    void ActivateHorrorActor(AActor* HorrorActor, bool bWasActive, TMap<AActor*, bool>& ActorActivationStatus);
+
+    void DeactivateHorrorActor(AActor* HorrorActor, bool bWasActive, TMap<AActor*, bool>& ActorActivationStatus);
 
     int32 HorrorScore = 0;
     int32 FineScore = 0;

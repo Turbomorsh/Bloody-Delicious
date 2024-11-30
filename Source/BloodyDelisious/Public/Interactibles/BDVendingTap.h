@@ -66,7 +66,7 @@ protected:
     FRotator InitialRotator;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horror)
-    bool HorrorMode = false;
+    bool bIsHorrorMode = false;
 
     virtual void BeginPlay() override;
 

@@ -72,7 +72,7 @@ protected:
     float TimeToPendingOrder = 5.0f;  // in sec
 
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "120"))
-    float TimeToCooking = 15.0f;  // in sec
+    float TimeToCooking = 75.0f;  // in sec
 
     UPROPERTY(EditDefaultsOnly, Category = "AI|Timers", meta = (ClampMin = "0", ClampMax = "1"))
     float TimerUpdateInterval = 0.1f;
