@@ -7,6 +7,7 @@
 #include "Framework/BDCoreTypes.h"
 #include "BDGameHUD.generated.h"
 
+class UBDDayDelimiterWidget;
 class UBDGameplayWidget;
 class UBDGameOverWidget;
 class UBDPauseWidget;
@@ -32,6 +33,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "UI")
     TSubclassOf<UBDGameCompletedWidget> GameCompletedWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<UBDDayDelimiterWidget> DayDelimiterClass;
 
     virtual void BeginPlay() override;
 

@@ -85,10 +85,12 @@ private:
     bool IsLimitsOver();
 
     void SpawnGroupController();
+    UFUNCTION()
     void StartRound();
     void HandleRoundTransition();
     void GameTimerUpdate();
 
+    UFUNCTION()
     void ResetOnePlayer(AController* Controller);
 
     FTransform GetCasseteSpawnTransform();

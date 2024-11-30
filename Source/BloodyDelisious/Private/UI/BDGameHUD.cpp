@@ -5,6 +5,7 @@
 #include "UI/BDPauseWidget.h"
 #include "UI/BDGameCompletedWidget.h"
 #include "UI/BDGameOverWidget.h"
+#include "UI/BDDayDelimiterWidget.h"
 #include "Framework/BDGameMode.h"
 #include "Framework/BDUtils.h"
 
@@ -16,6 +17,7 @@ void ABDGameHUD::BeginPlay()
     GameWidgets.Add(EBDGameState::GamePause, CreateWidget<UBDPauseWidget>(GetWorld(), PauseWidgetClass));
     GameWidgets.Add(EBDGameState::GameCompleted, CreateWidget<UBDGameCompletedWidget>(GetWorld(), GameCompletedWidgetClass));
     GameWidgets.Add(EBDGameState::GameOver, CreateWidget<UBDGameOverWidget>(GetWorld(), GameOverWidgetClass));
+    GameWidgets.Add(EBDGameState::Waiting, CreateWidget<UBDDayDelimiterWidget>(GetWorld(), DayDelimiterClass));
 
     for (auto& [UIState, GameWidget] : GameWidgets)
     {
@@ -44,6 +46,10 @@ void ABDGameHUD::OnGameStateChanged(EBDGameState State)
         CurrentWidget = GameWidgets[State];
         CurrentWidget->SetVisibility(ESlateVisibility::Visible);
     }
+
+    GameWidgets[EBDGameState::GameInProgress]->SetVisibility(
+        State == EBDGameState::Waiting ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+
     bool bShowCursor = State != EBDGameState::GameInProgress && State != EBDGameState::Waiting;
     WorldUtils::SetUIInput(GetWorld(), bShowCursor);
 
