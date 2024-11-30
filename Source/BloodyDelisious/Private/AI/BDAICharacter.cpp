@@ -106,6 +106,7 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
         {
             UE_LOG(LogBDAICharacter, Display, TEXT("Dialogue over"));
             Character->GetCharacterMovement()->SetDefaultMovementMode();
+            SetCustomerState(EBDCustomerStates::OrderAccepted);
         }
     }
 
@@ -178,7 +179,6 @@ bool ABDAICharacter::PlayDialogue(TArray<FText> InDialogue, int32 Page)
     if (Page == InDialogue.Num())
     {
         DialoguePage = 0;
-        SetCustomerState(EBDCustomerStates::OrderAccepted);
 
         return false;
     }
@@ -220,6 +220,13 @@ void ABDAICharacter::Ordering()
     }
     UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *OrderType->OrderName.ToString());
 
+    StartCustomerTimer(EBDCustomerTimers::Pending);
+}
+
+void ABDAICharacter::OrderAccepted()
+{
+    StartCustomerTimer(EBDCustomerTimers::Cooking);
+
     // order widget subscribe
     if (OrderWidget)
     {
@@ -231,12 +238,6 @@ void ABDAICharacter::Ordering()
         UE_LOG(LogBDAICharacter, Warning, TEXT("OrderWidget isn't setup!"));
     }
 
-    StartCustomerTimer(EBDCustomerTimers::Pending);
-}
-
-void ABDAICharacter::OrderAccepted()
-{
-    StartCustomerTimer(EBDCustomerTimers::Cooking);
     //"Ok! I'll wait!"
 }
 
