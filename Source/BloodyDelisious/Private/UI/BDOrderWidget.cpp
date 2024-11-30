@@ -20,7 +20,7 @@ void UBDOrderWidget::SetOrderText(FText InTitle, FText InDescription)
 
 void UBDOrderWidget::HandleVisibility(EBDCustomerStates State)
 {
-    if (State == EBDCustomerStates::Ordering)
+    if (State == EBDCustomerStates::OrderAccepted)
     {
         if (GetVisibility() != ESlateVisibility::Visible)
         {
