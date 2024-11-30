@@ -6,6 +6,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBDAIController, All, All);
+
 ABDAIController::ABDAIController()
 {
     BDAIPerceptionComponent = CreateDefaultSubobject<UBDAIPerceptionComponent>("BDPerceptionComponent");
@@ -16,15 +18,14 @@ void ABDAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
-    UE_LOG(LogTemp, Warning, TEXT("%s  OnPossess"), *InPawn->GetName());
+    UE_LOG(LogBDAIController, Display, TEXT("%s  OnPossess"), *InPawn->GetName());
     const auto AICharacter = Cast<ABDAICharacter>(InPawn);
     if (AICharacter)
     {
         RunBehaviorTree(AICharacter->BehsaviorTreeAsset);
-        // AICharacter->OnCustomerOutside.AddUObject(this, &ThisClass::StopBehavior);
-        UE_LOG(LogTemp, Warning, TEXT("%s  RunBehavior"), *AICharacter->GetName());
+
+        UE_LOG(LogBDAIController, Display, TEXT("%s  RunBehavior"), *AICharacter->GetName());
     }
-    // BrainComponent->StopLogic(TEXT("Paused Behavior Tree"));
 }
 
 void ABDAIController::Tick(float DelataTime)

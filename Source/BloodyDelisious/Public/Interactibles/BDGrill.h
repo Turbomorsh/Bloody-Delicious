@@ -65,7 +65,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Sounds)
     TObjectPtr<USoundBase> CookSound;
 
-    bool HorrorMode;
+    bool bIsHorrorMode;
 
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Horror)
     int32 HorrorCost = 2;

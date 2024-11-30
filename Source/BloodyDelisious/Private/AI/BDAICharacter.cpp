@@ -57,7 +57,7 @@ void ABDAICharacter::BeginPlay()
 
     PigHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Head_M");
 
-    UE_LOG(LogBDAICharacter, Warning, TEXT("%s"), *PhraseWidgetComponent->GetName());
+    UE_LOG(LogBDAICharacter, Display, TEXT("%s"), *PhraseWidgetComponent->GetName());
 
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
@@ -147,7 +147,7 @@ void ABDAICharacter::Scream()
 
 void ABDAICharacter::DisableScream()
 {
-    PigHead->SetVisibility(true);
+    PigHead->SetVisibility(false);
     if (NormalMaterial) GetMesh()->SetMaterial(0, NormalMaterial);
 }
 
@@ -273,7 +273,7 @@ void ABDAICharacter::Leaving()
     if (HorrorManagerPtr && !bIsEat)
     {
         HorrorManagerPtr->OnOrderScoreChanged.Broadcast(0, 0, Order.FineScore);
-        if (Order.HorrorScore > 0)
+        if (Order.HorrorScore >= 0)
         {
             HorrorManagerPtr->OnOrderScoreChanged.Broadcast(0, Order.AntiHorrorScore, 0);
         }
@@ -314,7 +314,7 @@ void ABDAICharacter::OnOutside()
     SetCustomerState(EBDCustomerStates::None);
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     OnCustomerOutside.Broadcast();
-    UE_LOG(LogBDAICharacter, Warning, TEXT("Customer %s Outside"), *GetName());
+    UE_LOG(LogBDAICharacter, Display, TEXT("Customer %s Outside"), *GetName());
 }
 
 UBDGameplayWidget* ABDAICharacter::GetGameplayWidget() const

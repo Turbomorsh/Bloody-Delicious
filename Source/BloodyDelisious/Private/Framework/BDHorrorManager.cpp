@@ -39,8 +39,8 @@ void UBDHorrorManager::InitializeHorrorActors()
             if (HorrorActor)
             {
                 HorrorActors.Add(HorrorActor, RequiredScore);
-                UE_LOG(LogBDHorrorManager, Display, TEXT("Added HorrorActor %s with RequiredScore %d"), *HorrorActor->GetName(),
-                    RequiredScore);
+                UE_LOG(LogBDHorrorManager, Display, TEXT("Added HorrorActor %s with RequiredScore %d"),  //
+                    *HorrorActor->GetName(), RequiredScore);
             }
         }
     }
@@ -62,40 +62,63 @@ void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorror
     Delegate.BindUFunction(this, "StartUpHorrorEvent", HorrorScore);
     GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, FMath::RandRange(ScreamTimer.Min, ScreamTimer.Max), false);
 
-    UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorScore %i, FineScore %i"), HorrorScore, FineScore);
-
-    // StartUpHorrorEvent(HorrorScore);
+    UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorScore %i, FineScore %i, InAntiHorrorScore %i"),  //
+        HorrorScore, FineScore, InAntiHorrorScore);
 }
 
 void UBDHorrorManager::StartUpHorrorEvent(int32 NewHorrorScore)
 {
+    static TMap<AActor*, bool> ActorActivationStatus;
+
     for (const auto& Pair : HorrorActors)
     {
         AActor* HorrorActor = Pair.Key;
         int32 RequiredScore = Pair.Value;
 
+        // check status activate
+        bool bWasActive = ActorActivationStatus.FindRef(HorrorActor);
+
         if (NewHorrorScore >= RequiredScore)
         {
-            if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
-            {
-                CastedActor->Scream();
-                UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorActor of class %s screamed!"), *HorrorActor->GetName());
-            }
-            else
-            {
-                UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorActor does not implement IBDHorrorInterface!"));
-            }
+            ActivateHorrorActor(HorrorActor, bWasActive, ActorActivationStatus);
+        }
+        else
+        {
+            DeactivateHorrorActor(HorrorActor, bWasActive, ActorActivationStatus);
         }
     }
 }
 
-void UBDHorrorManager::DisableHorrorEvent(TArray<AActor*> HorroredActors)
+void UBDHorrorManager::ActivateHorrorActor(AActor* HorrorActor, bool bWasActive, TMap<AActor*, bool>& ActorActivationStatus)
 {
-    for (AActor* HorrorActor : HorroredActors)
+    if (bWasActive) return;
+
+    if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
     {
-        if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
-        {
-            CastedActor->DisableScream();
-        }
+        CastedActor->Scream();
+        ActorActivationStatus.Add(HorrorActor, true);
+
+        UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorActor %s activated (Scream)."), *HorrorActor->GetName());
+    }
+    else
+    {
+        UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorActor %s does not implement IBDHorrorInterface!"), *HorrorActor->GetName());
+    }
+}
+
+void UBDHorrorManager::DeactivateHorrorActor(AActor* HorrorActor, bool bWasActive, TMap<AActor*, bool>& ActorActivationStatus)
+{
+    if (!bWasActive) return;
+
+    if (IBDHorrorInterface* CastedActor = Cast<IBDHorrorInterface>(HorrorActor))
+    {
+        CastedActor->DisableScream();
+        ActorActivationStatus.Add(HorrorActor, false);
+
+        UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorActor %s deactivated (Disable)."), *HorrorActor->GetName());
+    }
+    else
+    {
+        UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorActor %s does not implement IBDHorrorInterface!"), *HorrorActor->GetName());
     }
 }

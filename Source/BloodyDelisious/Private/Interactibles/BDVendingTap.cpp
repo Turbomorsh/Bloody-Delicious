@@ -40,11 +40,11 @@ void ABDVendingTap::Interact(TObjectPtr<UObject> Object)
 }
 void ABDVendingTap::Scream()
 {
-    HorrorMode = true;
+    bIsHorrorMode = true;
 }
 void ABDVendingTap::DisableScream()
 {
-    HorrorMode = false;
+    bIsHorrorMode = false;
 }
 
 void ABDVendingTap::BeginPlay()
@@ -93,7 +93,7 @@ void ABDVendingTap::TakeCup(TObjectPtr<ABDCup> InCup)
     InCup->Type = DrinkType;
     InCup->OnGrabbed.AddDynamic(this, &ABDVendingTap::ClearCup);
     InCup->SetActorEnableCollision(true);
-    if (ScreamSound && PourSound) UGameplayStatics::PlaySoundAtLocation(this, HorrorMode ? ScreamSound : PourSound, GetActorLocation());
+    if (ScreamSound && PourSound) UGameplayStatics::PlaySoundAtLocation(this, bIsHorrorMode ? ScreamSound : PourSound, GetActorLocation());
 }
 void ABDVendingTap::ClearCup()
 {

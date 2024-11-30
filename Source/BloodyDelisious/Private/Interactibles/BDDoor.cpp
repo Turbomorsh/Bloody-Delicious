@@ -11,10 +11,8 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDDoor, All, All);
 
-// Sets default values
 ABDDoor::ABDDoor()
 {
-    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
     OutDoorMesh = CreateDefaultSubobject<UStaticMeshComponent>("OutDoor");
@@ -55,7 +53,7 @@ void ABDDoor::Hide()
 
 void ABDDoor::ToggleOpenDoor()
 {
-    if (DoorState != EDoorStates::Locked && !Timeline.IsPlaying())
+    if (DoorState != EDoorStates::Locked && !Timeline.IsPlaying())  //
     {
         if (DoorState == EDoorStates::Closed)
         {
@@ -81,12 +79,10 @@ void ABDDoor::ToggleOpenDoor()
 void ABDDoor::Scream()
 {
     ToggleOpenDoor();
-    // DoorCreak();
 }
 
 void ABDDoor::DisableScream() {}
 
-// Called when the game starts or when spawned
 void ABDDoor::BeginPlay()
 {
     Super::BeginPlay();
@@ -123,7 +119,6 @@ void ABDDoor::TimelineProgress(float Alpha)
         DoorSocket->GetRelativeRotation().Roll));
 }
 
-// Called every frame
 void ABDDoor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
