@@ -171,10 +171,20 @@ void ABDGameMode::GameOver()
     if (Character->GetHaveCassete() && !IsNextRoundExist())
     {
         SetGameState(EBDGameState::GameCompleted);
+
+        if (!GoodLevel.IsNull())
+        {
+            UGameplayStatics::OpenLevel(GetWorld(), FName(GoodLevel.GetAssetName()));
+        }
     }
     else
     {
         SetGameState(EBDGameState::GameOver);
+
+        if (!BadLevel.IsNull())
+        {
+            UGameplayStatics::OpenLevel(GetWorld(), FName(BadLevel.GetAssetName()));
+        }
     }
 }
 

@@ -27,8 +27,13 @@ void UBDGameCompletedWidget::OnBackToMenu()
 
 void UBDGameCompletedWidget::OnAgain()
 {
-    const FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(this);
-    UGameplayStatics::OpenLevel(this, FName(CurrentLevelName));
+    // const FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(this);
+    // UGameplayStatics::OpenLevel(this, FName(CurrentLevelName));
+
+    if (!GameLevel.IsNull())
+    {
+        UGameplayStatics::OpenLevel(GetWorld(), FName(GameLevel.GetAssetName()));
+    }
 }
 
 void UBDGameCompletedWidget::OnVisibility(ESlateVisibility InVisibility)

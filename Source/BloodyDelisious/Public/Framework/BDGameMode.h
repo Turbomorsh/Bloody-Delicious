@@ -66,6 +66,12 @@ protected:
     UPROPERTY()
     TObjectPtr<UBDHorrorManager> HorrorManager;
 
+    UPROPERTY(EditDefaultsOnly)
+    TSoftObjectPtr<UWorld> GoodLevel;
+
+    UPROPERTY(EditDefaultsOnly)
+    TSoftObjectPtr<UWorld> BadLevel;
+
 private:
     EBDGameState GameState = EBDGameState::Waiting;
     int32 CurrentRound = 1;

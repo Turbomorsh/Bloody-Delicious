@@ -26,6 +26,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
     TObjectPtr<USoundBase> GameOverSound;
 
+    UPROPERTY(EditDefaultsOnly)
+    TSoftObjectPtr<UWorld> GameLevel;
+
     virtual void NativeOnInitialized() override;
 
 private:
