@@ -124,6 +124,18 @@ void ABDGrill::Cook(ABDBurgerPart* BurgerPart)
                 StartCook(BurgerPart);
                 break;
             }
+            case EFoodType::AlterMeat:
+            {
+                if (AlterMeetTransformation) BurgerPart->ChangeType(AlterMeetTransformation);
+                StartCook(BurgerPart);
+                break;
+            }
+            case EFoodType::AlterCookedMeat:
+            {
+                if (CookedAlterMeetTransformation) BurgerPart->ChangeType(CookedAlterMeetTransformation);
+                StartCook(BurgerPart);
+                break;
+            }
             default:
             {
                 break;
