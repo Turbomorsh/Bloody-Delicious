@@ -102,8 +102,11 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Phrases")
     TMap<EBDCustomerStates, FDialugueData> PhrasesMap;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Phrases")
+    TArray<FText> WrongOrderPhrases;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI|Phrases")
-    float VisibleDuration = 2.0f;
+    float VisibleDuration = 3.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UWidgetComponent* PhraseWidgetComponent;
