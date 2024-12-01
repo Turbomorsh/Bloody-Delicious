@@ -16,13 +16,7 @@ void UBDMenuWidget::NativeOnInitialized()
     CloseGameButton->OnClicked.AddDynamic(this, &ThisClass::OnCloseGame);
 }
 
-void UBDMenuWidget::OnStartGame()
-{
-    if (!GameLevel.IsNull())
-    {
-        UGameplayStatics::OpenLevel(GetWorld(), FName(GameLevel.GetAssetName()));
-    }
-}
+void UBDMenuWidget::OnStartGame_Implementation() {}
 
 void UBDMenuWidget::OnCloseGame()
 {
