@@ -26,6 +26,8 @@ public:
     TMap<TSubclassOf<APawn>, int32> CustomersTypeByNum;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI|Customers")
     TMap<TSubclassOf<APawn>, int32> EvilCustomersTypeByNum;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI|Customers")
+    FDelayTime CustomerVisitTimer;
 
     void InitializeCustomerGroup(
         const TMap<TSubclassOf<APawn>, int32>& GroupData, TArray<AAIController*>& ControllersArray, TArray<APawn*>& PawnsGroup);
@@ -40,11 +42,13 @@ protected:
     void OnRoundEnd();
 
 private:
-    AActor* GetRandomPlayerStartByTag();
-
+    FTimerHandle CustomerVisitHandle;
     bool bIsRoundEnd = false;
     TArray<AAIController*> CustomerControllers;
     TArray<AAIController*> EvilControllers;
     TArray<APawn*> CustomerPawns;
     TArray<APawn*> EvilPawns;
+
+    AActor* GetRandomPlayerStartByTag();
+    void SetRandomVisitTimer();
 };

@@ -4,23 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Framework/BDCoreTypes.h"
 #include "BDHorrorManager.generated.h"
 
 class ABDManager;
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnOrderScoreChangedSignature, int32, int32, int32);
-
-USTRUCT(BlueprintType)
-struct FDelayTime
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Delay", meta = (ClampMin = "0", ClampMax = "10"))
-    float Min = 0.0f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Delay", meta = (ClampMin = "0", ClampMax = "10"))
-    float Max = 5.0f;
-};
-
 class IBDHorrorInterface;
 class UBDFoodPartDataAsset;
 

@@ -29,7 +29,7 @@ void ABDGroupAIController::BeginPlay()
 void ABDGroupAIController::OnRoundStart()
 {
     bIsRoundEnd = false;
-    ActivateRandomCharacter();
+    SetRandomVisitTimer();
 }
 
 void ABDGroupAIController::OnRoundEnd()
@@ -72,7 +72,7 @@ void ABDGroupAIController::InitializeCustomerGroup(
             const auto BDAICustomer = GetWorld()->SpawnActor<ABDAICharacter>(PawnClass, SpawnLocation, SpawnRotation, SpawnPawnInfo);
             UE_LOG(LogBDGroupAIController, Display, TEXT("AIPawn successfully created: %s"), *BDAICustomer->GetName());
 
-            BDAICustomer->OnCustomerOutside.AddUObject(this, &ThisClass::ActivateRandomCharacter);
+            BDAICustomer->OnCustomerOutside.AddUObject(this, &ThisClass::SetRandomVisitTimer);
             PawnsGroup.Add(BDAICustomer);
 
             if (BDAIController)
@@ -82,6 +82,14 @@ void ABDGroupAIController::InitializeCustomerGroup(
             }
         }
     }
+}
+
+void ABDGroupAIController::SetRandomVisitTimer()
+{
+    const float RandomInterval = FMath::RandRange(CustomerVisitTimer.Min, CustomerVisitTimer.Max);
+    UE_LOG(LogBDGroupAIController, Display, TEXT("RandomInterval %s "), *LexToSanitizedString(RandomInterval));
+
+    GetWorldTimerManager().SetTimer(CustomerVisitHandle, this, &ThisClass::ActivateRandomCharacter, RandomInterval, false);
 }
 
 void ABDGroupAIController::ActivateRandomCharacter()

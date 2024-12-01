@@ -102,3 +102,17 @@ struct FDialugueData
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
     TArray<FText> Phrases;
 };
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnOrderScoreChangedSignature, int32, int32, int32);
+
+USTRUCT(BlueprintType)
+struct FDelayTime
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Delay", meta = (ClampMin = "0", ClampMax = "120"))
+    float Min = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Delay", meta = (ClampMin = "0", ClampMax = "120"))
+    float Max = 5.0f;
+};
