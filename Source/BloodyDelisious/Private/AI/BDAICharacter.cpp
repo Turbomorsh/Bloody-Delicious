@@ -197,7 +197,13 @@ void ABDAICharacter::TryGetOrder(TObjectPtr<ABDFoodTray> InOrder)
     }
     else  // order wrong
     {
-        //"That's not what I ordered."
+        FText Phrase = FText::FromString("That's not what I ordered!");
+        if (!WrongOrderPhrases.IsEmpty())
+        {
+            WrongOrderPhrases.Add(Phrase);
+            Phrase = WrongOrderPhrases[FMath::RandRange(0, WrongOrderPhrases.Num() - 1)];
+        }
+        SayPhrase(Phrase);
         UE_LOG(LogBDAICharacter, Display, TEXT("Wrong order"));
     }
 }
