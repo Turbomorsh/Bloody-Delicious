@@ -99,6 +99,12 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hint")
     FText HintText = FText::FromString("pick cube");
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Note)
+    FText AlterHintText = FText::FromString("");
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
+    TSubclassOf<AActor> AnotherHintTrigger = nullptr;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Phrases")
     TMap<EBDCustomerStates, FDialugueData> PhrasesMap;
 
