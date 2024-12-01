@@ -7,6 +7,7 @@
 #include "Interactibles/BDFoodPartDataAsset.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BDPlayerCharacter.h"
+#include "UI/BDInteractionHintWidget.h"
 
 ABDTray::ABDTray()
 {
@@ -24,6 +25,8 @@ void ABDTray::Interact(TObjectPtr<UObject> Object)
 {
     if (UsageLeft == 0)
     {
+        Hint->SetText(FText::FromString("Empty"));
+
         if (TObjectPtr<ABDBox> CastedBox = Cast<ABDBox>(Object))
         {
             if (CastedBox->PartType == FoodDataAsset->Type)

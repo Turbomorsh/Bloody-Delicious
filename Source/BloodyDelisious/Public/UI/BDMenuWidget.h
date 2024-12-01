@@ -25,10 +25,11 @@ protected:
 
     virtual void NativeOnInitialized() override;
 
-private:
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintNativeEvent)
     void OnStartGame();
+    void OnStartGame_Implementation();
 
+private:
     UFUNCTION(BlueprintCallable)
     void OnCloseGame();
 };
