@@ -3,6 +3,8 @@
 #include "Framework/BDHorrorManager.h"
 
 #include "AI/BDAICharacter.h"
+#include "AI/BDManager.h"
+#include "Framework/BDGameMode.h"
 #include "Interactibles/BDDoor.h"
 #include "Interactibles/BDVendingTap.h"
 #include "Kismet/GameplayStatics.h"
@@ -14,6 +16,16 @@ DEFINE_LOG_CATEGORY_STATIC(LogBDHorrorManager, All, All);
 UBDHorrorManager::UBDHorrorManager()
 {
     OnOrderScoreChanged.AddUObject(this, &ThisClass::OrderScoreChanged);
+}
+
+void UBDHorrorManager::StartUpManager()
+{
+    if (ManagerClass)
+    {
+        FActorSpawnParameters SpawnParams;
+        FTransform SpawnTransform = FTransform(FVector(0));
+        ManagerRef = Cast<ABDManager>(UGameplayStatics::GetActorOfClass(this, ManagerClass));
+    }
 }
 
 void UBDHorrorManager::InitializeHorrorActors()
@@ -64,6 +76,11 @@ void UBDHorrorManager::OrderScoreChanged(int32 InHorrorScore, int32 InAntiHorror
 
     UE_LOG(LogBDHorrorManager, Display, TEXT("HorrorScore %i, FineScore %i, InAntiHorrorScore %i"),  //
         HorrorScore, FineScore, InAntiHorrorScore);
+
+    if (InFineScore > 0 && ManagerRef)
+    {
+        CallManager();
+    }
 }
 
 void UBDHorrorManager::StartUpHorrorEvent(int32 NewHorrorScore)
@@ -121,4 +138,23 @@ void UBDHorrorManager::DeactivateHorrorActor(AActor* HorrorActor, bool bWasActiv
     {
         UE_LOG(LogBDHorrorManager, Warning, TEXT("HorrorActor %s does not implement IBDHorrorInterface!"), *HorrorActor->GetName());
     }
+}
+
+void UBDHorrorManager::CallManager()
+{
+    if (ManagerRef)
+    {
+        ACharacter* CharRef = UGameplayStatics::GetPlayerCharacter(this, 0);
+        ManagerRef->SetOrientation();
+        ManagerRef->PlayDialogue();
+    }
+}
+
+void UBDHorrorManager::KillPlayer()
+{
+    ManagerRef->Kill();
+    FTimerHandle Handle;
+    FTimerDelegate Delegate;
+    Delegate.BindUFunction(Cast<ABDGameMode>(UGameplayStatics::GetGameMode(this)), "GameOver");
+    GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, 10, false);
 }

@@ -26,7 +26,7 @@ public:
     ABDAICharacter();
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
-    virtual void Show() override;
+    virtual void Show(TObjectPtr<UObject> InObject) override;
     virtual void Hide() override;
 
     virtual void Scream() override;

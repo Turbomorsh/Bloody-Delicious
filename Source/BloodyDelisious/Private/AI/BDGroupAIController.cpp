@@ -5,6 +5,7 @@
 #include "Framework/BDGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "BrainComponent.h"
+#include "AI/BDManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBDGroupAIController, All, All);
 

@@ -32,6 +32,7 @@ void ABDGameMode::StartPlay()
     if (HorrorManagerClass)
     {
         HorrorManager = NewObject<UBDHorrorManager>(this, HorrorManagerClass);
+        HorrorManager->StartUpManager();
     }
 
     CurrentRound = 1;
@@ -88,7 +89,8 @@ void ABDGameMode::HandleRoundTransition()
     }
     else
     {
-        GameOver();
+        // GameOver();
+        HorrorManager->KillPlayer();
     }
 }
 

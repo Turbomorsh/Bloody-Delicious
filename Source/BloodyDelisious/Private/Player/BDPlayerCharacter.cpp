@@ -196,7 +196,14 @@ void ABDPlayerCharacter::InteractionRaycast()
     if (UKismetSystemLibrary::DoesImplementInterface(OutHit.GetActor(), UBDInteract::StaticClass()))
     {
         InteractibleObj = OutHit.GetActor();
-        Cast<IBDInteract>(InteractibleObj)->Show();
+        if (HandledObj)
+        {
+            Cast<IBDInteract>(InteractibleObj)->Show(HandledObj);
+        }
+        else
+        {
+            Cast<IBDInteract>(InteractibleObj)->Show(ItemSocket);
+        }
     }
 }
 

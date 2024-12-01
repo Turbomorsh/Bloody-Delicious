@@ -22,6 +22,9 @@ public:
     virtual void Scream() override;
     virtual void DisableScream() override;
 
+    UFUNCTION(BlueprintCallable)
+    void StartLightFade(bool bDecrease);
+
 protected:
     virtual void BeginPlay() override;
 
@@ -42,8 +45,6 @@ private:
     void OnTimelineTick(float Value);
 
     void CollectLightSources();
-
-    void StartLightFade(bool bDecrease);
 
 public:
     virtual void Tick(float DeltaTime) override;

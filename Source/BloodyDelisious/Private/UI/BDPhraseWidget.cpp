@@ -16,6 +16,17 @@ void UBDPhraseWidget::SetPhrase(FText InPhrase, float InDuration)
     GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::HideWidget, InDuration, false);
 }
 
+void UBDPhraseWidget::SetPhraseWrapEditable(FText InPhrase, float InDuration, float InWrap)
+{
+    Phrase_TextBlock->SetText(InPhrase);
+    Phrase_TextBlock->SetAutoWrapText(true);
+    Phrase_TextBlock->SetWrapTextAt(InWrap);
+    SetVisibility(ESlateVisibility::Visible);
+
+    FTimerHandle TimerHandle;
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::HideWidget, InDuration, false);
+}
+
 void UBDPhraseWidget::HideWidget()
 {
     SetVisibility(ESlateVisibility::Hidden);

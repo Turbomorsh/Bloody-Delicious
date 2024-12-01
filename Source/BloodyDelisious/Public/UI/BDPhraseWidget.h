@@ -16,6 +16,9 @@ class BLOODYDELISIOUS_API UBDPhraseWidget : public UUserWidget
 public:
     void SetPhrase(FText InPhrase, float InDuration);
 
+    UFUNCTION(BlueprintCallable)
+    void SetPhraseWrapEditable(FText InPhrase, float InDuration, float InWrap);
+
 protected:
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UTextBlock> Phrase_TextBlock;

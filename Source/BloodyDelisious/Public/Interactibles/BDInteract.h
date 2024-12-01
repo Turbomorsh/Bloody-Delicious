@@ -23,7 +23,7 @@ class BLOODYDELISIOUS_API IBDInteract
 public:
     virtual void Interact(TObjectPtr<UObject> Object = nullptr) = 0;
 
-    virtual void Show() = 0;
+    virtual void Show(TObjectPtr<UObject> InObject = nullptr) = 0;
 
     virtual void Hide() = 0;
 };

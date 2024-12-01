@@ -18,7 +18,7 @@ public:
     ABDStaticInteractionActor();
 
     virtual void Interact(TObjectPtr<UObject> Object) override;
-    virtual void Show() override;
+    virtual void Show(TObjectPtr<UObject> InObject) override;
     virtual void Hide() override;
 
 protected:
@@ -33,6 +33,12 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Note)
     FText HintText = FText::FromString("pick cube");
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Note)
+    FText AlterHintText = FText::FromString("");
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
+    TSubclassOf<AActor> AnotherHintTrigger = nullptr;
 
 public:
     // Called every frame

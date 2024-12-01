@@ -13,13 +13,23 @@ ABDStaticInteractionActor::ABDStaticInteractionActor()
 }
 void ABDStaticInteractionActor::Interact(TObjectPtr<UObject> Object) {}
 
-void ABDStaticInteractionActor::Show()
+void ABDStaticInteractionActor::Show(TObjectPtr<UObject> InObject)
 {
     if (HintWidgetClass && !Hint)
     {
-        Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
-        Hint->AddToViewport();
-        Hint->SetText(HintText);
+        if (Cast<USceneComponent>(InObject))
+        {
+            Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
+            Hint->AddToViewport();
+            Hint->SetText(HintText);
+        }
+        else if (AnotherHintTrigger)
+            if (InObject->IsA(AnotherHintTrigger))
+            {
+                Hint = CreateWidget<UBDInteractionHintWidget>(GetWorld()->GetFirstPlayerController(), HintWidgetClass);
+                Hint->AddToViewport();
+                Hint->SetText(AlterHintText);
+            }
     }
 }
 void ABDStaticInteractionActor::Hide()

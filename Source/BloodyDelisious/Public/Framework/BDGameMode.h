@@ -79,6 +79,7 @@ private:
     FTimerHandle GameRoundTimerHandle;
 
     void SetGameState(EBDGameState State);
+    UFUNCTION()
     void GameOver();
     void GameComplete();
     bool IsNextRoundExist() { return CurrentRound + 1 <= GameData.RoundsNum; };

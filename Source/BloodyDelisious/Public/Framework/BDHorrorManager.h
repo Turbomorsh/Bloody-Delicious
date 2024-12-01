@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "BDHorrorManager.generated.h"
 
+class ABDManager;
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnOrderScoreChangedSignature, int32, int32, int32);
 
 USTRUCT(BlueprintType)
@@ -31,6 +32,8 @@ class BLOODYDELISIOUS_API UBDHorrorManager : public UObject
 public:
     UBDHorrorManager();
 
+    void StartUpManager();
+
     FOnOrderScoreChangedSignature OnOrderScoreChanged;
 
     int32 GetHorrorScore() { return HorrorScore; };
@@ -41,7 +44,14 @@ public:
 
     void InitializeHorrorActors();
 
+    void KillPlayer();
+
 protected:
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Manager")
+    TSubclassOf<ABDManager> ManagerClass;
+
+    TObjectPtr<ABDManager> ManagerRef;
+
     UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Horror")
     TMap<TSubclassOf<AActor>, int32> HorrorMap;
 
@@ -68,6 +78,8 @@ protected:
     void ActivateHorrorActor(AActor* HorrorActor, bool bWasActive, TMap<AActor*, bool>& ActorActivationStatus);
 
     void DeactivateHorrorActor(AActor* HorrorActor, bool bWasActive, TMap<AActor*, bool>& ActorActivationStatus);
+
+    void CallManager();
 
     int32 HorrorScore = 0;
     int32 FineScore = 0;

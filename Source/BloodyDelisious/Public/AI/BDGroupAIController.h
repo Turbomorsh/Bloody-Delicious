@@ -7,6 +7,7 @@
 #include "Framework/BDCoreTypes.h"
 #include "BDGroupAIController.generated.h"
 
+class ABDManager;
 UCLASS()
 class BLOODYDELISIOUS_API ABDGroupAIController : public AAIController
 {

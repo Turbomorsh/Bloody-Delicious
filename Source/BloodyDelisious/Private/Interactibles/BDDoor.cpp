@@ -32,7 +32,7 @@ void ABDDoor::Interact(TObjectPtr<UObject> Object)
     ToggleOpenDoor();
 }
 
-void ABDDoor::Show()
+void ABDDoor::Show(TObjectPtr<UObject> InObject)
 {
     if (!Hint && HintWidgetClass)
     {

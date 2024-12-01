@@ -23,7 +23,7 @@ public:
 
     void Interact(TObjectPtr<UObject> Object) override;
 
-    void Show() override;
+    void Show(TObjectPtr<UObject> InObject) override;
 
     void Hide() override;
 
@@ -49,6 +49,12 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Note)
     FText HintText = FText::FromString("pick cube");
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Note)
+    FText AlterHintText = FText::FromString("");
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Note)
+    TSubclassOf<AActor> AnotherHintTrigger = nullptr;
 
     UPROPERTY()
     FTimeline PickableTimeline;

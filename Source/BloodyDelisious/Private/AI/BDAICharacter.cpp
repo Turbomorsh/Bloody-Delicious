@@ -120,7 +120,7 @@ void ABDAICharacter::Interact(TObjectPtr<UObject> Object)
     }
 }
 
-void ABDAICharacter::Show()
+void ABDAICharacter::Show(TObjectPtr<UObject> InObject)
 {
     if (HintWidgetClass && !Hint)
     {
