@@ -11,9 +11,9 @@ void UBDSettingsWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    BindSlider(VolumeSlider, VolumeSoundClass);
     BindSlider(MusicSlider, MusicSoundClass);
     BindSlider(SFXSlider, SFXSoundClass);
+    BindSlider(VolumeSlider, VolumeSoundClass);
 
     InitializeSliderValues();
 }
@@ -36,7 +36,11 @@ void UBDSettingsWidget::InitializeSliderValues()
 
         if (Slider && SoundClass)
         {
-            Slider->SetValue(SoundClass->Properties.Volume);
+            float DefaultVolume = SoundClass->Properties.Volume;
+            Slider->SetValue(DefaultVolume);
+
+            UE_LOG(LogBDSettingsWidget, Display, TEXT("Initialized slider for %s with default volume: %f"), *SoundClass->GetName(),
+                DefaultVolume);
         }
     }
 }
@@ -50,13 +54,15 @@ void UBDSettingsWidget::OnSliderValueChanged(float Value)
 
         if (Slider && SoundClass)
         {
-            float CurrentValue = Slider->GetValue();
-            float VolumeToSet = FMath::Max(CurrentValue, 0.01f);
+            if (FMath::IsNearlyEqual(Slider->GetValue(), Value, KINDA_SMALL_NUMBER))
+            {
+                float VolumeToSet = FMath::Clamp(Value, 0.01f, 1.0f);
+                UBDSoundFuncLib::SetSoundClassVolume(SoundClass, VolumeToSet);
 
-            UBDSoundFuncLib::SetSoundClassVolume(SoundClass, VolumeToSet);
-
-            UE_LOG(
-                LogBDSettingsWidget, Display, TEXT("Updated volume for SoundClass: %s to Value: %f"), *SoundClass->GetName(), VolumeToSet);
+                UE_LOG(LogBDSettingsWidget, Display, TEXT("Updated volume for SoundClass: %s to Value: %f"), *SoundClass->GetName(),
+                    VolumeToSet);
+                break;
+            }
         }
     }
 }
