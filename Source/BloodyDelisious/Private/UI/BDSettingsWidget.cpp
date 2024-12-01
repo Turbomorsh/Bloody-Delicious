@@ -5,10 +5,10 @@
 #include "Sound/SoundClass.h"
 #include "Framework/BDSoundFuncLib.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBDSettingsWidget, All, All)
+
 void UBDSettingsWidget::NativeConstruct()
 {
-    Super::NativeConstruct();
-
     Super::NativeConstruct();
 
     BindSlider(VolumeSlider, VolumeSoundClass);
@@ -22,9 +22,7 @@ void UBDSettingsWidget::BindSlider(USlider* Slider, USoundClass* SoundClass)
 {
     if (Slider && SoundClass)
     {
-
         SliderToSoundClassMap.Add(Slider, SoundClass);
-
         Slider->OnValueChanged.AddDynamic(this, &ThisClass::OnSliderValueChanged);
     }
 }
@@ -53,7 +51,7 @@ void UBDSettingsWidget::OnSliderValueChanged(float Value)
         if (Slider && Slider->GetValue() == Value && SoundClass)
         {
             UBDSoundFuncLib::SetSoundClassVolume(SoundClass, Value);
-            UE_LOG(LogTemp, Log, TEXT("Updated volume for SoundClass: %s to Value: %f"), *SoundClass->GetName(), Value);
+            UE_LOG(LogBDSettingsWidget, Display, TEXT("Updated volume for SoundClass: %s to Value: %f"), *SoundClass->GetName(), Value);
             break;
         }
     }

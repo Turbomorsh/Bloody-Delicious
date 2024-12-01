@@ -3,7 +3,7 @@
 #include "Framework/BDSoundFuncLib.h"
 #include "Sound/SoundClass.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogSTUSoundFuncLib, All, All)
+DEFINE_LOG_CATEGORY_STATIC(LogBDSoundFuncLib, All, All)
 
 void UBDSoundFuncLib::SetSoundClassVolume(USoundClass* SoundClass, float Volume)
 {
@@ -11,8 +11,8 @@ void UBDSoundFuncLib::SetSoundClassVolume(USoundClass* SoundClass, float Volume)
 
     SoundClass->Properties.Volume = FMath::Clamp(Volume, 0.0f, 1.0f);
 
-    UE_LOG(LogSTUSoundFuncLib, Display, TEXT("Sound class %s changed volume to %f"),  //
-        *SoundClass->GetName(),                                                       //
+    UE_LOG(LogBDSoundFuncLib, Display, TEXT("Sound class %s changed volume to %f"),  //
+        *SoundClass->GetName(),                                                      //
         SoundClass->Properties.Volume);
 }
 
