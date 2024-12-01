@@ -25,21 +25,34 @@ void ABDTray::Interact(TObjectPtr<UObject> Object)
 {
     if (UsageLeft == 0)
     {
-        Hint->SetText(FText::FromString("Empty"));
+        if (Hint && !Cast<ABDBox>(Object)) Hint->SetText(FText::FromString("Empty"));
 
         if (TObjectPtr<ABDBox> CastedBox = Cast<ABDBox>(Object))
         {
             if (CastedBox->PartType == FoodDataAsset->Type)
             {
                 UsageLeft = MaxUsage;
+                CastedBox->OnGrabbed.Broadcast();
                 CastedBox->Destroy();
                 CapMesh->SetVisibility(false);
+                Hint->SetText(HintText);
+            }
+            else if (Hint)
+            {
+                Hint->SetText(FText::FromString("Wrong"));
             }
         }
     }
     else if (TObjectPtr<USceneComponent> CastedScene = Cast<USceneComponent>(Object))
     {
         if (TObjectPtr<ABDPlayerCharacter> CastedPlayer = Cast<ABDPlayerCharacter>(CastedScene->GetOwner())) TakeItem(CastedPlayer);
+    }
+    else if (Cast<ABDBox>(Object))
+    {
+        if (Hint)
+        {
+            Hint->SetText(FText::FromString("Not empty yet"));
+        }
     }
 }
 
@@ -53,6 +66,8 @@ void ABDTray::DisableScream() {}
 void ABDTray::BeginPlay()
 {
     Super::BeginPlay();
+
+    UsageLeft = MaxUsage;
 }
 
 void ABDTray::TransformToAlterFood()
@@ -98,7 +113,7 @@ void ABDTray::TakeItem(TObjectPtr<ABDPlayerCharacter> Player)
         NewFoodPart->ChangeType(FoodDataAsset);
         Player->GrabItem(NewFoodPart);
 
-        UsageLeft--;
+        if (!IsInfinite) UsageLeft--;
 
         if (UsageLeft == 0)
         {

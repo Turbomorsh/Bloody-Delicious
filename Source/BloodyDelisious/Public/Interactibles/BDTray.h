@@ -46,6 +46,9 @@ protected:
     TSubclassOf<ABDBurgerPart> FoodClass;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Usage)
+    bool IsInfinite = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Usage)
     int32 MaxUsage = 5;
 
     int32 UsageLeft = 5;

@@ -6,5 +6,5 @@
 
 void UBDInteractionHintWidget::SetText(FText Text)
 {
-    HintText->SetText(Text);
+    if (HintText) HintText->SetText(Text);
 }
