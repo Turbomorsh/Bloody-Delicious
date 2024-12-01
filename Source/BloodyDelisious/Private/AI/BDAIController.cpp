@@ -23,6 +23,7 @@ void ABDAIController::OnPossess(APawn* InPawn)
     if (AICharacter)
     {
         RunBehaviorTree(AICharacter->BehsaviorTreeAsset);
+        AICharacter->OnCustomerStateChanged.AddUObject(this, &ThisClass::SetCustomerFocus);
 
         UE_LOG(LogBDAIController, Display, TEXT("%s  RunBehavior"), *AICharacter->GetName());
     }
@@ -38,7 +39,17 @@ void ABDAIController::Tick(float DelataTime)
 
 TObjectPtr<AActor> ABDAIController::GetFocusOnActor() const
 {
-    if (!GetBlackboardComponent()) return nullptr;
+    if (!GetBlackboardComponent() || !bIsFocusSet) return nullptr;
 
-    return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
+    const auto TargetActor = Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
+    if (TargetActor != nullptr)
+    {
+        UE_LOG(LogBDAIController, Display, TEXT("TargetActor %s  "), *TargetActor->GetName());
+    }
+    return TargetActor;
+}
+
+void ABDAIController::SetCustomerFocus(EBDCustomerStates InState)
+{
+    bIsFocusSet = (InState == EBDCustomerStates::Ordering || InState == EBDCustomerStates::OrderAccepted);
 }

@@ -27,6 +27,9 @@ void UBDTargetActorEnvQueryContext::ProvideContext(FEnvQueryInstance& QueryInsta
         case EBDCustomerStates::Eating:
             FoundActor = GetActorWithTag(TableTag);
             break;
+        case EBDCustomerStates::Ordering:
+            FoundActor = GetActorWithTag(OrderPlaceTag);
+            break;
         case EBDCustomerStates::Leaving:
             FoundActor = GetActorWithTag(OutsidePlaceTag);
             break;

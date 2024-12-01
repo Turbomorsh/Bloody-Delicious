@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Framework/BDCoreTypes.h"
 #include "BDAIController.generated.h"
 
 class UBDAIPerceptionComponent;
@@ -27,5 +28,9 @@ protected:
     virtual void Tick(float DelataTime) override;
 
 private:
+    bool bIsFocusSet = false;
+
     TObjectPtr<AActor> GetFocusOnActor() const;
+
+    void SetCustomerFocus(EBDCustomerStates InState);
 };
