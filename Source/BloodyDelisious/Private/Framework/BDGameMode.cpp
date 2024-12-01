@@ -75,8 +75,16 @@ void ABDGameMode::HandleRoundTransition()
             SpawnCassete();
         }
 
-        ResetOnePlayer(GetWorld()->GetFirstPlayerController());
-        StartRound();
+        SetGameState(EBDGameState::Waiting);
+        FTimerHandle TimerHandle1;
+        FTimerDelegate TimerDelegate1;
+        TimerDelegate1.BindUFunction(this, "ResetOnePlayer", GetWorld()->GetFirstPlayerController());
+        GetWorld()->GetTimerManager().SetTimer(TimerHandle1, TimerDelegate1, 5.f, false);
+
+        FTimerHandle TimerHandle2;
+        FTimerDelegate TimerDelegate2;
+        TimerDelegate2.BindUFunction(this, "StartRound");
+        GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerDelegate2, 5.f, false);
     }
     else
     {
@@ -91,7 +99,6 @@ void ABDGameMode::GameTimerUpdate()
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
 
         // round transition
-        SetGameState(EBDGameState::Waiting);
         OnRoundEnd.Broadcast();
     }
     OnGameDataChanged.Broadcast(GetRuondSecondsRemaning());
@@ -169,7 +176,7 @@ void ABDGameMode::GameOver()
     const auto Character = Cast<ABDPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
     if (Character->GetHaveCassete() && !IsNextRoundExist())
     {
-        SetGameState(EBDGameState::GameCompleted);
+        // SetGameState(EBDGameState::GameCompleted);
 
         if (!GoodLevel.IsNull())
         {
@@ -178,7 +185,7 @@ void ABDGameMode::GameOver()
     }
     else
     {
-        SetGameState(EBDGameState::GameOver);
+        // SetGameState(EBDGameState::GameOver);
 
         if (!BadLevel.IsNull())
         {

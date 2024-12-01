@@ -59,6 +59,7 @@ void ABDPlayerCharacter::BeginPlay()
     }
 
     Cast<ABDGameMode>(UGameplayStatics::GetGameMode(this))->OnRoundStart.AddUFunction(this, "StartFade");
+    Cast<ABDGameMode>(UGameplayStatics::GetGameMode(this))->OnAllCustomerExited.AddUFunction(this, "EndFade");
 
     // set speed
     GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
@@ -115,6 +116,8 @@ void ABDPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 }
 
 void ABDPlayerCharacter::StartFade_Implementation() {}
+
+void ABDPlayerCharacter::EndFade_Implementation() {}
 
 void ABDPlayerCharacter::Move(const FInputActionValue& InputActionValue)
 {

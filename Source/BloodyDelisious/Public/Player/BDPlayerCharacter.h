@@ -82,6 +82,10 @@ protected:
     void StartFade();
     void StartFade_Implementation();
 
+    UFUNCTION(BlueprintNativeEvent)
+    void EndFade();
+    void EndFade_Implementation();
+
     UFUNCTION()
     void Move(const FInputActionValue& InputActionValue);
 

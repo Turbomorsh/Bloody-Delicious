@@ -56,6 +56,12 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
     TObjectPtr<UBDFoodPartDataAsset> CookedMeetTransformation;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
+    TObjectPtr<UBDFoodPartDataAsset> AlterMeetTransformation;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Cooking)
+    TObjectPtr<UBDFoodPartDataAsset> CookedAlterMeetTransformation;
+
     UPROPERTY()
     TObjectPtr<UAudioComponent> AudioComponent;
 
