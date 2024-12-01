@@ -48,11 +48,15 @@ void UBDSettingsWidget::OnSliderValueChanged(float Value)
         USlider* Slider = Pair.Key;
         USoundClass* SoundClass = Pair.Value;
 
-        if (Slider && Slider->GetValue() == Value && SoundClass)
+        if (Slider && SoundClass)
         {
-            UBDSoundFuncLib::SetSoundClassVolume(SoundClass, Value);
-            UE_LOG(LogBDSettingsWidget, Display, TEXT("Updated volume for SoundClass: %s to Value: %f"), *SoundClass->GetName(), Value);
-            break;
+            float CurrentValue = Slider->GetValue();
+            float VolumeToSet = FMath::Max(CurrentValue, 0.01f);
+
+            UBDSoundFuncLib::SetSoundClassVolume(SoundClass, VolumeToSet);
+
+            UE_LOG(
+                LogBDSettingsWidget, Display, TEXT("Updated volume for SoundClass: %s to Value: %f"), *SoundClass->GetName(), VolumeToSet);
         }
     }
 }
