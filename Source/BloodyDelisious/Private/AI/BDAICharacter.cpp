@@ -70,6 +70,8 @@ void ABDAICharacter::BeginPlay()
     InitializeTimers();
 
     OrderWidget = GetOrderWidget();
+
+    SetFoodText();
 }
 
 UBDHorrorManager* ABDAICharacter::GetHorrorManager()
@@ -588,7 +590,8 @@ FText ABDAICharacter::GetOrderDescription(const TArray<TEnumAsByte<EFoodType>>& 
         for (int32 Index = inBurger.Num() - 1; Index >= 0; --Index)
         {
             const TEnumAsByte<EFoodType>& Food = inBurger[Index];
-            FText FoodName = UEnum::GetDisplayValueAsText(Food.GetValue());
+
+            FText FoodName = FoodNames[Food];
             IngredientsTexts.Add(FoodName);
         }
     }
@@ -602,4 +605,29 @@ FText ABDAICharacter::GetOrderDescription(const TArray<TEnumAsByte<EFoodType>>& 
     }
 
     return FText::Join(FText::FromString("\n"), IngredientsTexts);
+}
+
+void ABDAICharacter::SetFoodText()
+{
+    FoodNames.Add(EFoodType::Cheese, FText::FromString("Cheese"));
+    FoodNames.Add(EFoodType::Salad, FText::FromString("Salad"));
+    FoodNames.Add(EFoodType::Tomato, FText::FromString("Tomato"));
+    FoodNames.Add(EFoodType::Cucumber, FText::FromString("Cucumber"));
+    FoodNames.Add(EFoodType::Onion, FText::FromString("Onion"));
+    FoodNames.Add(EFoodType::TopBun, FText::FromString("Top Bun"));
+    FoodNames.Add(EFoodType::TopBurnedBun, FText::FromString("Top Burned Bun"));
+    FoodNames.Add(EFoodType::TopCookedBun, FText::FromString("Top Cooked Bun"));
+    FoodNames.Add(EFoodType::Meat, FText::FromString("Patty"));
+    FoodNames.Add(EFoodType::CookedMeat, FText::FromString("Cooked Patty"));
+    FoodNames.Add(EFoodType::BurnedMeat, FText::FromString("Burned Patty"));
+    FoodNames.Add(EFoodType::SauceYellow, FText::FromString("Mustard"));
+    FoodNames.Add(EFoodType::SauceRed, FText::FromString("Ketchup"));
+    FoodNames.Add(EFoodType::SauceHot, FText::FromString("Chili sauce"));
+    FoodNames.Add(EFoodType::SauceWhite, FText::FromString("Mayonnaise"));
+    FoodNames.Add(EFoodType::AlterMeat, FText::FromString("SPECIAL Patty"));
+    FoodNames.Add(EFoodType::AlterCookedMeat, FText::FromString("SPECIAL Cooked Patty"));
+    FoodNames.Add(EFoodType::AlterCheese, FText::FromString("SPECIAL Cheese"));
+    FoodNames.Add(EFoodType::BottomBun, FText::FromString("Bottom Bun"));
+    FoodNames.Add(EFoodType::BottomBurnedBun, FText::FromString("Bottom Burned Bun"));
+    FoodNames.Add(EFoodType::BottomCookedBun, FText::FromString("Bottom Cooked Bun"));
 }

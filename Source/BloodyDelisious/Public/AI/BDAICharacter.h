@@ -117,6 +117,8 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UWidgetComponent* PhraseWidgetComponent;
 
+    TMap<EFoodType, FText> FoodNames;
+
     FOrderStruct Order;
     int32 DialoguePage = 0;
 
@@ -179,4 +181,6 @@ private:
     void Leaving();
 
     FText GetOrderDescription(const TArray<TEnumAsByte<EFoodType>>& inBurger);
+
+    void SetFoodText();
 };
